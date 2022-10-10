@@ -64,12 +64,9 @@ public class UserHome extends JFrame {
                     obj.setTitle("Student-Login");
                     obj.setVisible(true);
                 }
-                dispose();
-                UserLogin obj = new UserLogin();
-
-                obj.setTitle("Student-Login");
-                obj.setVisible(true);
-
+                else { 
+                
+                }
             }
         });
         btnNewButton.setBounds(247, 118, 491, 114);
