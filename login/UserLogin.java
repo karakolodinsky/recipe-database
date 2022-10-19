@@ -1,85 +1,60 @@
 package login;
 
-import java.awt.Color;
-import java.awt.EventQueue;
-import java.awt.Font;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.AbstractDocument.Content;
 
-import com.jcraft.jsch.*;
 
 public class UserLogin extends JFrame {
 
     private static final long serialVersionUID = 1L;
-    private JTextField textField;
+
+    /**
+     * login window width
+     */
+    public static final int WIDTH_FRAME = 540;
+
+    /**
+     * login window height
+     */
+    public static final int HEIGHT_FRAME = 360;
+
+    /**
+     * wrong password or username error message
+     */
+    private final String errorText = "Wrong username or password";
+
+
+    private JTextField usernameField;
     private JPasswordField passwordField;
     private JButton btnNewButton;
-    private JLabel label;
+    private JLabel label_errorText;
     private JPanel contentPane;
-    String usernameSQL = "ktk4111";
-    String passwordSQL = "tunaSalad103!";
-    String tunnelHost = "starbug.cs.rit.edu";
-    String psqlHost = "localhost";
-    int psqlPort = 5432; 
-    int tunnelPort = 1001;
-    String dbUrl = "jdbc:postgresql://localhost:" + tunnelPort + "/" + "p32002_31";
+    private Insets insets;
 
-    /**
-     * Launch the application.
-     */
-    public static void main(String[] args) {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                        Class.forName("org.postgresql.Driver");  
-                        
-                        String tunnelHost = "starbug.cs.rit.edu";
-                        String psqlHost = "localhost";
-                        int psqlPort = 5432; 
-                        int tunnelPort = 1001;
-                        String usernameSQL = "ktk4111";
-                        String passwordSQL = "tunaSalad103!"; 
-                        JSch jsch = new JSch();
 
-                        Session session = jsch.getSession(usernameSQL, tunnelHost, 22);
-                        session.setPassword(passwordSQL);
-                        session.setConfig("StrictHostKeyChecking", "no");
-                        session.connect();
+    public UserLogin() {
+        super("UserLogin");
+        setResizable(false);
+        setLayout(null);
+        setSize(WIDTH_FRAME, HEIGHT_FRAME);
+        setLocationRelativeTo(null);
+        setLocation(getX() - 80, getY() - 80);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setVisible(true);
 
-                        System.out.println("Connected Successfully");
-                        session.setPortForwardingL(tunnelPort, psqlHost, psqlPort);
-                        System.out.println("Port Forwarded");
+        insets = this.getInsets();
 
-                        System.out.println("connect DB success");
-                    UserLogin frame = new UserLogin();
-                    frame.setVisible(true);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+        init();
+
     }
 
-    /**
-     * Create the frame.
-     */
-    public UserLogin() {
+    private void init() {
+
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(0, 0, 1000, 600);
         setResizable(false);
@@ -101,11 +76,11 @@ public class UserLogin extends JFrame {
         lblNewLabelcred.setBounds(100, 400, 1000, 70);
         contentPane.add(lblNewLabelcred);
 
-        textField = new JTextField();
-        textField.setFont(new Font("Juice ITC", Font.PLAIN, 32));
-        textField.setBounds(481, 170, 281, 68);
-        contentPane.add(textField);
-        textField.setColumns(10);
+        usernameField = new JTextField();
+        usernameField.setFont(new Font("Juice ITC", Font.PLAIN, 32));
+        usernameField.setBounds(481, 170, 281, 68);
+        contentPane.add(usernameField);
+        usernameField.setColumns(10);
 
         passwordField = new JPasswordField();
         passwordField.setFont(new Font("Juice ITC", Font.PLAIN, 32));
@@ -126,40 +101,64 @@ public class UserLogin extends JFrame {
         lblPassword.setBounds(250, 286, 193, 52);
         contentPane.add(lblPassword);
 
+
         btnNewButton = new JButton("login");
         btnNewButton.setFont(new Font("80er Teenie Demo", Font.BOLD, 26));
         btnNewButton.setBounds(545, 392, 162, 73);
         btnNewButton.addActionListener(new ActionListener() {
-
+            @Override
             public void actionPerformed(ActionEvent e) {
-                String userName = textField.getText();
-                String password = passwordField.getText();
-                try {
-                        Connection con = DriverManager.getConnection(dbUrl, usernameSQL, passwordSQL);
-                    PreparedStatement st = (PreparedStatement) con
-                        .prepareStatement("Select username, passwordhash from netizen where username=? and passwordhash=?");
 
-                    st.setString(1, userName);
-                    st.setString(2, password);
-                    ResultSet rs = st.executeQuery();
-                    if (rs.next()) {
-                        dispose();
-                        UserHome ah = new UserHome(userName);
-                        ah.setTitle("Welcome");
-                        ah.setVisible(true);
-                        JOptionPane.showMessageDialog(btnNewButton, "You have successfully logged in");
+                if (usernameField.getText().equals("") || String.valueOf(passwordField.getPassword()).equals("")) {
+                    label_errorText.setText(errorText);
+
+                } else {
+
+                    label_errorText.setText("");
+                    if (DataBase.verifyLogin(usernameField.getText(),
+                            String.valueOf(passwordField.getPassword())) != -1) {
+
+						/*JOptionPane.showMessageDialog(contentPane, "Login successful. Welcome", "Login",
+								JOptionPane.INFORMATION_MESSAGE);*/
+
+                        EventQueue.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                UserLogin.this.dispose();
+                                new UserHome("user");
+                            }
+                        });
+
                     } else {
-                        JOptionPane.showMessageDialog(btnNewButton, "Wrong Username & Password");
+                        label_errorText.setText(errorText);
                     }
-                } catch (SQLException sqlException) {
-                    sqlException.printStackTrace();
-                } 
-                }
-        });
 
+                }
+
+            }
+        });
         contentPane.add(btnNewButton);
 
-        label = new JLabel("");
-        label.setBounds(0, 0, 1008, 562);
-        contentPane.add(label);
-    }}
+        label_errorText = new JLabel();
+        label_errorText.setForeground(Color.RED);
+        label_errorText.setBounds(btnNewButton.getX() - 45, btnNewButton.getY() + 30,
+                170, 30);
+        label_errorText.setFont(new Font("Tahoma", Font.PLAIN + Font.BOLD, 11));
+        contentPane.add(label_errorText);
+
+        setContentPane(contentPane);
+
+    }
+    public static void main(String[] args) {
+        EventQueue.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+
+                new UserLogin();
+
+            }
+        });
+
+    }
+}

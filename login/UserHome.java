@@ -1,48 +1,47 @@
 package login;
 
-import java.awt.Color;
-import java.awt.EventQueue;
-import java.awt.Font;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 public class UserHome extends JFrame {
 
     private static final long serialVersionUID = 1;
+    /**
+     * UserHome window width
+     */
+    public static int WIDTH_FRAME = 960;
+
+    /**
+     * UserHome window height
+     */
+    public static int HEIGHT_FRAME = 960;
+
+    /**
+     * frame edge
+     */
+    public static Insets INSETS;
+
+    private JMenuBar menuBar_menubar;
     private JPanel contentPane;
 
-    /**
-     * Launch the application.
-     */
-    public static void main(String[] args) {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    UserHome frame = new UserHome();
-                    frame.setVisible(true);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+    public UserHome(String usersess){
+        super("UserHome");
+        setResizable(false);
+        setLayout(null);
+        setSize(WIDTH_FRAME, HEIGHT_FRAME);
+        setLocationRelativeTo(null);
+        setLocation(getX() - 80, getY() - 80);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setVisible(true);
+
+        init();
     }
 
-    public UserHome() {
-
-    }
-
-    /**
-     * Create the frame.
-     */
-    public UserHome(String userSes) {
-
+    private void init(){
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(450, 190, 1014, 597);
         setResizable(false);
@@ -64,8 +63,8 @@ public class UserHome extends JFrame {
                     obj.setTitle("Student-Login");
                     obj.setVisible(true);
                 }
-                else { 
-                
+                else {
+
                 }
             }
         });
@@ -84,5 +83,23 @@ public class UserHome extends JFrame {
         button.setFont(new Font("Tahoma", Font.PLAIN, 35));
         button.setBounds(247, 320, 491, 114);
         contentPane.add(button);
+
     }
+
+    /**
+     * Launch the application.
+     */
+    public static void main(String[] args) {
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    UserHome frame = new UserHome("user");
+                    frame.setVisible(true);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
 }
