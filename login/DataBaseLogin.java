@@ -5,11 +5,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.text.AbstractDocument.Content;
-import javax.xml.crypto.Data;
-
-import com.jcraft.jsch.*;
 
 
 public class DataBaseLogin extends JFrame{
@@ -113,9 +108,6 @@ public class DataBaseLogin extends JFrame{
                     db_label_errorText.setText("");
                     if( DataBase.verifyDBLogin(textField_username.getText(),
                             String.valueOf(db_passwordField_password.getPassword())) != -1 ) {
-
-						/*JOptionPane.showMessageDialog(contentPane, "Login successful. Welcome", "Login",
-								JOptionPane.INFORMATION_MESSAGE);*/
 
                         EventQueue.invokeLater(new Runnable() {
                             @Override
