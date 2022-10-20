@@ -4,6 +4,14 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 
+
+import at.favre.lib.crypto.bcrypt.*;
+
+
+
+
+
+
 import java.sql.*;
 
 import javax.swing.JOptionPane;
@@ -92,6 +100,30 @@ public class DataBase {
             PreparedStatement st = (PreparedStatement) conn
                     .prepareStatement("Select username, passwordhash from netizen where username=? and passwordhash=?");
 
+            st.setString(1, username);
+            st.setString(2, password);
+            ResultSet rs = st.executeQuery();
+            if (rs.next()) {
+                return 1;
+            }
+        } catch (SQLException e) {
+
+            JOptionPane.showMessageDialog(null, "Database statement error", "Database",
+                    JOptionPane.ERROR_MESSAGE);
+
+        }
+
+        return -1;
+
+    }
+
+    public static int createUser(String username, String password) {
+        Connection conn = DataBase.getConnect();
+
+        try {
+            PreparedStatement st = (PreparedStatement) conn
+                    .prepareStatement("Insert into netizen(username, passwordhash) values (?,?)");
+                
             st.setString(1, username);
             st.setString(2, password);
             ResultSet rs = st.executeQuery();

@@ -7,7 +7,7 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
-public class UserHome extends JFrame {
+public class Register extends JFrame {
 
     private static final long serialVersionUID = 1;
     /**
@@ -28,8 +28,8 @@ public class UserHome extends JFrame {
     private JMenuBar menuBar_menubar;
     private JPanel contentPane;
 
-    public UserHome(String usersess){
-        super("UserHome");
+    public Register(){
+        super("Register");
         setResizable(false);
         setLayout(null);
         setSize(WIDTH_FRAME, HEIGHT_FRAME);
@@ -46,13 +46,12 @@ public class UserHome extends JFrame {
         setBounds(0, 0, 1000, 600);
         setResizable(false);
         contentPane = new JPanel();
-        contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         setContentPane(contentPane);
         contentPane.setLayout(null);
-        JButton btnNewButton = new JButton("Logout");
+        JButton btnNewButton = new JButton("Return to login");
         btnNewButton.setForeground(new Color(0, 0, 0));
         btnNewButton.setBackground(UIManager.getColor("Button.disabledForeground"));
-        btnNewButton.setFont(new Font("Tahoma", Font.PLAIN, 39));
+        btnNewButton.setFont(new Font("Tahoma", Font.PLAIN, 20));
         btnNewButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 int a = JOptionPane.showConfirmDialog(btnNewButton, "Are you sure?");
@@ -68,21 +67,8 @@ public class UserHome extends JFrame {
                 }
             }
         });
-        btnNewButton.setBounds(247, 118, 491, 114);
+        btnNewButton.setBounds(247, 118, 200, 114);
         contentPane.add(btnNewButton);
-        JButton button = new JButton("Change-password\r\n");
-        button.setBackground(UIManager.getColor("Button.disabledForeground"));
-        button.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                // ChangePassword bo = new ChangePassword(userSes);
-                // bo.setTitle("Change Password");
-                // bo.setVisible(true);
-
-            }
-        });
-        button.setFont(new Font("Tahoma", Font.PLAIN, 35));
-        button.setBounds(247, 320, 491, 114);
-        contentPane.add(button);
 
     }
 
@@ -93,7 +79,7 @@ public class UserHome extends JFrame {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    UserHome frame = new UserHome("user");
+                    Register frame = new Register();
                     frame.setVisible(true);
                 } catch (Exception e) {
                     e.printStackTrace();
