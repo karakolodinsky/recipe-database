@@ -97,6 +97,9 @@ public class DataBase {
             st.setString(2, password);
             ResultSet rs = st.executeQuery();
             if (rs.next()) {
+                PreparedStatement st1 = (PreparedStatement) conn.prepareStatement("UPDATE netizen SET lastaccessdate = CURRENT_TIMESTAMP where username = ?");
+                st1.setString(1, username);
+                st1.executeUpdate();
                 return 1;
                 //update most recent access date
 
@@ -117,7 +120,7 @@ public class DataBase {
 
         try {
             PreparedStatement st = (PreparedStatement) conn
-                    .prepareStatement("INSERT INTO netizen VALUES (?, ?, now(), now());");
+                    .prepareStatement("INSERT INTO netizen VALUES (?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);");
                 
             st.setString(1, username);
             st.setString(2, password);

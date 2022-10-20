@@ -70,19 +70,22 @@ public class UserHome extends JFrame {
         });
         btnNewButton.setBounds(247, 118, 491, 114);
         contentPane.add(btnNewButton);
-        JButton button = new JButton("Change-password\r\n");
-        button.setBackground(UIManager.getColor("Button.disabledForeground"));
-        button.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+        // JButton button = new JButton("Change-password\r\n");
+        // button.setBackground(UIManager.getColor("Button.disabledForeground"));
+        // button.addActionListener(new ActionListener() {
+         //   public void actionPerformed(ActionEvent e) {
                 // ChangePassword bo = new ChangePassword(userSes);
                 // bo.setTitle("Change Password");
                 // bo.setVisible(true);
 
-            }
-        });
-        button.setFont(new Font("Tahoma", Font.PLAIN, 35));
-        button.setBounds(247, 320, 491, 114);
-        contentPane.add(button);
+         //   }
+        // });
+        // button.setFont(new Font("Tahoma", Font.PLAIN, 35));
+        // button.setBounds(247, 320, 491, 114);
+        // contentPane.add(button);
+        
+
+
 
     }
 

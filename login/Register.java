@@ -94,6 +94,28 @@ public class Register extends JFrame {
         contentPane.add(usernameField);
         usernameField.setColumns(10);
 
+        JLabel lblUsername = new JLabel("username");
+        lblUsername.setBackground(new Color(181, 151, 207));
+        lblUsername.setForeground(new Color(181, 151, 207));
+        lblUsername.setFont(new Font("80er Teenie Demo", Font.BOLD, 31));
+        lblUsername.setBounds(250, 166, 193, 52);
+        contentPane.add(lblUsername);
+
+        JLabel lblREG = new JLabel("REGISTER A NEW ACCOUNT");
+        lblREG.setForeground(new Color(181, 151, 207));
+        lblREG.setBackground(new Color(181, 151, 207));
+        lblREG.setFont(new Font("80er Teenie Demo", Font.BOLD, 31));
+        lblREG.setBounds(300, 0, 800, 52);
+        contentPane.add(lblREG);
+
+
+        JLabel lblPassword = new JLabel("password");
+        lblPassword.setForeground(new Color(181, 151, 207));
+        lblPassword.setBackground(new Color(181, 151, 207));
+        lblPassword.setFont(new Font("80er Teenie Demo", Font.BOLD, 31));
+        lblPassword.setBounds(250, 286, 193, 52);
+        contentPane.add(lblPassword);
+
         passwordField = new JPasswordField();
         passwordField.setFont(new Font("Juice ITC", Font.PLAIN, 32));
         passwordField.setBounds(481, 286, 281, 68);
