@@ -43,7 +43,7 @@ public class UserHome extends JFrame {
 
     private void init(){
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(450, 190, 1014, 597);
+        setBounds(0, 0, 1000, 600);
         setResizable(false);
         contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -60,7 +60,7 @@ public class UserHome extends JFrame {
                 if (a == JOptionPane.YES_OPTION) {
                     dispose();
                     UserLogin obj = new UserLogin();
-                    obj.setTitle("Student-Login");
+                    obj.setTitle("Login");
                     obj.setVisible(true);
                 }
                 else {
@@ -70,19 +70,22 @@ public class UserHome extends JFrame {
         });
         btnNewButton.setBounds(247, 118, 491, 114);
         contentPane.add(btnNewButton);
-        JButton button = new JButton("Change-password\r\n");
-        button.setBackground(UIManager.getColor("Button.disabledForeground"));
-        button.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+        // JButton button = new JButton("Change-password\r\n");
+        // button.setBackground(UIManager.getColor("Button.disabledForeground"));
+        // button.addActionListener(new ActionListener() {
+         //   public void actionPerformed(ActionEvent e) {
                 // ChangePassword bo = new ChangePassword(userSes);
                 // bo.setTitle("Change Password");
                 // bo.setVisible(true);
 
-            }
-        });
-        button.setFont(new Font("Tahoma", Font.PLAIN, 35));
-        button.setBounds(247, 320, 491, 114);
-        contentPane.add(button);
+         //   }
+        // });
+        // button.setFont(new Font("Tahoma", Font.PLAIN, 35));
+        // button.setBounds(247, 320, 491, 114);
+        // contentPane.add(button);
+        
+
+
 
     }
 

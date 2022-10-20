@@ -5,6 +5,7 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 
 import java.sql.*;
+import java.util.Date;
 
 import javax.swing.JOptionPane;
 
@@ -96,7 +97,12 @@ public class DataBase {
             st.setString(2, password);
             ResultSet rs = st.executeQuery();
             if (rs.next()) {
+                PreparedStatement st1 = (PreparedStatement) conn.prepareStatement("UPDATE netizen SET lastaccessdate = CURRENT_TIMESTAMP where username = ?");
+                st1.setString(1, username);
+                st1.executeUpdate();
                 return 1;
+                //update most recent access date
+
             }
         } catch (SQLException e) {
 
@@ -108,6 +114,47 @@ public class DataBase {
         return -1;
 
     }
+
+    public static int createUser(String username, String password) {
+        Connection conn = DataBase.getConnect();
+
+        try {
+            PreparedStatement st = (PreparedStatement) conn
+                    .prepareStatement("INSERT INTO netizen VALUES (?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);");
+                
+            st.setString(1, username);
+            st.setString(2, password);
+            System.out.println(st);
+            int rs = st.executeUpdate();
+            if(rs == 1){
+                return 1;
+            }
+        } catch (SQLException e) {
+
+                // print SQL exception information
+                printSQLException(e);
+            }
+
+        return -1;
+
+    }
+
+    public static void printSQLException(SQLException ex) {
+        for (Throwable e: ex) {
+            if (e instanceof SQLException) {
+                e.printStackTrace(System.err);
+                System.err.println("SQLState: " + ((SQLException) e).getSQLState());
+                System.err.println("Error Code: " + ((SQLException) e).getErrorCode());
+                System.err.println("Message: " + e.getMessage());
+                Throwable t = ex.getCause();
+                while (t != null) {
+                    System.out.println("Cause: " + t);
+                    t = t.getCause();
+                }
+            }
+        }
+}
+
 
 }
 

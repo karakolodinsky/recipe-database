@@ -32,13 +32,14 @@ public class UserLogin extends JFrame {
     private JTextField usernameField;
     private JPasswordField passwordField;
     private JButton btnNewButton;
+    private JButton RegisterButton;
     private JLabel label_errorText;
     private JPanel contentPane;
     private Insets insets;
 
 
     public UserLogin() {
-        super("UserLogin");
+        super("User Login");
         setResizable(false);
         setLayout(null);
         setSize(WIDTH_FRAME, HEIGHT_FRAME);
@@ -138,6 +139,19 @@ public class UserLogin extends JFrame {
             }
         });
         contentPane.add(btnNewButton);
+
+        RegisterButton = new JButton("Register");
+        RegisterButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                        UserLogin.this.dispose();
+                        new Register();
+    
+                }
+            });
+            RegisterButton.setFont(new Font("80er Teenie Demo", Font.BOLD, 26));
+            RegisterButton.setBounds(800, 392, 162, 73);
+            contentPane.add(RegisterButton);
+
 
         label_errorText = new JLabel();
         label_errorText.setForeground(Color.RED);
