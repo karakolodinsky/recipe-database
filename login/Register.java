@@ -27,6 +27,13 @@ public class Register extends JFrame {
 
     private JMenuBar menuBar_menubar;
     private JPanel contentPane;
+    private JTextField usernameField;
+    private JPasswordField passwordField;
+    private JLabel label_errorText;
+    private JButton btnNewButton;
+    private JButton btnNewButton2;
+
+
 
     public Register(){
         super("Register");
@@ -48,10 +55,12 @@ public class Register extends JFrame {
         contentPane = new JPanel();
         setContentPane(contentPane);
         contentPane.setLayout(null);
+
+
         JButton btnNewButton = new JButton("Return to login");
-        btnNewButton.setForeground(new Color(0, 0, 0));
+
         btnNewButton.setBackground(UIManager.getColor("Button.disabledForeground"));
-        btnNewButton.setFont(new Font("Tahoma", Font.PLAIN, 20));
+        btnNewButton.setFont(new Font("Tahoma", Font.PLAIN, 15));
         btnNewButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 int a = JOptionPane.showConfirmDialog(btnNewButton, "Are you sure?");
@@ -67,9 +76,68 @@ public class Register extends JFrame {
                 }
             }
         });
-        btnNewButton.setBounds(247, 118, 200, 114);
+
+        
+        btnNewButton.setBounds(0, 0, 150, 100);
         contentPane.add(btnNewButton);
 
+
+        label_errorText = new JLabel();
+        label_errorText.setForeground(Color.RED);
+        label_errorText.setBounds(btnNewButton.getX() - 45, btnNewButton.getY() + 30,
+                170, 30);
+        label_errorText.setFont(new Font("Tahoma", Font.PLAIN + Font.BOLD, 11));
+        contentPane.add(label_errorText);
+        usernameField = new JTextField();
+        usernameField.setFont(new Font("Juice ITC", Font.PLAIN, 32));
+        usernameField.setBounds(481, 170, 281, 68);
+        contentPane.add(usernameField);
+        usernameField.setColumns(10);
+
+        passwordField = new JPasswordField();
+        passwordField.setFont(new Font("Juice ITC", Font.PLAIN, 32));
+        passwordField.setBounds(481, 286, 281, 68);
+        contentPane.add(passwordField);
+
+
+        btnNewButton2 = new JButton("register");
+        btnNewButton2.setFont(new Font("80er Teenie Demo", Font.BOLD, 26));
+        btnNewButton2.setBounds(545, 392, 162, 73);
+        btnNewButton2.addActionListener(new ActionListener() {
+             @Override
+             public void actionPerformed(ActionEvent e) {
+
+                 if (usernameField.getText().equals("") || String.valueOf(passwordField.getPassword()).equals("")) {
+                     label_errorText.setText("Nothing has been typed.");
+
+                 } else {
+
+                     label_errorText.setText("");
+                    if (DataBase.createUser(usernameField.getText(),
+                            String.valueOf(passwordField.getPassword())) != -1) {
+
+						JOptionPane.showMessageDialog(contentPane, "Register successful. Welcome", "Login",
+								JOptionPane.INFORMATION_MESSAGE);
+
+                        EventQueue.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                Register.this.dispose();
+                                new UserHome("user");
+}
+                        });
+
+                } else {
+                    label_errorText.setText("Username is already taken.");
+                    JOptionPane.showMessageDialog(contentPane, "Username is taken.", "Error",
+								JOptionPane.INFORMATION_MESSAGE);
+                }
+
+            }
+
+        }
+    });
+    contentPane.add(btnNewButton2);
     }
 
     /**
@@ -85,7 +153,7 @@ public class Register extends JFrame {
                     e.printStackTrace();
                 }
             }
-        });
-    }
+        }); 
 
+        }
 }
