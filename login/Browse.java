@@ -21,7 +21,6 @@ public class Browse extends JFrame implements ActionListener{
         btn = new JButton("Submit");  
         btn.setBounds(50, 50, 100, 20);  
         btn.addActionListener(this);   
-        lb.setFont(new Font("Serif", Font.BOLD, 20));  
         setVisible(true);  
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);  
         setSize(500, 500);  
@@ -34,7 +33,6 @@ public class Browse extends JFrame implements ActionListener{
         add(lb5);  
         add(tf5);  
         add(btn);  
-        add(lb);  
         add(lb1);  
         add(tf1);   
         //Set TextField Editable False  
