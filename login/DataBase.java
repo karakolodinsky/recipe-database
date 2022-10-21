@@ -13,6 +13,7 @@ public class DataBase {
 
     private static String db_username;
     private static String db_password;
+    protected static Connection con;
 
     public static int getSSH(){
 
@@ -46,6 +47,7 @@ public class DataBase {
             // now connect to DB
             String dbUrl = "jdbc:postgresql://localhost:1001/p32002_31";
             conn = DriverManager.getConnection(dbUrl, db_username, db_password);
+            con = conn;
 
         }
         catch (SQLException e) {
