@@ -11,13 +11,10 @@ import java.security.spec.InvalidKeySpecException;
 import java.sql.*;
 import java.util.Base64;
 import java.util.Date;
-import java.util.Optional;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.swing.JOptionPane;
-
-import org.postgresql.shaded.com.ongres.scram.common.bouncycastle.base64.Base64Encoder;
 
 public class DataBase {
 
@@ -25,7 +22,8 @@ public class DataBase {
     private static String db_password;
     protected static Connection con;
     public static final int ITERATIONS = 1000;
-    //algorithm constructs secret keys using the Password-Based Key Derivation Function function found in PKCS #5 v2.0.
+    // PBEWith<digest>And<encryption> Parameters for use with the PBEWith<digest>And<encryption> algorithm.
+    // HmacSHA512 Key generator for use with the HmacSHA512 algorithm
     private static final String ALGORITHM = "PBKDF2WithHmacSHA512"; 
 
     /** 
@@ -141,18 +139,23 @@ public class DataBase {
 
         try {
             PreparedStatement st = (PreparedStatement) conn
-                    .prepareStatement("Select username, passwordhash from netizen where username=? and passwordhash=?");
+                    .prepareStatement("Select username, passwordhash, salt from netizen where username=?");
 
             st.setString(1, username);
-            st.setString(2, password);
+            //st.setString(2, password);
             ResultSet rs = st.executeQuery();
             if (rs.next()) {
-                PreparedStatement st1 = (PreparedStatement) conn.prepareStatement("UPDATE netizen SET lastaccessdate = CURRENT_TIMESTAMP where username = ?");
-                st1.setString(1, username);
-                st1.executeUpdate();
-                return 1;
-                //update most recent access date
-
+                String hashed = rs.getString("passwordhash");
+                String salt = rs.getString("salt");
+                String hashPass = hashPassword(password, salt);
+                if (hashPass.equals(hashed)) {
+                    PreparedStatement st1 = (PreparedStatement) conn.prepareStatement("UPDATE netizen SET lastaccessdate = CURRENT_TIMESTAMP where username = ?");
+                    st1.setString(1, username);
+                    st1.executeUpdate();
+                    return 1;
+                    //update most recent access date
+                }
+                
             }
         } catch (SQLException e) {
 
