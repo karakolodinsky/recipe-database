@@ -3,6 +3,7 @@ package login;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -135,25 +136,33 @@ public class Register extends JFrame {
                  } else {
 
                      label_errorText.setText("");
-                    if (DataBase.createUser(usernameField.getText(),
-                            String.valueOf(passwordField.getPassword())) != -1) {
+                    try {
+                        if (DataBase.createUser(usernameField.getText(),
+                                String.valueOf(passwordField.getPassword())) != -1) {
 
-						JOptionPane.showMessageDialog(contentPane, "Register successful. Welcome", "Login",
-								JOptionPane.INFORMATION_MESSAGE);
+                        	JOptionPane.showMessageDialog(contentPane, "Register successful. Welcome", "Login",
+                        			JOptionPane.INFORMATION_MESSAGE);
 
-                        EventQueue.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                Register.this.dispose();
-                                new UserHome("user");
+                            EventQueue.invokeLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Register.this.dispose();
+                                    new UserHome("user");
 }
-                        });
+                            });
 
-                } else {
-                    label_errorText.setText("Username is already taken.");
-                    JOptionPane.showMessageDialog(contentPane, "Username is taken.", "Error",
-								JOptionPane.INFORMATION_MESSAGE);
-                }
+            } else {
+                        label_errorText.setText("Username is already taken.");
+                        JOptionPane.showMessageDialog(contentPane, "Username is taken.", "Error",
+                        			JOptionPane.INFORMATION_MESSAGE);
+            }
+                    } catch (HeadlessException e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
+                    } catch (IOException e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
+                    }
 
             }
 
