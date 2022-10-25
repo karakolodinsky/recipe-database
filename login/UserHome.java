@@ -44,7 +44,7 @@ public class UserHome extends JFrame {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    UserHome frame = new UserHome();
+                    UserHome frame = new UserHome("user");
                     frame.setVisible(true);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -60,7 +60,7 @@ public class UserHome extends JFrame {
     /**
      * Create the frame.
      */
-    public UserHome(String userSes) {
+    public UserHome(String usersess) {
 
 
         super("UserHome");
@@ -74,7 +74,7 @@ public class UserHome extends JFrame {
 
         init();
 
-        user = userSes;
+        user = usersess;
         setBounds(0, 0, 1000, 600);
 
     }
