@@ -194,6 +194,90 @@ public class DataBase {
 
     }
 
+    public static int addtoPantry(String item, String user, int quantity, Date exp, Date purch, int qbought, String unit) throws IOException {
+        Connection conn = DataBase.getConnect();
+
+        try {
+                String ingID = "";
+                PreparedStatement st0 = (PreparedStatement) conn
+                    .prepareStatement("SELECT ingredientid from ingredient where name = ? ");
+                st0.setString(1, item);
+                ResultSet rs0 = st0.executeQuery();
+                while (rs0.next()) {
+                         ingID = rs0.getString("ingredientID");
+                        System.out.println(ingID + "\n");
+                      }
+
+           
+            PreparedStatement st = (PreparedStatement) conn
+                    .prepareStatement("INSERT INTO pantry VALUES (?,?,?,?,?,?,?);");
+           
+            st.setString(1, user);
+            st.setInt(2, Integer.parseInt(ingID));
+            st.setDate(3, (java.sql.Date) purch);
+            st.setInt(4, qbought);
+            st.setInt(5, quantity);
+            st.setDate(6, (java.sql.Date) exp);
+            st.setString(7, unit);
+            System.out.println(st);
+            int rs = st.executeUpdate();
+            if(rs == 1){
+                return 1;
+            }
+        } catch (SQLException e) {
+
+                // print SQL exception information
+                printSQLException(e);
+            }
+
+        return -1;
+
+    }
+
+    public static int SearchIngredient(String ingredient) throws IOException {
+        Connection conn = DataBase.getConnect();
+
+        try {
+            PreparedStatement st = (PreparedStatement) conn
+                    .prepareStatement("SELECT ingredientid, name FROM ingredient where name = ?");
+                    st.setString(1, ingredient);
+            System.out.println(st);
+            ResultSet rs = st.executeQuery();
+            while(rs.next()){
+                System.out.println(rs.getInt("ingredientid"));
+                return rs.getInt("ingredientid");
+            }
+        } catch (SQLException e) {
+
+                // print SQL exception information
+                printSQLException(e);
+            }
+
+        return -1;
+
+    }
+
+    public static ResultSet GetIngredients (String ingredient) throws IOException {
+        Connection conn = DataBase.getConnect();
+
+        try {
+            PreparedStatement st = (PreparedStatement) conn
+                    .prepareStatement("SELECT name FROM ingredient WHERE name LIKE '%" + ingredient + "%'");
+                //     st.setString(1, ingredient);
+            System.out.println(st);
+            ResultSet rs = st.executeQuery();
+            return rs;
+        } catch (SQLException e) {
+
+                // print SQL exception information
+                printSQLException(e);
+            }
+
+        return null;
+
+    }
+
+
     public static void printSQLException(SQLException ex) {
         for (Throwable e: ex) {
             if (e instanceof SQLException) {

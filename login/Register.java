@@ -147,7 +147,7 @@ public class Register extends JFrame {
                                 @Override
                                 public void run() {
                                     Register.this.dispose();
-                                    new UserHome("user");
+                                    new UserHome();
 }
                             });
 

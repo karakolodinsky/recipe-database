@@ -126,7 +126,7 @@ public class UserLogin extends JFrame {
                             @Override
                             public void run() {
                                 UserLogin.this.dispose();
-                                new UserHome("user");
+                                new UserHome();
                             }
                         });
 
