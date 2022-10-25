@@ -11,7 +11,7 @@ public class UserHome extends JFrame {
 
     private static final long serialVersionUID = 1;
 
-    private JPanel contentPane;
+    //private JPanel contentPane;
 
     private int strdButtonWidth = 150;
     private int strdButtonHeight = 40;
@@ -37,7 +37,7 @@ public class UserHome extends JFrame {
      */
     public static Insets INSETS;
 
-    user = userSes;
+    //user = userSes;
 
     private JMenuBar menuBar_menubar;
     private JPanel contentPane;
@@ -55,7 +55,7 @@ public class UserHome extends JFrame {
         init();
     }
 
-    private void init(){
+    private void init() {
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(0, 0, 1000, 600);
@@ -81,8 +81,7 @@ public class UserHome extends JFrame {
                     UserLogin obj = new UserLogin();
                     obj.setTitle("Login");
                     obj.setVisible(true);
-                }
-                else {
+                } else {
 
                 }
             }
@@ -100,28 +99,28 @@ public class UserHome extends JFrame {
         browseButton.setFont(new Font("Tahoma", Font.PLAIN, 15));
         browseButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                    dispose();
-                    Browse browse = new Browse();
-                    //browse.setTitle("Browse Recipes");
-                    browse.setVisible(true);
-                }
-            
+                dispose();
+                Browse browse = new Browse();
+                //browse.setTitle("Browse Recipes");
+                browse.setVisible(true);
+            }
+
         });
         browseButton.setBounds(20, 120, 200, 30);
         contentPane.add(browseButton);
         // JButton button = new JButton("Change-password\r\n");
         // button.setBackground(UIManager.getColor("Button.disabledForeground"));
         // button.addActionListener(new ActionListener() {
-         //   public void actionPerformed(ActionEvent e) {
-                // ChangePassword bo = new ChangePassword(userSes);
-                // bo.setTitle("Change Password");
-                // bo.setVisible(true);
-            }
-        });
-        button.setFont(new Font("Tahoma", Font.PLAIN, strdFontSize));
+        //   public void actionPerformed(ActionEvent e) {
+        // ChangePassword bo = new ChangePassword(userSes);
+        // bo.setTitle("Change Password");
+        // bo.setVisible(true);
+
+
+        //button.setFont(new Font("Tahoma", Font.PLAIN, strdFontSize));
         //button.setBounds(247, 320, 491, 114);
-        button.setBounds(20, 55, strdButtonWidth, strdButtonHeight);
-        contentPane.add(button);
+        //button.setBounds(20, 55, strdButtonWidth, strdButtonHeight);
+        //contentPane.add(button);
 
         JButton newRecipeButton = new JButton("Create new Recipe");
         newRecipeButton.setBackground(UIManager.getColor("Button.disabledForeground"));
@@ -144,7 +143,7 @@ public class UserHome extends JFrame {
         editRecipeButton.setBackground(UIManager.getColor("Button.disabledForeground"));
         editRecipeButton.setFont(new Font("Tahoma", Font.PLAIN, strdFontSize));
         //editRecipeButton.setBounds(247, 320, 491, 114);
-        editRecipeButton.setBounds((20+strdButtonWidth+borderSize), 320, strdButtonWidth, strdButtonHeight);
+        editRecipeButton.setBounds((20 + strdButtonWidth + borderSize), 320, strdButtonWidth, strdButtonHeight);
         editRecipeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //functionality
@@ -156,7 +155,7 @@ public class UserHome extends JFrame {
         searchRecipeButton.setBackground(UIManager.getColor("Button.disabledForeground"));
         searchRecipeButton.setFont(new Font("Tahoma", Font.PLAIN, strdFontSize));
         //editRecipeButton.setBounds(247, 320, 491, 114);
-        searchRecipeButton.setBounds((20+ (2 * (strdButtonWidth+borderSize))), 320, strdButtonWidth, strdButtonHeight);
+        searchRecipeButton.setBounds((20 + (2 * (strdButtonWidth + borderSize))), 320, strdButtonWidth, strdButtonHeight);
         searchRecipeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //functionality
@@ -168,18 +167,18 @@ public class UserHome extends JFrame {
         makeRecipeButton.setBackground(UIManager.getColor("Button.disabledForeground"));
         makeRecipeButton.setFont(new Font("Tahoma", Font.PLAIN, strdFontSize));
         //editRecipeButton.setBounds(247, 320, 491, 114);
-        makeRecipeButton.setBounds((20+ (3 * (strdButtonWidth+borderSize))), 320, strdButtonWidth, strdButtonHeight);
+        makeRecipeButton.setBounds((20 + (3 * (strdButtonWidth + borderSize))), 320, strdButtonWidth, strdButtonHeight);
         makeRecipeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //functionality
             }
         });
         contentPane.add(makeRecipeButton);
-
     }
 
 
-}
+
+
 
          //   }
         // });
@@ -190,7 +189,7 @@ public class UserHome extends JFrame {
 
 
 
-    }
+
 
     /**
      * Launch the application.
