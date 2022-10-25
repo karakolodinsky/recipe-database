@@ -4,15 +4,62 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.spec.InvalidKeySpecException;
 import java.sql.*;
+import java.util.Base64;
 import java.util.Date;
 
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 import javax.swing.JOptionPane;
 
 public class DataBase {
 
     private static String db_username;
     private static String db_password;
+    protected static Connection con;
+    public static final int ITERATIONS = 1000;
+    // PBEWith<digest>And<encryption> Parameters for use with the PBEWith<digest>And<encryption> algorithm.
+    // HmacSHA512 Key generator for use with the HmacSHA512 algorithm
+    private static final String ALGORITHM = "PBKDF2WithHmacSHA512"; 
+
+    /** 
+     * @return salt for user
+     * @throws IOException
+     */
+    public static String generateSalt() throws IOException {
+
+        SecureRandom RANDOM = new SecureRandom();
+        byte[] salt = new byte[16];
+        RANDOM.nextBytes(salt);
+        return Base64.getEncoder().encodeToString(salt);
+
+      }
+
+    /** Takes user's plaintext password and hashes it
+     * @param password plaintext password
+     * @return hashed password
+     */
+    public static String hashPassword (String password, String salt) {
+
+        byte[] saltBytes = salt.getBytes();
+    
+        PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), saltBytes, ITERATIONS, 128);
+        try {
+            SecretKeyFactory factory = SecretKeyFactory.getInstance(ALGORITHM);
+            byte[] hashed =  factory.generateSecret(spec).getEncoded();
+            String hashPsswrd = new String(hashed);
+            return hashPsswrd;
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            e.printStackTrace();
+        } finally {
+            spec.clearPassword();
+        }
+        return null;
+      }
 
     public static int getSSH(){
 
@@ -46,6 +93,7 @@ public class DataBase {
             // now connect to DB
             String dbUrl = "jdbc:postgresql://localhost:1001/p32002_31";
             conn = DriverManager.getConnection(dbUrl, db_username, db_password);
+            con = conn;
 
         }
         catch (SQLException e) {
@@ -91,18 +139,23 @@ public class DataBase {
 
         try {
             PreparedStatement st = (PreparedStatement) conn
-                    .prepareStatement("Select username, passwordhash from netizen where username=? and passwordhash=?");
+                    .prepareStatement("Select username, passwordhash, salt from netizen where username=?");
 
             st.setString(1, username);
-            st.setString(2, password);
+            //st.setString(2, password);
             ResultSet rs = st.executeQuery();
             if (rs.next()) {
-                PreparedStatement st1 = (PreparedStatement) conn.prepareStatement("UPDATE netizen SET lastaccessdate = CURRENT_TIMESTAMP where username = ?");
-                st1.setString(1, username);
-                st1.executeUpdate();
-                return 1;
-                //update most recent access date
-
+                String hashed = rs.getString("passwordhash");
+                String salt = rs.getString("salt");
+                String hashPass = hashPassword(password, salt);
+                if (hashPass.equals(hashed)) {
+                    PreparedStatement st1 = (PreparedStatement) conn.prepareStatement("UPDATE netizen SET lastaccessdate = CURRENT_TIMESTAMP where username = ?");
+                    st1.setString(1, username);
+                    st1.executeUpdate();
+                    return 1;
+                    //update most recent access date
+                }
+                
             }
         } catch (SQLException e) {
 
@@ -115,15 +168,17 @@ public class DataBase {
 
     }
 
-    public static int createUser(String username, String password) {
+    public static int createUser(String username, String password) throws IOException {
         Connection conn = DataBase.getConnect();
 
         try {
             PreparedStatement st = (PreparedStatement) conn
-                    .prepareStatement("INSERT INTO netizen VALUES (?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);");
-                
+                    .prepareStatement("INSERT INTO netizen VALUES (?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?);");
+            String salt = generateSalt(); 
+            String hashPsswrd = hashPassword(password, salt);   
             st.setString(1, username);
-            st.setString(2, password);
+            st.setString(2, hashPsswrd);
+            st.setString(3, salt);
             System.out.println(st);
             int rs = st.executeUpdate();
             if(rs == 1){

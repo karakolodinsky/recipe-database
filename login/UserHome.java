@@ -52,7 +52,7 @@ public class UserHome extends JFrame {
         JButton btnNewButton = new JButton("Logout");
         btnNewButton.setForeground(new Color(0, 0, 0));
         btnNewButton.setBackground(UIManager.getColor("Button.disabledForeground"));
-        btnNewButton.setFont(new Font("Tahoma", Font.PLAIN, 39));
+        btnNewButton.setFont(new Font("Tahoma", Font.PLAIN, 15));
         btnNewButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 int a = JOptionPane.showConfirmDialog(btnNewButton, "Are you sure?");
@@ -68,8 +68,23 @@ public class UserHome extends JFrame {
                 }
             }
         });
-        btnNewButton.setBounds(247, 118, 491, 114);
+        btnNewButton.setBounds(20, 20, 200, 30);
         contentPane.add(btnNewButton);
+        JButton browseButton = new JButton("Browse Recipes");
+        browseButton.setForeground(new Color(0, 0, 0));
+        browseButton.setBackground(UIManager.getColor("Button.disabledForeground"));
+        browseButton.setFont(new Font("Tahoma", Font.PLAIN, 15));
+        browseButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                    dispose();
+                    Browse browse = new Browse();
+                    //browse.setTitle("Browse Recipes");
+                    browse.setVisible(true);
+                }
+            
+        });
+        browseButton.setBounds(20, 120, 200, 30);
+        contentPane.add(browseButton);
         // JButton button = new JButton("Change-password\r\n");
         // button.setBackground(UIManager.getColor("Button.disabledForeground"));
         // button.addActionListener(new ActionListener() {

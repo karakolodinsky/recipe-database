@@ -5,6 +5,7 @@
                 "c:\\Users\\kolod\\Downloads\\postgresql-42.5.0.jar",
                 "c:\\Users\\kolod\\Downloads\\jsch-0.1.55.jar",
                 "c:\\Users\\neste\\JavaPostgresSSHJars\\jsch-0.1.55.jar",
-                "c:\\Users\\neste\\JavaPostgresSSHJars\\postgresql-42.2.24.jar"
+                "c:\\Users\\neste\\JavaPostgresSSHJars\\postgresql-42.2.24.jar",
+                "c:\\Users\\neste\\jsch-0.1.55.jar"
         ]
 }
