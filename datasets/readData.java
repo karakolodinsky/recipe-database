@@ -3,6 +3,13 @@ package datasets;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import javax.swing.JOptionPane;
+
+import login.DataBase;
 
 public class readData {
 
@@ -29,13 +36,53 @@ public class readData {
             // String ingedients = recipe[10];
             // String n_ingred = recipe[11];
 
-            // // insert steps to parse and create categories
+            // insert steps to parse and create categories
             String[] categories = recipeParts[1].split("'");
             int size = categories.length;
-            //check that element of categories is not "" or ", "
-            // if category does not already exist, create it
-            // add category to recipe_category
+            for(int i = 0; i < size; i++){
 
+                String currTag = categories[i];
+
+                //check that element of categories is not "" or ", "
+                if(currTag.equals("") || currTag.equals(", ") || currTag.equals(" ")){
+                        break;
+                }
+                try {
+                    PreparedStatement st = login.DataBase.con.prepareStatement("SELECT categoryId FROM category WHERE name=?");
+                    st.setString(1, currTag.strip());
+                    ResultSet rs = st.executeQuery();
+                    int categoryId = -1;
+
+                     // if category does not already exist, create it
+                    if (!rs.next()) {
+                        st = login.DataBase.con.prepareStatement("Select max(categoryId) from category");
+                        rs = st.executeQuery();
+                        categoryId = rs.getInt(1) + 1;
+                        st = login.DataBase.con.prepareStatement("Insert into category values('?','?'");
+                        st.setString(1, String.valueOf(categoryId));
+                        st.setString(2, currTag);
+                        rs = st.executeQuery();
+                    }
+                    else{
+                        categoryId = rs.getInt(1);
+                    }
+
+                    // add category to recipeCategory
+                    st = login.DataBase.con.prepareStatement("insert into recipeCategory values('?', '?'");
+                    st.setString(1, String.valueOf(recipeId));
+                    st.setString(2, String.valueOf(categoryId));
+
+                } catch (SQLException e) {
+    
+                    JOptionPane.showMessageDialog(null, "Database statement error", "Database",
+                            JOptionPane.ERROR_MESSAGE);
+        
+                }    
+            }
+
+            // insert steps to parse steps
+            
+            
         }
 
         br.close();
