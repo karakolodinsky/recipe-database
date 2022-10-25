@@ -20,7 +20,7 @@ public class DataBase {
 
     private static String db_username;
     private static String db_password;
-    protected static Connection con;
+    public static Connection con;
     public static final int ITERATIONS = 1000;
     // PBEWith<digest>And<encryption> Parameters for use with the PBEWith<digest>And<encryption> algorithm.
     // HmacSHA512 Key generator for use with the HmacSHA512 algorithm
