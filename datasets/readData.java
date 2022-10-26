@@ -32,7 +32,7 @@ public class readData {
 
     public void readRecipes (Connection con) throws IOException, SQLException {
         //Connection con = DataBase.getCon();
-        FileReader fr = new FileReader("datasets/test_recipe.csv"); // I'm running from recipe-database
+        FileReader fr = new FileReader("datasets/RAW_recipes.csv"); // I'm running from recipe-database
         BufferedReader br = new BufferedReader(fr);
         String line = br.readLine();
         while ((line = br.readLine()) != null) {
@@ -82,24 +82,25 @@ public class readData {
             ResultSet user = s.executeQuery();
             if (!user.next()) {
                 s = con.prepareStatement("INSERT INTO netizen VALUES (?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?);");
-                String salt = DataBase.generateSalt(); 
+                // String salt = DataBase.generateSalt(); 
 
-                byte[] saltBytes = salt.getBytes();
+                // byte[] saltBytes = salt.getBytes();
     
-                    PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), saltBytes, 1000, 128);
-                try {
-                    SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
-                    byte[] hashed =  factory.generateSecret(spec).getEncoded();
-                    String hashPsswrd = new String(hashed);
+                //     PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), saltBytes, 1000, 128);
+                // try {
+                //     SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
+                //     byte[] hashed =  factory.generateSecret(spec).getEncoded();
+                //     hashed = new String(hashed).getBytes("UTF-8");
+                //     String hashPsswrd = new String(hashed);
                     s.setString(1, username);
-                    s.setString(2, hashPsswrd);
-                    s.setString(3, salt);
+                    s.setString(2, password);
+                    s.setString(3, "");
                     s.executeUpdate();
-                } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-                    e.printStackTrace();
-                } finally {
-                    spec.clearPassword();
-                }
+                // } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+                //     e.printStackTrace();
+                // } finally {
+                //     spec.clearPassword();
+                // }
              
             }
             // parse and create categories
