@@ -11,8 +11,12 @@ public class UserHome extends JFrame {
 
     private static final long serialVersionUID = 1;
 
-    //private JPanel contentPane;
+    /**
+     * Currently logged in user's username
+     */
+    private static String netizenUsername;
 
+    //private JPanel contentPane;
     private int strdButtonWidth = 150;
     private int strdButtonHeight = 40;
     private int strdFontSize = 10;
@@ -56,6 +60,7 @@ public class UserHome extends JFrame {
     }
 
     private void init() {
+        netizenUsername = UserLogin.getUsername();                  //current user's UN
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(0, 0, 1000, 600);
