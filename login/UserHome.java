@@ -104,10 +104,10 @@ public class UserHome extends JFrame {
         browseButton.setFont(new Font("Tahoma", Font.PLAIN, 15));
         browseButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                dispose();
-                Browse browse = new Browse();
+                UserHome.this.dispose();
+                new Browse(user);
                 //browse.setTitle("Browse Recipes");
-                browse.setVisible(true);
+                //browse.setVisible(true);
             }
 
         });
