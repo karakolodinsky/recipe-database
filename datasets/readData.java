@@ -76,30 +76,31 @@ public class readData {
 
             // create user from author if they don't already exist
             Random random = new Random();
-            String password = String.valueOf(random.nextInt());
+            String password = String.valueOf(random.nextInt(500));
             String username = author.strip();
             PreparedStatement s = con.prepareStatement("SELECT username FROM netizen WHERE username=?;");
             s.setString(1, username);
             ResultSet user = s.executeQuery();
             if (!user.next()) {
                 s = con.prepareStatement("INSERT INTO netizen VALUES (?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?);");
-            String salt = DataBase.generateSalt(); 
+                String salt = DataBase.generateSalt(); 
 
-            byte[] saltBytes = salt.getBytes();
+                byte[] saltBytes = salt.getBytes();
     
-            PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), saltBytes, 1000, 128);
-            try {
-                SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
-                byte[] hashed =  factory.generateSecret(spec).getEncoded();
-                String hashPsswrd = new String(hashed);
-                s.setString(1, username);
-                s.setString(2, hashPsswrd);
-                s.executeUpdate();
-            } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-                e.printStackTrace();
-            } finally {
-                spec.clearPassword();
-            }
+                    PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), saltBytes, 1000, 128);
+                try {
+                    SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
+                    byte[] hashed =  factory.generateSecret(spec).getEncoded();
+                    String hashPsswrd = new String(hashed);
+                    s.setString(1, username);
+                    s.setString(2, hashPsswrd);
+                    s.setString(3, salt);
+                    s.executeUpdate();
+                } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+                    e.printStackTrace();
+                } finally {
+                    spec.clearPassword();
+                }
              
             }
             // parse and create categories
@@ -109,38 +110,45 @@ public class readData {
                 String currTag = categories[i];
 
                 //check that element of categories is not "" or ", "
-                if(currTag.equals("") || currTag.equals(", ") || currTag.equals(" ")){
-                        break;
-                }
-                try {
-                    PreparedStatement st = con.prepareStatement("SELECT categoryId FROM category WHERE name=?;");
-                    st.setString(1, currTag.strip());
-                    ResultSet rs = st.executeQuery();
-                    int categoryId = -1;
+                if(!(currTag.equals("") || currTag.equals(", ") || currTag.equals(" "))){
+                
+                    try {
+                        ResultSet rs = null;
+                        PreparedStatement st = con.prepareStatement("SELECT categoryId FROM category WHERE categoryname=?;");
+                        st.setString(1, currTag.strip());
+                        boolean exists = st.execute();
+                        int categoryId = -1;
+                        if (exists) {
+                            // if category does not already exist, create it, else grab existing category's Id
+                            rs = st.getResultSet();
+                            if (!rs.isBeforeFirst()) {
+                                st = con.prepareStatement("Select max(categoryId) from category;");
+                                rs = st.executeQuery();
+                                rs.next();
+                                categoryId = rs.getInt(1) + 1;
+                                st = con.prepareStatement("Insert into category values(?, ?);");
+                                st.setInt(1, categoryId);
+                                st.setString(2, currTag);
+                                st.executeUpdate();
+                            }
+                            else{
+                                rs.next();
+                                categoryId = rs.getInt(1);
+                            }
+                        }
 
-                    // if category does not already exist, create it, else grab existing category's Id
-                    if (!rs.next()) {
-                        st = con.prepareStatement("Select max(categoryId) from category;");
-                        rs = st.executeQuery();
-                        categoryId = rs.getInt(1) + 1;
-                        st = con.prepareStatement("Insert into category values('?','?');");
-                        st.setInt(1, categoryId);
-                        st.setString(2, currTag);
+
+                        // add category to recipeCategory
+                        st = con.prepareStatement("insert into recipe_category values(?, ?);");
+                        st.setInt(1, recipeId);
+                        st.setInt(2, categoryId);
                         st.executeUpdate();
-                    }
-                    else{
-                        categoryId = rs.getInt(1);
-                    }
 
-                    // add category to recipeCategory
-                    st = con.prepareStatement("insert into recipeCategory values('?', '?');");
-                    st.setInt(1, recipeId);
-                    st.setInt(2, categoryId);
-
-                } catch (SQLException e) {
-                    JOptionPane.showMessageDialog(null, "Database statement error", "Database",
-                            JOptionPane.ERROR_MESSAGE);
-                }    
+                    } catch (SQLException e) {
+                        JOptionPane.showMessageDialog(null, "Database statement error", "Database",
+                                JOptionPane.ERROR_MESSAGE);
+                    } 
+                }       
             }
 
 
@@ -151,40 +159,40 @@ public class readData {
                 String currIngred = ingredients[i];
 
                 //check that element of categories is not "" or ", " or " "
-                if(currIngred.equals("") || currIngred.equals(", ") || currIngred.equals(" ")){
-                        break;
-                }
-                try {
-                    PreparedStatement st = con.prepareStatement("SELECT ingredientId FROM ingredient WHERE name=?;");
-                    st.setString(1, currIngred.strip());
-                    ResultSet rs = st.executeQuery();
-                    int ingredId = -1;
+                if(!(currIngred.equals("") || currIngred.equals(", ") || currIngred.equals(" "))){
 
-                    // if ingredient does not already exist, create it, else grab the existing ingred's ID
-                    if (!rs.next()) {
-                        st = con.prepareStatement("Select max(ingredientId) from ingredient;");
-                        rs = st.executeQuery();
-                        ingredId = rs.getInt(1) + 1;
-                        st = con.prepareStatement("Insert into ingredient values('?','?');");
-                        st.setInt(1, ingredId);
-                        st.setString(2, currIngred);
+                    try {
+                        PreparedStatement st = con.prepareStatement("SELECT ingredientId FROM ingredient WHERE name=?;");
+                        st.setString(1, currIngred.strip());
+                        ResultSet rs = st.executeQuery();
+                        int ingredId = -1;
+
+                        // if ingredient does not already exist, create it, else grab the existing ingred's ID
+                        if (!rs.next()) {
+                            st = con.prepareStatement("Select max(ingredientId) from ingredient;");
+                            rs = st.executeQuery();
+                            ingredId = rs.getInt(1) + 1;
+                            st = con.prepareStatement("Insert into ingredient values(?, ?);");
+                            st.setInt(1, ingredId);
+                            st.setString(2, currIngred);
+                            st.executeUpdate();
+                        }
+                        else{
+                            ingredId = rs.getInt(1);
+                        }
+
+                        // add ingredient to recipeRequires
+                        st = con.prepareStatement("insert into recipe_requires values(?, ?, ?, ?);");
+                        st.setInt(1, recipeId);
+                        st.setInt(2, ingredId);
+                        st.setString(3, "1");
+                        st.setString(4, "grams");
                         st.executeUpdate();
-                    }
-                    else{
-                        ingredId = rs.getInt(1);
-                    }
 
-                    // add ingredient to recipeRequires
-                    st = con.prepareStatement("insert into recipeRequires values('?', '?', '?', '?');");
-                    st.setInt(1, recipeId);
-                    st.setInt(2, ingredId);
-                    st.setString(3, "1");
-                    st.setString(4, "grams");
-                    st.executeUpdate();
-
-                } catch (SQLException e) {
-                    System.exit(0);
-                }    
+                    } catch (SQLException e) {
+                        System.exit(0);
+                    }  
+                }  
             } 
             
         }
