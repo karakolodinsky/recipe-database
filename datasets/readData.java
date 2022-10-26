@@ -43,7 +43,7 @@ public class readData {
             int cookTime = Integer.parseInt(recipe[2]);
             String author = recipe[3];
             String[] categories = recipeParts[1].split("'");   // check these receipeParts numbers
-            String steps = recipeParts[5];
+            String steps = recipeParts[5].substring(1);
             String desc = recipeParts[6];
             String[] ingredients = recipeParts[7].split("'");
 
@@ -75,8 +75,7 @@ public class readData {
             st1.executeUpdate();
 
             // create user from author if they don't already exist
-            Random random = new Random();
-            String password = String.valueOf(random.nextInt(500));
+            String password = "password";
             String username = author.strip();
             PreparedStatement s = con.prepareStatement("SELECT username FROM netizen WHERE username=?;");
             s.setString(1, username);
@@ -145,8 +144,7 @@ public class readData {
                         st.executeUpdate();
 
                     } catch (SQLException e) {
-                        JOptionPane.showMessageDialog(null, "Database statement error", "Database",
-                                JOptionPane.ERROR_MESSAGE);
+                        System.exit(0);
                     } 
                 }       
             }
@@ -162,30 +160,35 @@ public class readData {
                 if(!(currIngred.equals("") || currIngred.equals(", ") || currIngred.equals(" "))){
 
                     try {
+                        ResultSet rs = null;
                         PreparedStatement st = con.prepareStatement("SELECT ingredientId FROM ingredient WHERE name=?;");
                         st.setString(1, currIngred.strip());
-                        ResultSet rs = st.executeQuery();
+                        boolean exists = st.execute();
                         int ingredId = -1;
-
-                        // if ingredient does not already exist, create it, else grab the existing ingred's ID
-                        if (!rs.next()) {
-                            st = con.prepareStatement("Select max(ingredientId) from ingredient;");
-                            rs = st.executeQuery();
-                            ingredId = rs.getInt(1) + 1;
-                            st = con.prepareStatement("Insert into ingredient values(?, ?);");
-                            st.setInt(1, ingredId);
-                            st.setString(2, currIngred);
-                            st.executeUpdate();
-                        }
-                        else{
-                            ingredId = rs.getInt(1);
+                        if (exists) {
+                            rs = st.getResultSet();
+                            // if ingredient does not already exist, create it, else grab the existing ingred's ID
+                            if (!rs.isBeforeFirst()) {
+                                st = con.prepareStatement("Select max(ingredientId) from ingredient;");
+                                rs = st.executeQuery();
+                                rs.next();
+                                ingredId = rs.getInt(1) + 1;
+                                st = con.prepareStatement("Insert into ingredient values(?, ?);");
+                                st.setInt(1, ingredId);
+                                st.setString(2, currIngred);
+                                st.executeUpdate();
+                            }
+                            else{
+                                rs.next();
+                                ingredId = rs.getInt(1);
+                            }
                         }
 
                         // add ingredient to recipeRequires
                         st = con.prepareStatement("insert into recipe_requires values(?, ?, ?, ?);");
                         st.setInt(1, recipeId);
                         st.setInt(2, ingredId);
-                        st.setString(3, "1");
+                        st.setInt(3, 1);
                         st.setString(4, "grams");
                         st.executeUpdate();
 
@@ -244,6 +247,7 @@ public class readData {
         readData rd = new readData();
         Connection con = rd.dbLogin(username, password);
         rd.readRecipes(con);
+        System.exit(1);
     }
     
 }
