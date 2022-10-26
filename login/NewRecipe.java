@@ -85,6 +85,10 @@ public class NewRecipe extends JFrame{
         contentPane.add(rNameLabel);
         contentPane.add(rNameTxt);
 
+        /**
+         * ADD RECIPE DESCRIPTION INPUT: VARCHAR(200)
+         */
+
         JLabel rStepsLabel = new JLabel("Enter Recipe Steps:");
         JTextField rStepsTxt = new JTextField(TEXT_BOX_WIDTH);
         contentPane.add(rStepsLabel);
@@ -136,6 +140,9 @@ public class NewRecipe extends JFrame{
                     if (rNameTxt.getText().length() < 500 && rStepsTxt.getText().length() < 5000){
                         name = rNameTxt.getText();
                         System.out.println("set var name as: " + name);
+                        /**
+                         * ADD RECIPE DESCRIPTION VARIABLE
+                         */
                         steps = rStepsTxt.getText();
                         System.out.println("set steps as: " + steps);
                         diffuiculty = (int) rDiffTime.getItemAt(rDiffTime.getSelectedIndex());

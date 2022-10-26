@@ -233,22 +233,25 @@ public class DataBase {
                                     Integer servings, Integer difficulty, String name){
         //(recipeid, author, steps, description, cooktime, servings, difficulty, name)
         String username = UserLogin.getUsername();
-
         Connection conn = DataBase.getConnect();
+        //Q; does insert auto-assign recipeIDs?
         try{
             PreparedStatement st = (PreparedStatement) conn
-                    .prepareStatement("INSERT INTO recipe VALUES (?, CURRENT_USER, STEPS, DESCRIPTION, COOKTIME" +
-                            "SERVINGS, DIFFICULTY, NAME);");
-            st.setString(2, username);
-            st.setString(3, steps);
-            st.setString(4, description);
-            st.setString(5, cooktime.toString());
-            st.setString(6, servings.toString());
-            st.setString(7, difficulty.toString());
-            st.setString(8, name);
+                    .prepareStatement("INSERT INTO recipe VALUES (RECIPE_ID, ?, ?, ?, ?, ?, ?, ?);");
+            st.setString(1, username);
+            st.setString(2, steps);
+            st.setString(3, description);
+            //st.setString(4, cooktime.toString());
+            //st.setString(5, servings.toString());
+            //st.setString(6, difficulty.toString());
+            st.setInt(4, cooktime);
+            st.setInt(5, servings);
+            st.setInt(6, difficulty);
+            st.setString(7, name);
 
             int rs = st.executeUpdate();
             if(rs == 1){
+                //display(rs);
                 return 1;
             }
         }
