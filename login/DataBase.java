@@ -229,6 +229,37 @@ public class DataBase {
         }
 }
 
+    public static int createRecipe(String steps, String description, Integer cooktime,
+                                    Integer servings, Integer difficulty, String name){
+        //(recipeid, author, steps, description, cooktime, servings, difficulty, name)
+        String username = UserLogin.getUsername();
+
+        Connection conn = DataBase.getConnect();
+        try{
+            PreparedStatement st = (PreparedStatement) conn
+                    .prepareStatement("INSERT INTO recipe VALUES (?, CURRENT_USER, STEPS, DESCRIPTION, COOKTIME" +
+                            "SERVINGS, DIFFICULTY, NAME);");
+            st.setString(2, username);
+            st.setString(3, steps);
+            st.setString(4, description);
+            st.setString(5, cooktime.toString());
+            st.setString(6, servings.toString());
+            st.setString(7, difficulty.toString());
+            st.setString(8, name);
+
+            int rs = st.executeUpdate();
+            if(rs == 1){
+                return 1;
+            }
+        }
+        catch (SQLException e) {
+
+            // print SQL exception information
+            printSQLException(e);
+        }
+        return -1;      // try failed
+    }
+
 
 }
 
