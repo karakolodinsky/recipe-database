@@ -25,7 +25,7 @@ public class readData {
         
     }
 
-    public void readRecipes (Connection con) throws IOException {
+    public void readRecipes (Connection con) throws IOException, SQLException {
         //Connection con = DataBase.getCon();
         FileReader fr = new FileReader("datasets/test_recipe.csv"); // I'm running from recipe-database
         BufferedReader br = new BufferedReader(fr);
@@ -50,22 +50,24 @@ public class readData {
 
 
             // store recipeId, author, steps, description, cooktime, servings, difficulty, name in the recipe
-            try{
-                PreparedStatement st = con.prepareStatement("insert into recipe values (?, ?, ?, ?, ?, ?, ?, ?);");
-                st.setInt(1, recipeId);
-                st.setString(2, author);
-                st.setString(8, name);
-                st.setString(4, desc);
-                st.setInt(7, 3); //difficulty = Medium
-                st.setString(3, steps);
-                st.setInt(6, 1); //servings
-                st.setInt(5, cookTime);
-                st.executeQuery();
-            }
-            catch (SQLException e){
-                JOptionPane.showMessageDialog(null, "Database statement error", "Database",
-                            JOptionPane.ERROR_MESSAGE);
-            }  
+            PreparedStatement st1 = con.prepareStatement("insert into recipe values (?, ?, ?, ?, ?, ?, ?, ?);");
+            st1.setInt(1, 1);
+            st1.setInt(1, recipeId);
+            //st1.setString(2, "Teagan");
+            st1.setString(2, author);
+            //st1.setString(8, "Mush");
+            st1.setString(8, name);
+            //st1.setString(4, "Mushy");
+            st1.setString(4, desc);
+            //st1.setInt(7, 3);
+            st1.setInt(7, 3); //difficulty = Medium
+            //st1.setString(3, "Take indredients and MUSH");
+            st1.setString(3, steps);
+            //st1.setInt(6, 1);
+            st1.setInt(6, 1); //servings
+            //st1.setInt(5, 5);
+            st1.setInt(5, cookTime);
+            st1.executeUpdate();
 
 
             // parse and create categories
@@ -79,29 +81,29 @@ public class readData {
                         break;
                 }
                 try {
-                    PreparedStatement st = login.DataBase.con.prepareStatement("SELECT categoryId FROM category WHERE name=?");
+                    PreparedStatement st = con.prepareStatement("SELECT categoryId FROM category WHERE name=?");
                     st.setString(1, currTag.strip());
                     ResultSet rs = st.executeQuery();
                     int categoryId = -1;
 
                     // if category does not already exist, create it, else grab existing category's Id
                     if (!rs.next()) {
-                        st = login.DataBase.con.prepareStatement("Select max(categoryId) from category");
+                        st = con.prepareStatement("Select max(categoryId) from category");
                         rs = st.executeQuery();
                         categoryId = rs.getInt(1) + 1;
-                        st = login.DataBase.con.prepareStatement("Insert into category values('?','?'");
-                        st.setString(1, String.valueOf(categoryId));
+                        st = con.prepareStatement("Insert into category values('?','?');");
+                        st.setInt(1, categoryId);
                         st.setString(2, currTag);
-                        rs = st.executeQuery();
+                        st.executeUpdate();
                     }
                     else{
                         categoryId = rs.getInt(1);
                     }
 
                     // add category to recipeCategory
-                    st = login.DataBase.con.prepareStatement("insert into recipeCategory values('?', '?'");
-                    st.setString(1, String.valueOf(recipeId));
-                    st.setString(2, String.valueOf(categoryId));
+                    st = con.prepareStatement("insert into recipeCategory values('?', '?');");
+                    st.setInt(1, recipeId);
+                    st.setInt(2, categoryId);
 
                 } catch (SQLException e) {
                     JOptionPane.showMessageDialog(null, "Database statement error", "Database",
@@ -121,18 +123,18 @@ public class readData {
                         break;
                 }
                 try {
-                    PreparedStatement st = login.DataBase.con.prepareStatement("SELECT ingredientId FROM ingredient WHERE name=?");
+                    PreparedStatement st = con.prepareStatement("SELECT ingredientId FROM ingredient WHERE name=?");
                     st.setString(1, currIngred.strip());
                     ResultSet rs = st.executeQuery();
                     int ingredId = -1;
 
                     // if ingredient does not already exist, create it, else grab the existing ingred's ID
                     if (!rs.next()) {
-                        st = login.DataBase.con.prepareStatement("Select max(ingredientId) from ingredient");
+                        st = con.prepareStatement("Select max(ingredientId) from ingredient");
                         rs = st.executeQuery();
                         ingredId = rs.getInt(1) + 1;
-                        st = login.DataBase.con.prepareStatement("Insert into ingredient values('?','?'");
-                        st.setString(1, String.valueOf(ingredId));
+                        st = con.prepareStatement("Insert into ingredient values('?','?');");
+                        st.setInt(1, ingredId);
                         st.setString(2, currIngred);
                         st.executeUpdate();
                     }
@@ -141,9 +143,9 @@ public class readData {
                     }
 
                     // add ingredient to recipeRequires
-                    st = login.DataBase.con.prepareStatement("insert into recipeRequires values('?', '?', '?', '?'");
-                    st.setString(1, String.valueOf(recipeId));
-                    st.setString(2, String.valueOf(ingredId));
+                    st = con.prepareStatement("insert into recipeRequires values('?', '?', '?', '?');");
+                    st.setInt(1, recipeId);
+                    st.setInt(2, ingredId);
                     st.setString(3, "1");
                     st.setString(4, "grams");
                     st.executeUpdate();
@@ -189,7 +191,7 @@ public class readData {
 
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, SQLException {
         // make connection to database
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         System.out.println("Username: ");
