@@ -6,10 +6,17 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import net.proteanit.sql.DbUtils;
 import java.sql.*;
+import java.util.Properties;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.text.AbstractDocument.Content;
+
+import org.jdatepicker.impl.DateComponentFormatter;
+import org.jdatepicker.impl.JDatePanelImpl;
+import org.jdatepicker.impl.JDatePickerImpl;
+import org.jdatepicker.impl.UtilDateModel;
 
 
 public class AddToPantry extends JFrame {
@@ -76,6 +83,118 @@ public class AddToPantry extends JFrame {
         ingredientJLabel.setBounds(30, 50, 200, 40);
         contentPane.add(ingredientJLabel);
 
+        JLabel iJLabel = new JLabel("Ingredient Name");
+        iJLabel.setVisible(false);
+        iJLabel.setBackground(new Color(181, 151, 207));
+        iJLabel.setForeground(new Color(181, 151, 207));
+        iJLabel.setFont(new Font("80er Teenie Demo", Font.BOLD, 20));
+        iJLabel.setBounds(350, 50, 200, 40);
+        contentPane.add(iJLabel);
+
+        JLabel pJLabel = new JLabel("Purchase Date");
+        pJLabel.setVisible(false);
+        pJLabel.setBackground(new Color(181, 151, 207));
+        pJLabel.setForeground(new Color(181, 151, 207));
+        pJLabel.setFont(new Font("80er Teenie Demo", Font.BOLD, 20));
+        pJLabel.setBounds(375, 100, 200, 40);
+        contentPane.add(pJLabel);
+
+        JLabel eJLabel = new JLabel("Expiration Date");
+        eJLabel.setBackground(new Color(181, 151, 207));
+        eJLabel.setVisible(false);
+        eJLabel.setForeground(new Color(181, 151, 207));
+        eJLabel.setFont(new Font("80er Teenie Demo", Font.BOLD, 20));
+        eJLabel.setBounds(360, 150, 200, 40);
+        contentPane.add(eJLabel);
+
+        JLabel qJLabel = new JLabel("Current Quantity");
+        qJLabel.setBackground(new Color(181, 151, 207));
+        qJLabel.setVisible(false);
+        qJLabel.setForeground(new Color(181, 151, 207));
+        qJLabel.setFont(new Font("80er Teenie Demo", Font.BOLD, 20));
+        qJLabel.setBounds(350, 200, 200, 40);
+        contentPane.add(qJLabel);
+
+        JLabel bqJLabel = new JLabel("Bought Quantity");
+        bqJLabel.setBackground(new Color(181, 151, 207));
+        bqJLabel.setVisible(false);
+        bqJLabel.setForeground(new Color(181, 151, 207));
+        bqJLabel.setFont(new Font("80er Teenie Demo", Font.BOLD, 20));
+        bqJLabel.setBounds(350, 250, 200, 40);
+        contentPane.add(bqJLabel);
+
+        JLabel uJLabel = new JLabel("Unit of Measurement");
+        uJLabel.setBackground(new Color(181, 151, 207));
+        uJLabel.setVisible(false);
+        uJLabel.setForeground(new Color(181, 151, 207));
+        uJLabel.setFont(new Font("80er Teenie Demo", Font.BOLD, 20));
+        uJLabel.setBounds(320, 300, 200, 40);
+        contentPane.add(uJLabel);
+
+        String[] unit = { "grams","ounces", "fl oz"};
+        JComboBox<String> units = new JComboBox<String>(unit);
+        units.setBounds(500, 300, 200, 30);
+        units.setVisible(false);
+        contentPane.add(units);
+        
+
+
+        JTextField SIngredientField = new JTextField();
+        SIngredientField.setFont(new Font("Juice ITC", Font.PLAIN, 20));
+        SIngredientField.setBounds(500, 50, 200, 30);
+        SIngredientField.setColumns(10);
+       SIngredientField.setVisible(false);
+        SIngredientField.setEditable(false);
+        contentPane.add(SIngredientField);
+
+        UtilDateModel model = new UtilDateModel();
+        model.setDate(2022,11,1);
+        Properties p = new Properties();
+        p.put("text.today", "Today");
+        p.put("text.month", "Month");
+        p.put("text.year", "Year");
+        JDatePanelImpl datePanel = new JDatePanelImpl(model, p);
+        JDatePickerImpl datePicker = new JDatePickerImpl(datePanel, new DateComponentFormatter());
+        datePicker.setBounds(500, 100, 200, 30);
+        datePicker.setVisible(false);
+        contentPane.add(datePicker);
+
+        UtilDateModel model2 = new UtilDateModel();
+        model2.setDate(2022,11,1);
+        Properties p2 = new Properties();
+        p2.put("text.today", "Today");
+        p2.put("text.month", "Month");
+        p2.put("text.year", "Year");
+        JDatePanelImpl datePanel2 = new JDatePanelImpl(model2, p2);
+        JDatePickerImpl datePicker2 = new JDatePickerImpl(datePanel2, new DateComponentFormatter());
+        datePicker2.setBounds(500, 150, 200, 30);
+        datePicker2.setVisible(false);
+        contentPane.add(datePicker2);
+
+        JTextField QuantField = new JTextField();
+        QuantField.setFont(new Font("Juice ITC", Font.PLAIN, 20));
+        QuantField.setBounds(500, 200, 200, 30);
+        QuantField.setColumns(10);
+        QuantField.setVisible(false);
+        contentPane.add(QuantField);
+
+        JTextField QuantBoughtField = new JTextField();
+        QuantBoughtField.setFont(new Font("Juice ITC", Font.PLAIN, 20));
+        QuantBoughtField.setBounds(500, 250, 200, 30);
+        QuantBoughtField.setColumns(10);
+        QuantBoughtField.setVisible(false);
+        contentPane.add(QuantBoughtField);
+
+        // JTextField SIngredientField = new JTextField();
+        // SIngredientField.setFont(new Font("Juice ITC", Font.PLAIN, 20));
+        // SIngredientField.setBounds(500, 140, 200, 30);
+        // SIngredientField.setColumns(10);
+        // SIngredientField.setVisible(false);
+        // SIngredientField.setEditable(false);
+        // contentPane.add(SIngredientField);
+        
+
+
         JLabel addJLabel = new JLabel("Add to Pantry");
         addJLabel.setBackground(new Color(181, 151, 207));
         addJLabel.setForeground(new Color(181, 151, 207));
@@ -88,15 +207,41 @@ public class AddToPantry extends JFrame {
         label_errorText.setBounds(20, 320, 170, 30);
         label_errorText.setFont(new Font("Tahoma", Font.PLAIN + Font.BOLD, 11));
         contentPane.add(label_errorText);
-
-
         JTable SearchTbl = new JTable();
-        SearchTbl.setBounds(20, 150, 200, 40);
-        contentPane.add(SearchTbl);
+        SearchTbl.setVisible(false);
+        SearchTbl.setBounds(20, 150, 200, 175);
+        SearchTbl.setFocusable(false);
+        SearchTbl.setRowSelectionAllowed(true);
+        SearchTbl.addMouseListener(new java.awt.event.MouseAdapter() {
+                @Override
+                public void mouseClicked(java.awt.event.MouseEvent evt) {
+                    int row = SearchTbl.rowAtPoint(evt.getPoint());
+                    String ing = (String) SearchTbl.getValueAt(row, 0);
+                    SIngredientField.setText(ing);
+                    SIngredientField.setVisible(true);
+                    QuantField.setVisible(true);
+                    QuantBoughtField.setVisible(true);
+                    iJLabel.setVisible(true);
+                    uJLabel.setVisible(true);
+                    qJLabel.setVisible(true);
+                    bqJLabel.setVisible(true);
+                    uJLabel.setVisible(true);
+                    eJLabel.setVisible(true);
+                    units.setVisible(true);
+                    pJLabel.setVisible(true);
+                    datePicker.setVisible(true);
+                    datePicker2.setVisible(true);
 
-        JScrollPane js=new JScrollPane(SearchTbl);
-        js.setVisible(true);
-        add(js);
+
+                }
+            });
+
+        contentPane.add(SearchTbl);
+        
+
+        // JScrollPane js=new JScrollPane(SearchTbl);
+        // js.setVisible(true);
+        // add(js);
 
         JButton SearchButton = new JButton("Search");
         SearchButton.setFont(new Font("80er Teenie Demo", Font.BOLD, 26));
@@ -106,6 +251,7 @@ public class AddToPantry extends JFrame {
                 public void actionPerformed(ActionEvent e) {
                         if (IngredientField.getText().equals("")) {
                                 label_errorText.setText("Nothing has been typed.");
+                                
            
                             } else {
            
@@ -115,6 +261,8 @@ public class AddToPantry extends JFrame {
                                    if (rs != null) {
                                         SearchTbl.setModel(DbUtils.resultSetToTableModel(rs));
                                         label_errorText.setText("");
+                                        SearchTbl.setVisible(true);
+                                        SearchTbl.setDefaultEditor(Object.class, null);
            
                        } else {
                                    label_errorText.setText("Ingredient not found.");
@@ -131,6 +279,48 @@ public class AddToPantry extends JFrame {
            
                    }
                });
+
+        JButton AddButton = new JButton("Add to Pantry");
+        AddButton.setVisible(true);
+        AddButton.setFont(new Font("80er Teenie Demo", Font.BOLD, 26));
+        AddButton.setBounds(500, 350, 200, 50);
+        AddButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                        if (SIngredientField.getText().equals("") && QuantBoughtField.getText().equals("")) {
+                                label_errorText.setText("Nothing has been typed.");
+                                
+           
+                            } else {
+           
+                               try {
+                                if (DataBase.addtoPantry(SIngredientField.getText(), UserLogin.getUsername(), Integer.parseInt(QuantField.getText()), (java.sql.Date) datePicker.getModel().getValue(), (java.sql.Date) datePicker2.getModel().getValue(), Integer.parseInt(QuantBoughtField.getText()), String.valueOf(units.getSelectedItem()) ) != -1) {
+                                        
+                                        JOptionPane.showMessageDialog(contentPane, SIngredientField.getText()+ " added to "+ UserLogin.getUsername() + "'s pantry.", "Login",
+                                        JOptionPane.INFORMATION_MESSAGE);
+
+                    EventQueue.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            AddToPantry.this.dispose();
+                            new Pantry();
+}
+                    });
+                       } else {
+                                   label_errorText.setText("");
+                       }
+                               } catch (HeadlessException e1) {
+                                   // TODO Auto-generated catch block
+                                   e1.printStackTrace();
+                               } catch (IOException e1) {
+                                   // TODO Auto-generated catch block
+                                   e1.printStackTrace();
+                               }
+           
+                       }
+           
+                   }
+               });
+               contentPane.add(AddButton);
 
                
 
