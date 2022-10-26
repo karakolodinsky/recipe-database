@@ -11,6 +11,8 @@ import javax.swing.text.AbstractDocument.Content;
 
 public class UserLogin extends JFrame {
 
+    private static String netizenUsername;
+
     private static final long serialVersionUID = 1L;
 
     /**
@@ -122,6 +124,9 @@ public class UserLogin extends JFrame {
 						/*JOptionPane.showMessageDialog(contentPane, "Login successful. Welcome", "Login",
 								JOptionPane.INFORMATION_MESSAGE);*/
 
+                        netizenUsername = usernameField.getText();
+                        System.out.println("Logged in as "+ netizenUsername);
+                        System.out.println("Saved username as variable netizenUsername");
                         EventQueue.invokeLater(new Runnable() {
                             @Override
                             public void run() {
@@ -173,6 +178,14 @@ public class UserLogin extends JFrame {
 
             }
         });
+    }
 
+
+    /**
+     * Getter for the currently logged in user's (netizen's) username
+     * @return String username
+     */
+    public static String getUsername(){
+        return netizenUsername;
     }
 }

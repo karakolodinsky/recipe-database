@@ -64,6 +64,9 @@ public class NewRecipe extends JFrame{
     public NewRecipe(String user) {
         //solve s = new solve();
         currUser = user;
+
+        author = UserLogin.getUsername();
+
         // yoinked code:
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(450, 190, 1014, 597);
@@ -130,26 +133,39 @@ public class NewRecipe extends JFrame{
                 if (rNameTxt.getText() != null && rStepsTxt.getText()!= null && rCookTimeInt.getValue()!= null &&
                         rServings.getItemAt(rServings.getSelectedIndex())!= null &&
                         rDiffTime.getItemAt(rDiffTime.getSelectedIndex())!= null){
-                    name = rNameTxt.getText();
-                    System.out.println("set var name as: " + name);
-                    steps = rStepsTxt.getText();
-                    System.out.println("set steps as: " + steps);
-                    diffuiculty = (int) rDiffTime.getItemAt(rDiffTime.getSelectedIndex());
-                    System.out.println("set difficulty as: " + diffuiculty);
-                    servings = (int) rServings.getItemAt(rServings.getSelectedIndex());
-                    System.out.println("set servings as: " + servings);
-                    cooktime = (Integer) rCookTimeInt.getValue();
-                    System.out.println("set cooktime as: " + cooktime + " minutes");
+                    if (rNameTxt.getText().length() < 500 && rStepsTxt.getText().length() < 5000){
+                        name = rNameTxt.getText();
+                        System.out.println("set var name as: " + name);
+                        steps = rStepsTxt.getText();
+                        System.out.println("set steps as: " + steps);
+                        diffuiculty = (int) rDiffTime.getItemAt(rDiffTime.getSelectedIndex());
+                        System.out.println("set difficulty as: " + diffuiculty);
+                        servings = (int) rServings.getItemAt(rServings.getSelectedIndex());
+                        System.out.println("set servings as: " + servings);
+                        cooktime = (Integer) rCookTimeInt.getValue();
+                        System.out.println("set cooktime as: " + cooktime + " minutes");
+
+                        System.out.println("The author of "+name+" is "+author);
+                        NewRecipe.this.dispose();
+                    }
+                    else{                                                       // strings too long
+                        JFrame errorPopup = new JFrame("Error");
+                        errorPopup.setSize(325,100);
+                        PopupFactory pop = new PopupFactory();
+                        Popup p = pop.getPopup(errorPopup, new JPanel(), 180, 100);
+                        errorPopup.add(new JLabel("<html>Surpassed character limit: <br/>Recipe name must be " +
+                                "less than 500 characters <br/>Recipe steps must be less than 5000 characters<html/>"));
+                        errorPopup.show();
+                        p.show();
+                    }
                 }
-                else{
+                else{                                                           // Empty fields
                     JFrame errorPopup = new JFrame("Error");
-                    errorPopup.setSize(200,100);
+                    errorPopup.setSize(325,100);
                     PopupFactory pop = new PopupFactory();
                     Popup p = pop.getPopup(errorPopup, new JPanel(), 180, 100);
-                    errorPopup.add(new JLabel("Fill out all information"));
+                    errorPopup.add(new JLabel("Fill out all fields"));
                     errorPopup.show();
-
-                    //p.setResizable(false);
                     p.show();
 
                 }
