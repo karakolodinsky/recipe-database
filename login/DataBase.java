@@ -5,6 +5,7 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
@@ -26,6 +27,10 @@ public class DataBase {
     // HmacSHA512 Key generator for use with the HmacSHA512 algorithm
     private static final String ALGORITHM = "PBKDF2WithHmacSHA512"; 
 
+    public static Connection getCon() {
+        return con;
+    }
+
     /** 
      * @return salt for user
      * @throws IOException
@@ -35,8 +40,31 @@ public class DataBase {
         SecureRandom RANDOM = new SecureRandom();
         byte[] salt = new byte[16];
         RANDOM.nextBytes(salt);
-        return Base64.getEncoder().encodeToString(salt);
+        String s64 =  Base64.getEncoder().encodeToString(salt);
+        byte[] s = s64.getBytes("UTF-8");
+        return s.toString();
+      }
 
+      public static byte[] hashHelper (byte[] saltBytes, String password) {
+        boolean invalid = true;
+        while (invalid) {
+            PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), saltBytes, ITERATIONS, 128);
+            try {
+                SecretKeyFactory factory = SecretKeyFactory.getInstance(ALGORITHM);
+                byte[] hashed =  factory.generateSecret(spec).getEncoded();
+                try {
+                    hashed = new String(hashed).getBytes("UTF-8");
+                    return hashed;
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+            } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+                e.printStackTrace();
+            } finally {
+                spec.clearPassword();
+            }
+        }
+        return null;
       }
 
     /** Takes user's plaintext password and hashes it
@@ -46,19 +74,10 @@ public class DataBase {
     public static String hashPassword (String password, String salt) {
 
         byte[] saltBytes = salt.getBytes();
-    
-        PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), saltBytes, ITERATIONS, 128);
-        try {
-            SecretKeyFactory factory = SecretKeyFactory.getInstance(ALGORITHM);
-            byte[] hashed =  factory.generateSecret(spec).getEncoded();
-            String hashPsswrd = new String(hashed);
-            return hashPsswrd;
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            e.printStackTrace();
-        } finally {
-            spec.clearPassword();
-        }
-        return null;
+
+        byte[] hashed = hashHelper(saltBytes, password);
+        String hashPsswrd = new String(hashed);
+        return hashPsswrd;
       }
 
     public static int getSSH(){
@@ -139,16 +158,16 @@ public class DataBase {
 
         try {
             PreparedStatement st = (PreparedStatement) conn
-                    .prepareStatement("Select username, passwordhash, salt from netizen where username=?");
+                    .prepareStatement("Select username, passwordhash, salt from netizen where username=? and passwordhash=?;");
 
             st.setString(1, username);
             //st.setString(2, password);
             ResultSet rs = st.executeQuery();
             if (rs.next()) {
-                String hashed = rs.getString("passwordhash");
-                String salt = rs.getString("salt");
-                String hashPass = hashPassword(password, salt);
-                if (hashPass.equals(hashed)) {
+                //String hashed = rs.getString("passwordhash");
+                //String salt = rs.getString("salt");
+                //String hashPass = hashPassword(password, salt);
+                //if (hashPass.equals(hashed)) {
                     PreparedStatement st1 = (PreparedStatement) conn.prepareStatement("UPDATE netizen SET lastaccessdate = CURRENT_TIMESTAMP where username = ?");
                     st1.setString(1, username);
                     st1.executeUpdate();
@@ -156,7 +175,7 @@ public class DataBase {
                     //update most recent access date
                 }
                 
-            }
+            //}
         } catch (SQLException e) {
 
             JOptionPane.showMessageDialog(null, "Database statement error", "Database",
@@ -174,11 +193,11 @@ public class DataBase {
         try {
             PreparedStatement st = (PreparedStatement) conn
                     .prepareStatement("INSERT INTO netizen VALUES (?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?);");
-            String salt = generateSalt(); 
-            String hashPsswrd = hashPassword(password, salt);   
+            //String salt = generateSalt(); 
+            //String hashPsswrd = hashPassword(password, salt);   
             st.setString(1, username);
-            st.setString(2, hashPsswrd);
-            st.setString(3, salt);
+            st.setString(2, password);
+            st.setString(3, "");
             System.out.println(st);
             int rs = st.executeUpdate();
             if(rs == 1){
