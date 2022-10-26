@@ -44,7 +44,19 @@ public class readData {
             String author = recipe[3];
             String[] categories = recipeParts[1].split("'");   // check these receipeParts numbers
             String steps = recipeParts[5].substring(1);
+            if (steps.length() >= 5000) {
+                steps = steps.substring(0, 4999);
+            }
             String desc = recipeParts[6];
+            if (desc.length() == 0) {
+                desc = "";
+            }
+            else {
+                desc = recipeParts[6].substring(2);
+            }
+            if (desc.length() >= 200) {
+                desc = desc.substring(0, 199);
+            }
             String[] ingredients = recipeParts[7].split("'");
 
 
@@ -190,7 +202,7 @@ public class readData {
                         st.setInt(1, recipeId);
                         st.setInt(2, ingredId);
                         st.setInt(3, 1);
-                        st.setString(4, "grams");
+                        st.setString(4, "");
                         st.executeUpdate();
 
                     } catch (SQLException e) {
