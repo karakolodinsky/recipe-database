@@ -43,6 +43,7 @@ public class Browse extends JFrame {
         setLocationRelativeTo(null);
         setLocation(getX(), getY());
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setBounds(0, 0, 1000, 600);
         setVisible(true);
 
         init();
@@ -68,12 +69,21 @@ public class Browse extends JFrame {
         bagConstraints.gridy = 0;
         add(search, bagConstraints);
 
-        JTextField tf1 = new JTextField(15);
+        tf1 = new JTextField(15);
         bagConstraints.gridx = 1;
         bagConstraints.gridy = 0;
         add(tf1, bagConstraints);
 
         JButton submit = new JButton("Submit");
+        submit.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                submitClick();
+                
+            }
+
+        });
         bagConstraints.gridx = 1;
         bagConstraints.gridy = 1;
         add(submit, bagConstraints);
@@ -176,6 +186,65 @@ public class Browse extends JFrame {
             }
 
         });
+    }
+
+    private void submitClick () {
+        boolean exec = false;
+        PreparedStatement ps;
+        Connection con = DataBase.getCon();
+        String searchVal = tf1.getText().toString().strip();
+        try {
+            if (search.equals("Name")) {
+                
+                if (order.equals("Ascending")) {
+                    ps = con.prepareStatement("SELECT name, recipeId FROM recipe WHERE name like ? ORDER BY ? ASC;");
+                }
+                else {
+                    ps = con.prepareStatement("SELECT name, recipeId FROM recipe WHERE name like ? ORDER BY ? DESC;");
+                }
+                ps.setString(1, "%" + searchVal + "%");
+                    if (sort.equals("Name")) {
+                        ps.setString(2, "name");
+                    }
+            
+                    exec = ps.execute();
+
+            }
+            else { // change this it's stubbed out
+                ps = con.prepareStatement("SELECT recipeId, name FROM recipe WHERE name like %?% ORDER BY ?;");
+            }
+            if (exec) {
+                ResultSet rs = ps.getResultSet();
+                if ((rs.isBeforeFirst())) {
+                    addResult(rs);
+                }
+
+            }
+        }  catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        
+    }
+
+    private void addResult (ResultSet rs) throws SQLException {
+        int x = 0;
+        int y = 3;
+        while (rs.next()) {
+            String name = rs.getString("name");
+            int recipeId = rs.getInt("recipeId");
+            JButton recipe = new JButton(name);
+            recipe.setName(String.valueOf(recipeId));
+            bagConstraints.gridx = x;
+            bagConstraints.gridy = y;
+            add(recipe, bagConstraints);
+            x++;
+            if (x > 4) {
+                x = 0;
+                y++;
+            }
+        }
     }
 
     private JButton logout () {
