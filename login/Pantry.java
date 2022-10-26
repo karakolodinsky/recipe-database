@@ -77,6 +77,21 @@ public class Pantry extends JFrame {
         });
         contentPane.add(addButton);
 
+        JButton backButton = new JButton("Return to Home");
+        backButton.setFont(new Font("80er Teenie Demo", Font.BOLD, 20));
+        backButton.setBounds(20, 500, 200, 50);
+        contentPane.add(backButton);
+        backButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                        dispose();
+                        UserHome userHome = new UserHome();
+                        userHome.setTitle("User Home");
+                        userHome.setVisible(true);
+                    }
+                
+            });
+        contentPane.add(backButton);
+
         JButton updButton = new JButton("Update Pantry");
         updButton.setFont(new Font("80er Teenie Demo", Font.BOLD, 26));
         updButton.setBounds(750,500 , 200, 50);

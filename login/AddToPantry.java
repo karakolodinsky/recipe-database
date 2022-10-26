@@ -21,12 +21,6 @@ import javax.swing.text.DateFormatter;
 import javax.swing.text.AbstractDocument.Content;
 import java.util.Date;
 
-import org.jdatepicker.impl.DateComponentFormatter;
-import org.jdatepicker.impl.JDatePanelImpl;
-import org.jdatepicker.impl.JDatePickerImpl;
-import org.jdatepicker.impl.UtilDateModel;
-
-
 public class AddToPantry extends JFrame {
 
     private static final long serialVersionUID = 1L;
