@@ -35,10 +35,11 @@ public class NewRecipe extends JFrame{
     // SQL variables:
     String name;            // <= 500 chars
     String author;
+    String description;     // <= 200 chars
     String steps;           // <= 5000 chars
     Integer cooktime;
     Integer servings;
-    Integer diffuiculty;
+    Integer difficulty;
 
 
     /**
@@ -88,6 +89,10 @@ public class NewRecipe extends JFrame{
         /**
          * ADD RECIPE DESCRIPTION INPUT: VARCHAR(200)
          */
+        JLabel rDescLabel = new JLabel("Enter Recipe Description:");
+        JTextField rDescTxt = new JTextField(TEXT_BOX_WIDTH);
+        contentPane.add(rDescLabel);
+        contentPane.add(rDescTxt);
 
         JLabel rStepsLabel = new JLabel("Enter Recipe Steps:");
         JTextField rStepsTxt = new JTextField(TEXT_BOX_WIDTH);
@@ -133,35 +138,44 @@ public class NewRecipe extends JFrame{
                 //    String steps;           // <= 5000 chars
                 //    int cooktime;
                 //    int servings;
-                //    int diffuiculty;
+                //    int difficulty;
+
+                // don't judge my shitty != null checks
                 if (rNameTxt.getText() != null && rStepsTxt.getText()!= null && rCookTimeInt.getValue()!= null &&
                         rServings.getItemAt(rServings.getSelectedIndex())!= null &&
-                        rDiffTime.getItemAt(rDiffTime.getSelectedIndex())!= null){
-                    if (rNameTxt.getText().length() < 500 && rStepsTxt.getText().length() < 5000){
+                        rDiffTime.getItemAt(rDiffTime.getSelectedIndex())!= null && rDescTxt.getText() != null){
+                    // Check for acceptable str length
+                    if (rNameTxt.getText().length() < 500 && rStepsTxt.getText().length() < 5000 &&
+                            rDescTxt.getText().length() <= 200){
                         name = rNameTxt.getText();
                         System.out.println("set var name as: " + name);
-                        /**
-                         * ADD RECIPE DESCRIPTION VARIABLE
-                         */
+                        description = rDescTxt.getText();
+                        System.out.println("set description as: " + description);
                         steps = rStepsTxt.getText();
                         System.out.println("set steps as: " + steps);
-                        diffuiculty = (int) rDiffTime.getItemAt(rDiffTime.getSelectedIndex());
-                        System.out.println("set difficulty as: " + diffuiculty);
+                        difficulty = (int) rDiffTime.getItemAt(rDiffTime.getSelectedIndex());
+                        System.out.println("set difficulty as: " + difficulty);
                         servings = (int) rServings.getItemAt(rServings.getSelectedIndex());
                         System.out.println("set servings as: " + servings);
                         cooktime = (Integer) rCookTimeInt.getValue();
                         System.out.println("set cooktime as: " + cooktime + " minutes");
 
                         System.out.println("The author of "+name+" is "+author);
+
+                        /** Create recipe in SQL database; do not run until RecipeId is auto-generated **/
+                        //DataBase.createRecipe(steps, description, cooktime, servings, difficulty, name);
+
+
                         NewRecipe.this.dispose();
                     }
                     else{                                                       // strings too long
                         JFrame errorPopup = new JFrame("Error");
-                        errorPopup.setSize(325,100);
+                        errorPopup.setSize(350,175);
                         PopupFactory pop = new PopupFactory();
                         Popup p = pop.getPopup(errorPopup, new JPanel(), 180, 100);
                         errorPopup.add(new JLabel("<html>Surpassed character limit: <br/>Recipe name must be " +
-                                "less than 500 characters <br/>Recipe steps must be less than 5000 characters<html/>"));
+                                "less than 500 characters <br/>Recipe steps must be less than 5000 characters<br/>" +
+                                "Recipe Description must be less than 200 characters<html/>"));
                         errorPopup.show();
                         p.show();
                     }

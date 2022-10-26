@@ -11,6 +11,7 @@ import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.*;
 import java.util.Base64;
+import java.util.Calendar;
 import java.util.Date;
 
 import javax.crypto.SecretKeyFactory;
@@ -229,15 +230,25 @@ public class DataBase {
         }
 }
 
+    /**
+     * Creates a recipe with information passed from the UI
+     * @param steps             String <= 5000 chars long
+     * @param description       String <= 200 chars long
+     * @param cooktime          Positive integer
+     * @param servings          Integer 1-12
+     * @param difficulty        Integer 1-5
+     * @param name              String <= 50 chars long
+     * @return                  1 on success, -1 on failure
+     */
     public static int createRecipe(String steps, String description, Integer cooktime,
                                     Integer servings, Integer difficulty, String name){
-        //(recipeid, author, steps, description, cooktime, servings, difficulty, name)
+        //(recipeid, author, steps, description, cooktime, servings, difficulty, name, date)
         String username = UserLogin.getUsername();
         Connection conn = DataBase.getConnect();
         //Q; does insert auto-assign recipeIDs?
         try{
             PreparedStatement st = (PreparedStatement) conn
-                    .prepareStatement("INSERT INTO recipe VALUES (RECIPE_ID, ?, ?, ?, ?, ?, ?, ?);");
+                    .prepareStatement("INSERT INTO recipe VALUES (RECIPE_ID, ?, ?, ?, ?, ?, ?, ?, ?);");
             st.setString(1, username);
             st.setString(2, steps);
             st.setString(3, description);
@@ -248,6 +259,7 @@ public class DataBase {
             st.setInt(5, servings);
             st.setInt(6, difficulty);
             st.setString(7, name);
+            st.setDate(8, java.sql.Date.valueOf(java.time.LocalDate.now()));
 
             int rs = st.executeUpdate();
             if(rs == 1){
