@@ -26,6 +26,10 @@ public class DataBase {
     // HmacSHA512 Key generator for use with the HmacSHA512 algorithm
     private static final String ALGORITHM = "PBKDF2WithHmacSHA512"; 
 
+    public static Connection getCon() {
+        return con;
+    }
+
     /** 
      * @return salt for user
      * @throws IOException

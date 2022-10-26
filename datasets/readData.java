@@ -3,24 +3,31 @@ package datasets;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Connection;
+import java.sql.DriverManager;
 
 import javax.swing.JOptionPane;
 
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
+
 import login.DataBase;
+import login.DataBaseLogin;
 
 public class readData {
 
     readData () {
-
+        
     }
 
-    public void readRecipes () throws IOException {
-        Connection con = DataBase.getConnect();
-        FileReader fr = new FileReader("datasets/RAW_recipes.csv"); // I'm running from recipe-database
+    public void readRecipes (Connection con) throws IOException {
+        //Connection con = DataBase.getCon();
+        FileReader fr = new FileReader("datasets/test_recipe.csv"); // I'm running from recipe-database
         BufferedReader br = new BufferedReader(fr);
         String line = br.readLine();
         while ((line = br.readLine()) != null) {
@@ -42,17 +49,17 @@ public class readData {
             // String n_ingred = recipe[11];
 
 
-            // store author, name, description, difficulty, steps, servings, and cooktime in the recipe
+            // store recipeId, author, steps, description, cooktime, servings, difficulty, name in the recipe
             try{
-
-                PreparedStatement st = con.prepareStatement("insert into recipe(author, name, description, difficulty, steps, servings, cooktime) values ('?', '?', '?', '?', '?', '?', '?')");
-                st.setString(1, author);
-                st.setString(2, name);
-                st.setString(3, desc);
-                st.setString(4, String.valueOf(3));
-                st.setString(5, steps);
-                st.setString(6, String.valueOf(2));
-                st.setString(7, String.valueOf(cookTime));
+                PreparedStatement st = con.prepareStatement("insert into recipe values (?, ?, ?, ?, ?, ?, ?, ?);");
+                st.setInt(1, recipeId);
+                st.setString(2, author);
+                st.setString(8, name);
+                st.setString(4, desc);
+                st.setInt(7, 3); //difficulty = Medium
+                st.setString(3, steps);
+                st.setInt(6, 1); //servings
+                st.setInt(5, cookTime);
                 st.executeQuery();
             }
             catch (SQLException e){
@@ -142,8 +149,7 @@ public class readData {
                     st.executeUpdate();
 
                 } catch (SQLException e) {
-                    JOptionPane.showMessageDialog(null, "Database statement error", "Database",
-                            JOptionPane.ERROR_MESSAGE);
+                    System.exit(0);
                 }    
             } 
             
@@ -153,10 +159,49 @@ public class readData {
         fr.close();
     }
 
+    private Connection dbLogin (String username, String password) {
+        try {
+            // connect to ssh
+            Class.forName("org.postgresql.Driver");
+            JSch jsch = new JSch();
+
+            Session session = jsch.getSession(username, "starbug.cs.rit.edu", 22);
+            session.setPassword(password);
+            session.setConfig("StrictHostKeyChecking", "no");
+            session.connect();
+            session.setPortForwardingL(1001, "localhost", 5432);
+
+        }
+        catch (JSchException | ClassNotFoundException ssh){
+            return null;
+        }
+
+        try {
+            // now connect to DB
+            String dbUrl = "jdbc:postgresql://localhost:1001/p32002_31";
+            Connection con = DriverManager.getConnection(dbUrl, username, password);
+            return con;
+
+        }
+        catch (SQLException e) {
+            return null;
+        }
+
+    }
+
     public static void main(String[] args) throws IOException {
         // make connection to database
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        System.out.println("Username: ");
+ 
+        // Reading data using readLine
+        String username = reader.readLine().trim();
+        System.out.println("Password: ");
+        String password = reader.readLine().trim();
+        
         readData rd = new readData();
-        rd.readRecipes();
+        Connection con = rd.dbLogin(username, password);
+        rd.readRecipes(con);
     }
     
 }
