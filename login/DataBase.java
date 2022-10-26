@@ -161,7 +161,7 @@ public class DataBase {
                     .prepareStatement("Select username, passwordhash, salt from netizen where username=? and passwordhash=?;");
 
             st.setString(1, username);
-            //st.setString(2, password);
+            st.setString(2, password);
             ResultSet rs = st.executeQuery();
             if (rs.next()) {
                 //String hashed = rs.getString("passwordhash");
