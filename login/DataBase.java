@@ -210,7 +210,7 @@ public class DataBase {
 
            if (unit != "item name"){
                 PreparedStatement st = (PreparedStatement) conn
-                .prepareStatement("INSERT INTO pantry VALUES (?,?,?,?,?,?,?);");
+                .prepareStatement("INSERT INTO in_pantry VALUES (?,?,?,?,?,?,?);");
                 st.setString(1, user);
             st.setInt(2, Integer.parseInt(ingID));
             st.setDate(3, (java.sql.Date) purch);
@@ -224,7 +224,7 @@ public class DataBase {
             }
            } else {
                 PreparedStatement st = (PreparedStatement) conn
-                    .prepareStatement("INSERT INTO pantry VALUES (?,?,?,?,?,?,?);");
+                    .prepareStatement("INSERT INTO in_pantry VALUES (?,?,?,?,?,?,?);");
         st.setString(1, user);
             st.setInt(2, Integer.parseInt(ingID));
             st.setDate(3, (java.sql.Date) purch);

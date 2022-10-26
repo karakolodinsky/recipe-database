@@ -7,6 +7,7 @@ import java.io.IOException;
 import net.proteanit.sql.DbUtils;
 import java.sql.*;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
@@ -163,18 +164,20 @@ public class AddToPantry extends JFrame {
         // DatePicker datePicker = new DatePicker();
         // datePicker.setBounds(500, 100, 200, 30);
         // datePicker.setVisible(false);
-        DateFormat format = new SimpleDateFormat("dd-MMMM-yyyy");
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         DateFormatter df = new DateFormatter(format);
         JFormattedTextField dateField = new JFormattedTextField(df);
-        dateField.setPreferredSize(new Dimension(100, 20));
+        dateField.setBounds(500, 100, 200, 30);
         dateField.setValue(new Date());
+        dateField.setVisible(false);
         contentPane.add(dateField);
 
-        DateFormat format2 = new SimpleDateFormat("dd-MMMM-yyyy");
+        DateFormat format2 = new SimpleDateFormat("yyyy-MM-dd");
         DateFormatter df2 = new DateFormatter(format2);
         JFormattedTextField dateField2 = new JFormattedTextField(df2);
-        dateField2.setPreferredSize(new Dimension(100, 20));
+        dateField2.setBounds(500, 150, 200, 30);
         dateField2.setValue(new Date());
+        dateField2.setVisible(false);
         contentPane.add(dateField2);
 
 
@@ -248,8 +251,8 @@ public class AddToPantry extends JFrame {
                     eJLabel.setVisible(true);
                     units.setVisible(true);
                     pJLabel.setVisible(true);
-                    datePicker.setVisible(true);
-                    datePicker2.setVisible(true);
+                    dateField.setVisible(true);
+                    dateField2.setVisible(true);
 
 
                 }
@@ -306,14 +309,20 @@ public class AddToPantry extends JFrame {
         AddButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                         if (SIngredientField.getText().equals("") && QuantBoughtField.getText().equals("")) {
-                                label_errorText.setText("Nothing has been typed.");
+                                label_errorText.setText("Nothing has been typed."); 
                                 
            
                             } else {
            
                                try {
-                                java.sql.Date sqlDate = java.sql.Date.valueOf(datepicker.getValue());
-                                if (DataBase.addtoPantry(SIngredientField.getText(), UserLogin.getUsername(), Integer.parseInt(QuantField.getText()), datePicker.getModel().getValue(), (java.sql.Date) datePicker2.getModel().getValue(), Integer.parseInt(QuantBoughtField.getText()), String.valueOf(units.getSelectedItem()) ) != -1) {
+                                java.util.Date date = format.parse(dateField.getText());
+                                System.out.println(date.toString());
+                                java.sql.Date sqlStartDate = new java.sql.Date(date.getTime());
+                                System.out.println(sqlStartDate.toString());  
+                                java.util.Date date2 = format.parse(dateField2.getText());
+                                java.sql.Date sqlStartDate2 = new java.sql.Date(date2.getTime()); 
+                
+                                if (DataBase.addtoPantry(SIngredientField.getText(), UserLogin.getUsername(), Integer.parseInt(QuantField.getText()),sqlStartDate, sqlStartDate2, Integer.parseInt(QuantBoughtField.getText()), String.valueOf(units.getSelectedItem()) ) != -1) {
                                         
                                         JOptionPane.showMessageDialog(contentPane, SIngredientField.getText()+ " added to "+ UserLogin.getUsername() + "'s pantry.", "Login",
                                         JOptionPane.INFORMATION_MESSAGE);
@@ -334,7 +343,10 @@ public class AddToPantry extends JFrame {
                                } catch (IOException e1) {
                                    // TODO Auto-generated catch block
                                    e1.printStackTrace();
-                               }
+                               } catch (ParseException e1) {
+                                // TODO Auto-generated catch block
+                                e1.printStackTrace();
+                        }
            
                        }
            
