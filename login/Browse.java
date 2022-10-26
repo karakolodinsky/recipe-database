@@ -10,15 +10,21 @@ public class Browse extends JFrame {
 
     static private String user;
 
+    static private String search = "Name";
+
+    static private String sort = "Name";
+
+    static private String order = "Ascending";
+
     /**
      * login window width
      */
-    public static final int WIDTH_FRAME = 800;
+    public static final int WIDTH_FRAME = 960;
 
     /**
      * login window height
      */
-    public static final int HEIGHT_FRAME = 800;
+    public static final int HEIGHT_FRAME = 960;
 
     //Initializing Components  
     GridBagLayout bag = new GridBagLayout();
@@ -35,7 +41,7 @@ public class Browse extends JFrame {
         setResizable(false);
         setSize(WIDTH_FRAME, HEIGHT_FRAME);
         setLocationRelativeTo(null);
-        setLocation(getX() - 80, getY() - 80);
+        setLocation(getX(), getY());
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setVisible(true);
 
@@ -45,6 +51,13 @@ public class Browse extends JFrame {
     private void init (){
         setup();
         JButton home = returnHome();
+        bagConstraints.gridx = 2;
+        bagConstraints.gridy = 1;
+        add(home, bagConstraints);
+        JButton logout = logout();
+        bagConstraints.gridx = 3;
+        bagConstraints.gridy = 1;
+        add(logout, bagConstraints);
     }
 
     private void setup () {
@@ -61,51 +74,65 @@ public class Browse extends JFrame {
         add(tf1, bagConstraints);
 
         JButton submit = new JButton("Submit");
-        bagConstraints.gridx = 5;
-        bagConstraints.gridy = 0;
+        bagConstraints.gridx = 1;
+        bagConstraints.gridy = 1;
         add(submit, bagConstraints);
 
         JMenuBar menu = new JMenuBar();
         JMenu searchBy = new JMenu("Search By:");
-        JMenuItem m1 = new JMenuItem("Name");
-        JMenuItem m2 = new JMenuItem("Ingredient");
-        JMenuItem m3 = new JMenuItem("Category");
-        menuClick(m1, searchBy);
-        menuClick(m2, searchBy);
-        menuClick(m3, searchBy);
-        searchBy.add(m3);
-        searchBy.add(m2);
-        searchBy.add(m1);
         menu.add(searchBy);
         bagConstraints.gridx = 2;
         bagConstraints.gridy = 0;
         add(menu, bagConstraints);
+        ButtonGroup group = new ButtonGroup();
+        JRadioButtonMenuItem rbMenuItem = new JRadioButtonMenuItem("Name");
+        rbMenuItem.setSelected(true);
+        searchClick(rbMenuItem);
+        group.add(rbMenuItem);
+        searchBy.add(rbMenuItem);
+        rbMenuItem = new JRadioButtonMenuItem("Ingredient");
+        searchClick(rbMenuItem);
+        group.add(rbMenuItem);
+        searchBy.add(rbMenuItem);
+        rbMenuItem = new JRadioButtonMenuItem("Category");
+        searchClick(rbMenuItem);
+        group.add(rbMenuItem);
+        searchBy.add(rbMenuItem);
 
         JMenuBar menu2 = new JMenuBar();
         JMenu sortBy = new JMenu("Sort By: ");
-        JMenuItem m21 = new JMenuItem("Rating");
-        JMenuItem m22 = new JMenuItem("Date");
-        JMenuItem m23 = new JMenuItem("Name");
-        menuClick(m21, sortBy);
-        menuClick(m22, sortBy);
-        menuClick(m23, sortBy);
-        sortBy.add(m23);
-        sortBy.add(m22);
-        sortBy.add(m21);
         menu2.add(sortBy);
         bagConstraints.gridx = 3;
         bagConstraints.gridy = 0;
         add(menu2, bagConstraints);
+        ButtonGroup group2 = new ButtonGroup();
+        JRadioButtonMenuItem rbMenuItem2 = new JRadioButtonMenuItem("Name");
+        rbMenuItem2.setSelected(true);
+        sortClick(rbMenuItem2);
+        group2.add(rbMenuItem2);
+        sortBy.add(rbMenuItem2);
+        rbMenuItem2 = new JRadioButtonMenuItem("Rating");
+        sortClick(rbMenuItem2);
+        group2.add(rbMenuItem2);
+        sortBy.add(rbMenuItem2);
+        rbMenuItem2 = new JRadioButtonMenuItem("Date");
+        sortClick(rbMenuItem2);
+        group2.add(rbMenuItem2);
+        sortBy.add(rbMenuItem2);
 
         JMenuBar menu3 = new JMenuBar();
         JMenu order = new JMenu("Order: ");
-        JMenuItem m31 = new JMenuItem("Ascending");
-        JMenuItem m32 = new JMenuItem("Descending");
-        menuClick(m31, sortBy);
-        menuClick(m32, sortBy);
-        order.add(m32);
-        order.add(m31);
         menu3.add(order);
+        ButtonGroup group3 = new ButtonGroup();
+        JRadioButtonMenuItem rbMenuItem3 = new JRadioButtonMenuItem("Ascending");
+        rbMenuItem3.setSelected(true);
+        orderClick(rbMenuItem3);
+        group3.add(rbMenuItem3);
+        order.add(rbMenuItem3);
+        rbMenuItem3 = new JRadioButtonMenuItem("Descending");
+        orderClick(rbMenuItem3);
+        group3.add(rbMenuItem3);
+        order.add(rbMenuItem3);
         bagConstraints.gridx = 4;
         bagConstraints.gridy = 0;
         add(menu3, bagConstraints);
@@ -115,24 +142,62 @@ public class Browse extends JFrame {
 
     }
 
-    private void menuClick (JMenuItem m, JMenu menu) {
+    private void searchClick (JRadioButtonMenuItem m) {
         m.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
                 String text = m.getText();
-                menu.setText(text); 
+                search = text;
             }
 
         });
     }
 
-    public void submitClick (JButton submit, JMenu search, JMenu sort, JMenu order) {
-        String searchChoice = search.getText();
-        if (searchChoice.equals("Sort by:") || searchChoice.equals("Name:")){
-            searchChoice = "name";
-        }
+    private void sortClick (JRadioButtonMenuItem m) {
+        m.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String text = m.getText();
+                sort = text;
+            }
+
+        });
     }
+
+    private void orderClick (JRadioButtonMenuItem m) {
+        m.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String text = m.getText();
+                order = text;
+            }
+
+        });
+    }
+
+    private JButton logout () {
+        JButton btnNewButton = new JButton("Logout");
+        btnNewButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                int a = JOptionPane.showConfirmDialog(btnNewButton, "Are you sure?");
+                // JOptionPane.setRootFrame(null);
+                if (a == JOptionPane.YES_OPTION) {
+                    dispose();
+                    UserLogin obj = new UserLogin();
+                    obj.setTitle("Login");
+                    obj.setVisible(true);
+                } else {
+
+                }
+            }
+        });
+        return btnNewButton;
+    }
+
+    
 
     private JButton returnHome () {
         JButton home = new JButton("Home");
