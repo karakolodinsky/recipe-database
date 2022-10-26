@@ -4,17 +4,25 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.util.Random;
+import java.util.random.*;
 
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 import javax.swing.JOptionPane;
 
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
+
+import login.DataBase;
 
 public class readData {
 
@@ -67,7 +75,33 @@ public class readData {
             st1.executeUpdate();
 
             // create user from author if they don't already exist
+            Random random = new Random();
+            String password = String.valueOf(random.nextInt());
+            String username = author.strip();
+            PreparedStatement s = con.prepareStatement("SELECT username FROM netizen WHERE username=?;");
+            s.setString(1, username);
+            ResultSet user = s.executeQuery();
+            if (!user.next()) {
+                s = con.prepareStatement("INSERT INTO netizen VALUES (?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?);");
+            String salt = DataBase.generateSalt(); 
 
+            byte[] saltBytes = salt.getBytes();
+    
+            PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), saltBytes, 1000, 128);
+            try {
+                SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA512");
+                byte[] hashed =  factory.generateSecret(spec).getEncoded();
+                String hashPsswrd = new String(hashed);
+                s.setString(1, username);
+                s.setString(2, hashPsswrd);
+                s.executeUpdate();
+            } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+                e.printStackTrace();
+            } finally {
+                spec.clearPassword();
+            }
+             
+            }
             // parse and create categories
             int size = categories.length;
             for(int i = 0; i < size; i++){
