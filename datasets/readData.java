@@ -16,9 +16,6 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 
-import login.DataBase;
-import login.DataBaseLogin;
-
 public class readData {
 
     readData () {
@@ -69,6 +66,7 @@ public class readData {
             st1.setInt(5, cookTime);
             st1.executeUpdate();
 
+            // create user from author if they don't already exist
 
             // parse and create categories
             int size = categories.length;
@@ -81,14 +79,14 @@ public class readData {
                         break;
                 }
                 try {
-                    PreparedStatement st = con.prepareStatement("SELECT categoryId FROM category WHERE name=?");
+                    PreparedStatement st = con.prepareStatement("SELECT categoryId FROM category WHERE name=?;");
                     st.setString(1, currTag.strip());
                     ResultSet rs = st.executeQuery();
                     int categoryId = -1;
 
                     // if category does not already exist, create it, else grab existing category's Id
                     if (!rs.next()) {
-                        st = con.prepareStatement("Select max(categoryId) from category");
+                        st = con.prepareStatement("Select max(categoryId) from category;");
                         rs = st.executeQuery();
                         categoryId = rs.getInt(1) + 1;
                         st = con.prepareStatement("Insert into category values('?','?');");
@@ -123,14 +121,14 @@ public class readData {
                         break;
                 }
                 try {
-                    PreparedStatement st = con.prepareStatement("SELECT ingredientId FROM ingredient WHERE name=?");
+                    PreparedStatement st = con.prepareStatement("SELECT ingredientId FROM ingredient WHERE name=?;");
                     st.setString(1, currIngred.strip());
                     ResultSet rs = st.executeQuery();
                     int ingredId = -1;
 
                     // if ingredient does not already exist, create it, else grab the existing ingred's ID
                     if (!rs.next()) {
-                        st = con.prepareStatement("Select max(ingredientId) from ingredient");
+                        st = con.prepareStatement("Select max(ingredientId) from ingredient;");
                         rs = st.executeQuery();
                         ingredId = rs.getInt(1) + 1;
                         st = con.prepareStatement("Insert into ingredient values('?','?');");
