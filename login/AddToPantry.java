@@ -6,12 +6,19 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import net.proteanit.sql.DbUtils;
 import java.sql.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.util.Locale;
 import java.util.Properties;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.text.DateFormatter;
 import javax.swing.text.AbstractDocument.Content;
+import java.util.Date;
 
 import org.jdatepicker.impl.DateComponentFormatter;
 import org.jdatepicker.impl.JDatePanelImpl;
@@ -131,7 +138,7 @@ public class AddToPantry extends JFrame {
         uJLabel.setBounds(320, 300, 200, 40);
         contentPane.add(uJLabel);
 
-        String[] unit = { "grams","ounces", "fl oz"};
+        String[] unit = { "grams","ounces", "fl oz", "item name"};
         JComboBox<String> units = new JComboBox<String>(unit);
         units.setBounds(500, 300, 200, 30);
         units.setVisible(false);
@@ -147,29 +154,41 @@ public class AddToPantry extends JFrame {
         SIngredientField.setEditable(false);
         contentPane.add(SIngredientField);
 
-        UtilDateModel model = new UtilDateModel();
-        model.setDate(2022,11,1);
-        Properties p = new Properties();
-        p.put("text.today", "Today");
-        p.put("text.month", "Month");
-        p.put("text.year", "Year");
-        JDatePanelImpl datePanel = new JDatePanelImpl(model, p);
-        JDatePickerImpl datePicker = new JDatePickerImpl(datePanel, new DateComponentFormatter());
-        datePicker.setBounds(500, 100, 200, 30);
-        datePicker.setVisible(false);
-        contentPane.add(datePicker);
+        // UtilDateModel model = new UtilDateModel();
+        // model.setDate(2022,11,1);
+        // Properties p = new Properties();
+        // p.put("text.today", "Today");
+        // p.put("text.month", "Month");
+        // p.put("text.year", "Year");
+        // DatePicker datePicker = new DatePicker();
+        // datePicker.setBounds(500, 100, 200, 30);
+        // datePicker.setVisible(false);
+        DateFormat format = new SimpleDateFormat("dd-MMMM-yyyy");
+        DateFormatter df = new DateFormatter(format);
+        JFormattedTextField dateField = new JFormattedTextField(df);
+        dateField.setPreferredSize(new Dimension(100, 20));
+        dateField.setValue(new Date());
+        contentPane.add(dateField);
 
-        UtilDateModel model2 = new UtilDateModel();
-        model2.setDate(2022,11,1);
-        Properties p2 = new Properties();
-        p2.put("text.today", "Today");
-        p2.put("text.month", "Month");
-        p2.put("text.year", "Year");
-        JDatePanelImpl datePanel2 = new JDatePanelImpl(model2, p2);
-        JDatePickerImpl datePicker2 = new JDatePickerImpl(datePanel2, new DateComponentFormatter());
-        datePicker2.setBounds(500, 150, 200, 30);
-        datePicker2.setVisible(false);
-        contentPane.add(datePicker2);
+        DateFormat format2 = new SimpleDateFormat("dd-MMMM-yyyy");
+        DateFormatter df2 = new DateFormatter(format2);
+        JFormattedTextField dateField2 = new JFormattedTextField(df2);
+        dateField2.setPreferredSize(new Dimension(100, 20));
+        dateField2.setValue(new Date());
+        contentPane.add(dateField2);
+
+
+        // UtilDateModel model2 = new UtilDateModel();
+        // model2.setDate(2022,11,1);
+        // Properties p2 = new Properties();
+        // p2.put("text.today", "Today");
+        // p2.put("text.month", "Month");
+        // p2.put("text.year", "Year");
+        // JDatePanelImpl datePanel2 = new JDatePanelImpl(model2, p2);
+        // JDatePickerImpl datePicker2 = new JDatePickerImpl(datePanel2, new DateComponentFormatter());
+        // datePicker2.setBounds(500, 150, 200, 30);
+        // datePicker2.setVisible(false);
+        // contentPane.add(datePicker2);
 
         JTextField QuantField = new JTextField();
         QuantField.setFont(new Font("Juice ITC", Font.PLAIN, 20));
@@ -293,7 +312,8 @@ public class AddToPantry extends JFrame {
                             } else {
            
                                try {
-                                if (DataBase.addtoPantry(SIngredientField.getText(), UserLogin.getUsername(), Integer.parseInt(QuantField.getText()), (java.sql.Date) datePicker.getModel().getValue(), (java.sql.Date) datePicker2.getModel().getValue(), Integer.parseInt(QuantBoughtField.getText()), String.valueOf(units.getSelectedItem()) ) != -1) {
+                                java.sql.Date sqlDate = java.sql.Date.valueOf(datepicker.getValue());
+                                if (DataBase.addtoPantry(SIngredientField.getText(), UserLogin.getUsername(), Integer.parseInt(QuantField.getText()), datePicker.getModel().getValue(), (java.sql.Date) datePicker2.getModel().getValue(), Integer.parseInt(QuantBoughtField.getText()), String.valueOf(units.getSelectedItem()) ) != -1) {
                                         
                                         JOptionPane.showMessageDialog(contentPane, SIngredientField.getText()+ " added to "+ UserLogin.getUsername() + "'s pantry.", "Login",
                                         JOptionPane.INFORMATION_MESSAGE);

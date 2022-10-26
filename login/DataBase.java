@@ -208,22 +208,36 @@ public class DataBase {
                         System.out.println(ingID + "\n");
                       }
 
-           
-            PreparedStatement st = (PreparedStatement) conn
-                    .prepareStatement("INSERT INTO pantry VALUES (?,?,?,?,?,?,?);");
-           
-            st.setString(1, user);
+           if (unit != "item name"){
+                PreparedStatement st = (PreparedStatement) conn
+                .prepareStatement("INSERT INTO pantry VALUES (?,?,?,?,?,?,?);");
+                st.setString(1, user);
             st.setInt(2, Integer.parseInt(ingID));
             st.setDate(3, (java.sql.Date) purch);
             st.setInt(4, qbought);
             st.setInt(5, quantity);
             st.setDate(6, (java.sql.Date) exp);
             st.setString(7, unit);
-            System.out.println(st);
             int rs = st.executeUpdate();
             if(rs == 1){
                 return 1;
             }
+           } else {
+                PreparedStatement st = (PreparedStatement) conn
+                    .prepareStatement("INSERT INTO pantry VALUES (?,?,?,?,?,?,?);");
+        st.setString(1, user);
+            st.setInt(2, Integer.parseInt(ingID));
+            st.setDate(3, (java.sql.Date) purch);
+            st.setInt(4, qbought);
+            st.setInt(5, quantity);
+            st.setDate(6, (java.sql.Date) exp);
+            st.setString(7, item);
+            int rs = st.executeUpdate();
+            if(rs == 1){
+                return 1;
+            }
+
+           }
         } catch (SQLException e) {
 
                 // print SQL exception information
