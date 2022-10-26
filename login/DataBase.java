@@ -291,6 +291,28 @@ public class DataBase {
 
     }
 
+    public static ResultSet GetPantry (String user) throws IOException {
+        Connection conn = DataBase.getConnect();
+
+        try {
+            PreparedStatement st = (PreparedStatement) conn
+                    .prepareStatement("SELECT i.name, p.purchasedate, p.expirationdate, p.quantitycurr, p.quantitybought, p.unit from ingredient i, in_pantry p where i.ingredientid = p.ingredientid and p.username = ?");
+                st.setString(1, user);
+            System.out.println(st);
+            ResultSet rs = st.executeQuery();
+            return rs;
+        } catch (SQLException e) {
+
+                // print SQL exception information
+                printSQLException(e);
+            }
+
+        return null;
+
+    }
+
+
+
 
     public static void printSQLException(SQLException ex) {
         for (Throwable e: ex) {
