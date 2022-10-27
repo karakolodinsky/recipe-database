@@ -8,6 +8,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.ResultSet;
 import java.sql.SQLException; 
 
@@ -15,7 +17,7 @@ public class BrowseResult extends JFrame {
 
     private String user;
     private JScrollPane contentPane;
-    public static final int WIDTH_FRAME = 1000;
+    public static final int WIDTH_FRAME = 1200;
     public static final int HEIGHT_FRAME = 600;
     private JPanel panel;
     private ResultSet rs;
@@ -38,12 +40,31 @@ public class BrowseResult extends JFrame {
     }
 
     private void init () throws SQLException {
-        panel = new JPanel(new GridLayout(0,5, 10, 15));
+        panel = new JPanel(new GridLayout(0, 3, 10, 10));
         contentPane = new JScrollPane(panel,
         JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
         JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         addResult(rs);
         setContentPane(contentPane);
+    }
+    
+    private void recipeClick (JButton recipe) {
+        int recipeId = Integer.parseInt(recipe.getName());
+        String btnText = recipe.getText();
+        recipe.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    new DisplayRecipe(btnText, recipeId, btnText);
+                } catch (SQLException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+                
+            }
+
+        });
     }
 
     private void addResult (ResultSet rs) throws SQLException {
@@ -56,6 +77,7 @@ public class BrowseResult extends JFrame {
             }
             JButton recipe = new JButton(name);
             recipe.setName(String.valueOf(recipeId));
+            recipeClick(recipe);
             recipe.setSize(10, 30);
             panel.add(recipe);
         }

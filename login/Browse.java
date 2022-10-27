@@ -247,29 +247,40 @@ public class Browse extends JFrame {
                 // sort by name
                 if (sort.equals("Name")) {
                     if (asc) {
-                        ps = con.prepareStatement("SELECT name, recipeId FROM recipe WHERE name like ? ORDER BY name;");
+                        ps = con.prepareStatement("SELECT r.name, r.recipeId, avg(n.rating) as avgrating " +
+                                                "FROM recipe r LEFT JOIN netizen_creates n on r.recipeId=n.recipeId " +
+                                                "WHERE name like ? GROUP BY r.recipeId, r.name ORDER BY r.name;");
                     }
                     else {
-                        ps = con.prepareStatement("SELECT name, recipeId FROM recipe WHERE name like ? ORDER BY name DESC;");
+                        ps = con.prepareStatement("SELECT r.name, r.recipeId, avg(n.rating) as avgrating " +
+                                                "FROM recipe r LEFT JOIN netizen_creates n on r.recipeId=n.recipeId " +
+                                                "WHERE name like ? GROUP BY r.recipeId, r.name ORDER BY r.name DESC;");
                     }
                 }
                 //sort by date
                 else if (sort.equals("Date")) {
                     if (asc) {
-                        ps = con.prepareStatement("SELECT name, recipeId FROM recipe WHERE name like ? ORDER BY date;");
+                        ps = con.prepareStatement("SELECT r.name, r.recipeId, avg(n.rating) as avgrating " +
+                                                "FROM recipe r LEFT JOIN netizen_creates n on r.recipeId=n.recipeId " +
+                                                "WHERE name like ? GROUP BY r.recipeId, r.name ORDER BY r.date;");
                     }
                     else {
-                        ps = con.prepareStatement("SELECT name, recipeId FROM recipe WHERE name like ? ORDER BY date DESC;");
+                        ps = con.prepareStatement("SELECT r.name, r.recipeId, avg(n.rating) as avgrating " +
+                                                "FROM recipe r LEFT JOIN netizen_creates n on r.recipeId=n.recipeId " +
+                                                "WHERE name like ? GROUP BY r.recipeId, r.name ORDER BY r.date DESC;");
                     }
                 }
                 else { //sort on rating
                     if (asc) {
-                        ps = con.prepareStatement("SELECT name, recipeId FROM recipe ORDER BY ? ASC;");
+                        ps = con.prepareStatement("SELECT r.name, r.recipeId, avg(n.rating) as avgrating " +
+                                                "FROM recipe r LEFT JOIN netizen_creates n on r.recipeId=n.recipeId " +
+                                                "WHERE name like ? GROUP BY r.recipeId, r.name ORDER BY avgrating;");
                     }
                     else {
-                        ps = con.prepareStatement("SELECT name, recipeId FROM recipe ORDER BY ? DESC;");
+                        ps = con.prepareStatement("SELECT r.name, r.recipeId, avg(n.rating) as avgrating " +
+                                                "FROM recipe r LEFT JOIN netizen_creates n on r.recipeId=n.recipeId " +
+                                                "WHERE name like ? GROUP BY r.recipeId, r.name ORDER BY avgrating DESC;");
                     }
-                    ps.setString(1, "name");
                 }
                 ps.setString(1, "%" + searchVal + "%");
                 
