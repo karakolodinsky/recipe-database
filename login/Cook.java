@@ -13,7 +13,7 @@ public class Cook extends JFrame implements ActionListener{
     //Creating Constructor for initializing JFrame components
     Cook() {
         //Providing Title
-        super("Browse");
+        super("Cook");
         lb5 = new JLabel("Search:");
         lb5.setBounds(20, 20, 100, 20);
         tf5 = new JTextField(20);
@@ -69,7 +69,7 @@ public class Cook extends JFrame implements ActionListener{
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    Browse frame = new Browse();
+                    Cook frame = new Cook();
                     frame.setVisible(true);
                 } catch (Exception e) {
                     e.printStackTrace();
