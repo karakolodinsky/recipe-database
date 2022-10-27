@@ -50,6 +50,10 @@ public class BrowseResult extends JFrame {
         while (rs.next()) {
             String name = rs.getString("name");
             int recipeId = rs.getInt("recipeId");
+            int rating = rs.getInt("avgrating");
+            if (rating != 0) {
+                name = name + " Avg Rating: " + String.valueOf(rating);
+            }
             JButton recipe = new JButton(name);
             recipe.setName(String.valueOf(recipeId));
             recipe.setSize(10, 30);
