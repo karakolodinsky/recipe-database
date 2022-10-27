@@ -246,18 +246,20 @@ public class DataBase {
         Connection conn = DataBase.getConnect();
         //Q; does insert auto-assign recipeIDs?
         try{
+            int newid = (getMaxRecipeId() + 1);
             //recipe: (recipeid, author, steps, description, cooktime, servings, difficulty, name, date)
             PreparedStatement st = (PreparedStatement) conn
-                    .prepareStatement("INSERT INTO recipe (AUTHOR, STEPS, DESCRIPTION, COOKTIME, SERVINGS, " +
-                            "DIFFICULTY, NAME, DATE) VALUES (?, ?, ?, ?, ?, ?, ?, ?);");
-            st.setString(1, username);
-            st.setString(2, steps);
-            st.setString(3, description);
-            st.setInt(4, cooktime);
-            st.setInt(5, servings);
-            st.setInt(6, difficulty);
-            st.setString(7, name);
-            st.setDate(8, java.sql.Date.valueOf(java.time.LocalDate.now()));
+                    .prepareStatement("INSERT INTO recipe (RECIPEID, AUTHOR, STEPS, DESCRIPTION, COOKTIME, SERVINGS, " +
+                                        "DIFFICULTY, NAME, DATE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);");
+            st.setInt(1, newid);
+            st.setString(2, username);
+            st.setString(3, steps);
+            st.setString(4, description);
+            st.setInt(5, cooktime);
+            st.setInt(6, servings);
+            st.setInt(7, difficulty);
+            st.setString(8, name);
+            st.setDate(9, java.sql.Date.valueOf(java.time.LocalDate.now()));
 
             int rs = st.executeUpdate();
             if(rs == 1){
@@ -269,6 +271,29 @@ public class DataBase {
             printSQLException(e);
         }
         return -1;                  // try failed
+    }
+
+
+    /**
+     * Gets the current maximum recipeid value from the recipe table
+     * @return int
+     */
+    public static int getMaxRecipeId (){
+        Connection conn = DataBase.getConnect();
+        int newId;
+        try{
+            PreparedStatement id = (PreparedStatement) conn .prepareStatement("SELECT MAX(R.RECIPEID) " +
+                                                                                "FROM RECIPE AS R");
+            ResultSet idEx = id.executeQuery();
+            //empnum = rs.getString(1);
+            while (idEx.next()){
+                return idEx.getInt(1);
+            }
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 
 

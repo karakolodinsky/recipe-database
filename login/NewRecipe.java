@@ -163,7 +163,7 @@ public class NewRecipe extends JFrame{
                         System.out.println("The author of "+name+" is "+author);
 
                         /** Create recipe in SQL database; do not run until RecipeId is auto-generated **/
-                        //DataBase.createRecipe(steps, description, cooktime, servings, difficulty, name);
+                        DataBase.createRecipe(steps, description, cooktime, servings, difficulty, name);
 
 
                         NewRecipe.this.dispose();
