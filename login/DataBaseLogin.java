@@ -5,7 +5,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.*;
-
+/**
+ * UI-Interface for the database login
+ *
+ * @author Kara Kolodinsky
+ * @author Ainsley Ross
+ * @author ?
+ */
 
 public class DataBaseLogin extends JFrame{
 

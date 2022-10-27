@@ -9,7 +9,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 /**
- * DataBase functionality for accessing/requesting data from the SQL database
+ * UI-Interface for the User-home; offers buttons that link to database-functionality
  *
  * @author Kara Kolodinsky
  * @author Ainsley Ross
