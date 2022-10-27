@@ -69,6 +69,8 @@ public class DisplayRecipe extends JFrame {
         ps.setInt(1, recipeId);
         ResultSet rs = ps.executeQuery();
         rs.next();
+        String date = rs.getDate("date").toString();
+        labelMaker("Uploaded On: " + date);
         int diff = rs.getInt("difficulty");
         String diffString = difficulty(diff);
         labelMaker("Difficulty: " + diffString);
@@ -79,7 +81,7 @@ public class DisplayRecipe extends JFrame {
         String desc = rs.getString("description");
         textArea("Description:\n" + desc);
         String steps = rs.getString("steps");
-        textArea("Steps: " + steps);
+        textArea("Steps:\n " + steps);
 
 
         validate();
