@@ -3,6 +3,7 @@ package login;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.ResultSet;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -190,7 +191,11 @@ public class UserHome extends JFrame {
         makeRecipeButton.setBounds((20 + (3 * (strdButtonWidth + borderSize))), 320, strdButtonWidth, strdButtonHeight);
         makeRecipeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                //functionality
+                //functionality todo on make-bake-cook branch
+                dispose();
+                Cook cook = new Cook();
+                cook.setTitle("Choose Recipe to cook");
+                cook.setVisible(true);
             }
         });
         contentPane.add(makeRecipeButton);

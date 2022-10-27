@@ -366,6 +366,24 @@ public class DataBase {
 
     }
 
+    // STUB
+    // todo on make-bake-cook branch
+    public static ResultSet cookRecipe (int recipeID) {
+        Connection conn = DataBase.getConnect();
+
+        try{
+            PreparedStatement st = (PreparedStatement)  conn
+                    .prepareStatement("SELECT recipeid FROM recipe_requires");
+            ResultSet rs = st.executeQuery();
+            return rs;
+        } catch (SQLException e) {
+
+            // print SQL exception information
+            printSQLException(e);
+        }
+        return null;
+    }
+
 
 
 
