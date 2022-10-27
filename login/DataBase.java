@@ -11,6 +11,7 @@ import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.*;
 import java.util.Base64;
+import java.util.Calendar;
 import java.util.Date;
 
 import javax.crypto.SecretKeyFactory;
@@ -403,6 +404,74 @@ public class DataBase {
         }
 }
 
+
+    /**
+     * Creates a recipe with information passed from the UI
+     * @param steps             String <= 5000 chars long
+     * @param description       String <= 200 chars long
+     * @param cooktime          Positive integer
+     * @param servings          Integer 1-12
+     * @param difficulty        Integer 1-5
+     * @param name              String <= 50 chars long
+     * @return                  1 on success, -1 on failure
+     */
+    public static int createRecipe(String steps, String description, Integer cooktime,
+                                    Integer servings, Integer difficulty, String name){
+        String username = UserLogin.getUsername();
+        Connection conn = DataBase.getConnect();
+        //Q; does insert auto-assign recipeIDs?
+        try{
+            int newid = (getMaxRecipeId() + 1);
+            //recipe: (recipeid, author, steps, description, cooktime, servings, difficulty, name, date)
+            PreparedStatement st = (PreparedStatement) conn
+                    .prepareStatement("INSERT INTO recipe (RECIPEID, AUTHOR, STEPS, DESCRIPTION, COOKTIME, SERVINGS, " +
+                                        "DIFFICULTY, NAME, DATE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);");
+            st.setInt(1, newid);
+            st.setString(2, username);
+            st.setString(3, steps);
+            st.setString(4, description);
+            st.setInt(5, cooktime);
+            st.setInt(6, servings);
+            st.setInt(7, difficulty);
+            st.setString(8, name);
+            st.setDate(9, java.sql.Date.valueOf(java.time.LocalDate.now()));
+
+            int rs = st.executeUpdate();
+            if(rs == 1){
+                //display(rs);      // nvm lol
+                return 1;
+            }
+        }
+        catch (SQLException e) {
+            printSQLException(e);
+        }
+        return -1;                  // try failed
+    }
+
+
+    /**
+     * Gets the current maximum recipeid value from the recipe table
+     * @return int
+     */
+    public static int getMaxRecipeId (){
+        Connection conn = DataBase.getConnect();
+        int newId;
+        try{
+            PreparedStatement id = (PreparedStatement) conn .prepareStatement("SELECT MAX(R.RECIPEID) " +
+                                                                                "FROM RECIPE AS R");
+            ResultSet idEx = id.executeQuery();
+            //empnum = rs.getString(1);
+            while (idEx.next()){
+                return idEx.getInt(1);
+            }
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+
 public static int deleteFromPantry(String username, String item) throws IOException {
         Connection conn = DataBase.getConnect();
 
@@ -432,8 +501,6 @@ public static int deleteFromPantry(String username, String item) throws IOExcept
         return -1;
 
     }
-
-
 
 }
 

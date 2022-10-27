@@ -154,6 +154,7 @@ public class UserHome extends JFrame {
                 NewRecipe newR = new NewRecipe(user);
                 newR.setTitle("Create a recipe:");
                 newR.setVisible(true);
+                //System.out.print("Current max recipeID" + DataBase.getMaxRecipeId());                 DEBUG
                 //JOptionPane.showMessageDialog(btnNewButton, "You have successfully logged in");
             }
         });
