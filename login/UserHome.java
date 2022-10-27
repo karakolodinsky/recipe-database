@@ -184,23 +184,24 @@ public class UserHome extends JFrame {
         });
         contentPane.add(searchRecipeButton);
 
-        JButton makeRecipeButton = new JButton("Bake/Cook Recipe");
+        /* JButton makeRecipeButton = new JButton("Bake/Cook Recipe");
         makeRecipeButton.setBackground(UIManager.getColor("Button.disabledForeground"));
         makeRecipeButton.setFont(new Font("Tahoma", Font.PLAIN, strdFontSize));
         //editRecipeButton.setBounds(247, 320, 491, 114);
         makeRecipeButton.setBounds((20 + (3 * (strdButtonWidth + borderSize))), 320, strdButtonWidth, strdButtonHeight);
         makeRecipeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                //functionality todo on make-bake-cook branch
                 dispose();
                 Cook cook = new Cook();
                 cook.setTitle("Choose Recipe to cook");
                 cook.setVisible(true);
             }
         });
-        contentPane.add(makeRecipeButton);
-    }
+        contentPane.add(makeRecipeButton);*/
 
+
+
+    }
 
 
 
