@@ -1,6 +1,7 @@
 package datasets;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -10,9 +11,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.util.Random;
-import java.util.random.*;
+//import java.util.random.*;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
@@ -217,6 +219,50 @@ public class readData {
         fr.close();
     }
 
+    private void getDates (Connection con) throws IOException {
+        FileReader fr = new FileReader("datasets/RAW_recipes.csv"); // I'm running from recipe-database
+        BufferedReader br = new BufferedReader(fr);
+        String line = br.readLine();
+        while ((line = br.readLine()) != null) {
+            String[] recipeParts = line.split("[\\[\\]]");
+            String[] recipe = recipeParts[0].split(",");
+            int recipeId = Integer.parseInt(recipe[1]);
+            String[] d = recipe[4].split("/");
+            String year = d[2];
+            String month = d[0];
+            String day = d[1];
+            if (day.length() == 1) {
+                day = "0" + day;
+            }
+            if (month.length() == 1) {
+                month = "0" + month;
+            }
+            String dateForm = year + "-" + month + "-" + day;
+            Date date = Date.valueOf(dateForm);
+
+            ResultSet rs = null;
+            try {
+                PreparedStatement st = con.prepareStatement("SELECT recipeId FROM recipe WHERE recipeId=?;");
+                st.setInt(1, recipeId);
+                boolean exists = st.execute();
+                if (exists) {
+                    rs = st.getResultSet();
+                    rs.next();
+                    st = con.prepareStatement("UPDATE recipe set date=? where recipeId=?;");
+                    st.setDate(1, date);
+                    st.setInt(2, recipeId);
+                    st.executeUpdate();
+                }
+            } catch (SQLException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+
+        br.close();
+        fr.close();
+    }
+
     private Connection dbLogin (String username, String password) {
         try {
             // connect to ssh
@@ -259,7 +305,8 @@ public class readData {
         
         readData rd = new readData();
         Connection con = rd.dbLogin(username, password);
-        rd.readRecipes(con);
+        //rd.readRecipes(con);
+        rd.getDates(con);
         System.exit(1);
     }
     

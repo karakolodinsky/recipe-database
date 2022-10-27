@@ -11,6 +11,7 @@ import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.*;
 import java.util.Base64;
+import java.util.Calendar;
 import java.util.Date;
 
 import javax.crypto.SecretKeyFactory;
@@ -21,7 +22,7 @@ public class DataBase {
 
     private static String db_username;
     private static String db_password;
-    public static Connection con;
+    protected static Connection con;
     public static final int ITERATIONS = 1000;
     // PBEWith<digest>And<encryption> Parameters for use with the PBEWith<digest>And<encryption> algorithm.
     // HmacSHA512 Key generator for use with the HmacSHA512 algorithm
@@ -213,6 +214,180 @@ public class DataBase {
 
     }
 
+    public static int addtoPantry(String item, String user, int quantity, Date exp, Date purch, int qbought, String unit) throws IOException {
+        Connection conn = DataBase.getConnect();
+
+        try {
+                String ingID = "";
+                int qOLD = 0;
+                int bqOLD = 0;
+                PreparedStatement st0 = (PreparedStatement) conn
+                    .prepareStatement("SELECT ingredientid from ingredient where name = ? ");
+                st0.setString(1, item);
+                ResultSet rs0 = st0.executeQuery();
+                while (rs0.next()) {
+                         ingID = rs0.getString("ingredientID");
+                        System.out.println(ingID + "\n");
+                        System.out.println(ingID + "\n");
+                      }
+                      PreparedStatement st1 = (PreparedStatement) conn
+                      .prepareStatement("SELECT ingredientid from in_pantry where ingredientid = ? and username = ? ");
+                      st1.setInt(1,Integer.parseInt(ingID));
+                      st1.setString(2, user);
+                      ResultSet rs1 = st1.executeQuery();
+                      boolean in_pantry = true;
+                      if (!rs1.isBeforeFirst() ) {    
+                        in_pantry = false;
+                      } 
+
+                      if (in_pantry){
+                        PreparedStatement st3 = (PreparedStatement) conn
+                        .prepareStatement("Select quantitycurr, quantitybought from in_pantry where username = ? and ingredientid = ?");
+                        st3.setString(1, user);
+                        st3.setInt(2, Integer.parseInt(ingID));
+                        ResultSet rs3 = st3.executeQuery();
+                        while (rs3.next()) {
+                                        qOLD = rs3.getInt(1);
+                                        bqOLD = rs3.getInt(2);
+                                }
+                        PreparedStatement st2 = (PreparedStatement) conn
+                        .prepareStatement("UPDATE in_pantry SET quantitycurr = ?, quantitybought = ?, purchasedate = ? , expirationdate = ?, unit = ? WHERE username = ? and ingredientid = ?;  ");
+                        st2.setDate(3, (java.sql.Date) purch);
+                        st2.setInt(1, quantity + qOLD);
+                        st2.setInt(2, qbought+ bqOLD);
+                        st2.setDate(4, (java.sql.Date) exp);
+                        if (unit != "item name"){
+                                st2.setString(5, unit);   
+                        }
+                        else {
+                                st2.setString(5, item);
+                        }
+                        st2.setString(6, user);
+                        st2.setInt(7, Integer.parseInt(ingID));
+
+                       int rs2 = st2.executeUpdate();
+
+                        if(rs2 == 1){
+                                return 1;
+                            }
+                      }
+                      else{
+                      
+          
+                PreparedStatement st = (PreparedStatement) conn
+                .prepareStatement("INSERT INTO in_pantry VALUES (?,?,?,?,?,?,?);");
+                st.setString(1, user);
+            st.setInt(2, Integer.parseInt(ingID));
+            st.setDate(3, (java.sql.Date) purch);
+            st.setInt(4, qbought);
+            st.setInt(5, quantity);
+            st.setDate(6, (java.sql.Date) exp);
+            if (unit != "item name"){
+                st.setString(7, unit);   
+        }
+                else {
+                st.setString(7, item);
+        }
+            int rs = st.executeUpdate();
+            if(rs == 1){
+                return 1;
+            }
+           }
+        } catch (SQLException e) {
+                
+
+                // print SQL exception information
+                printSQLException(e);
+            }
+
+        return -1;
+
+    }
+
+    public static int SearchIngredient(String ingredient) throws IOException {
+        Connection conn = DataBase.getConnect();
+
+        try {
+            PreparedStatement st = (PreparedStatement) conn
+                    .prepareStatement("SELECT ingredientid, name FROM ingredient where name = ?");
+                    st.setString(1, ingredient);
+            System.out.println(st);
+            ResultSet rs = st.executeQuery();
+            while(rs.next()){
+                System.out.println(rs.getInt("ingredientid"));
+                return rs.getInt("ingredientid");
+            }
+        } catch (SQLException e) {
+
+                // print SQL exception information
+                printSQLException(e);
+            }
+
+        return -1;
+
+    }
+
+    public static ResultSet GetIngredients (String ingredient) throws IOException {
+        Connection conn = DataBase.getConnect();
+
+        try {
+            PreparedStatement st = (PreparedStatement) conn
+                    .prepareStatement("SELECT name FROM ingredient WHERE name LIKE '%" + ingredient + "%'");
+                //     st.setString(1, ingredient);
+            System.out.println(st);
+            ResultSet rs = st.executeQuery();
+            return rs;
+        } catch (SQLException e) {
+
+                // print SQL exception information
+                printSQLException(e);
+            }
+
+        return null;
+
+    }
+
+    public static ResultSet GetPantry (String user) throws IOException {
+        Connection conn = DataBase.getConnect();
+
+        try {
+            PreparedStatement st = (PreparedStatement) conn
+                    .prepareStatement("SELECT i.name, p.purchasedate, p.expirationdate, p.quantitycurr, p.quantitybought, p.unit from ingredient i, in_pantry p where i.ingredientid = p.ingredientid and p.username = ?");
+                st.setString(1, user);
+            System.out.println(st);
+            ResultSet rs = st.executeQuery();
+            return rs;
+        } catch (SQLException e) {
+
+                // print SQL exception information
+                printSQLException(e);
+            }
+
+        return null;
+
+    }
+
+    // STUB
+    // todo on make-bake-cook branch
+    public static ResultSet cookRecipe (int recipeID) {
+        Connection conn = DataBase.getConnect();
+
+        try{
+            PreparedStatement st = (PreparedStatement)  conn
+                    .prepareStatement("SELECT recipeid FROM recipe_requires");
+            ResultSet rs = st.executeQuery();
+            return rs;
+        } catch (SQLException e) {
+
+            // print SQL exception information
+            printSQLException(e);
+        }
+        return null;
+    }
+
+
+
+
     public static void printSQLException(SQLException ex) {
         for (Throwable e: ex) {
             if (e instanceof SQLException) {
@@ -229,6 +404,103 @@ public class DataBase {
         }
 }
 
+
+    /**
+     * Creates a recipe with information passed from the UI
+     * @param steps             String <= 5000 chars long
+     * @param description       String <= 200 chars long
+     * @param cooktime          Positive integer
+     * @param servings          Integer 1-12
+     * @param difficulty        Integer 1-5
+     * @param name              String <= 50 chars long
+     * @return                  1 on success, -1 on failure
+     */
+    public static int createRecipe(String steps, String description, Integer cooktime,
+                                    Integer servings, Integer difficulty, String name){
+        String username = UserLogin.getUsername();
+        Connection conn = DataBase.getConnect();
+        //Q; does insert auto-assign recipeIDs?
+        try{
+            int newid = (getMaxRecipeId() + 1);
+            //recipe: (recipeid, author, steps, description, cooktime, servings, difficulty, name, date)
+            PreparedStatement st = (PreparedStatement) conn
+                    .prepareStatement("INSERT INTO recipe (RECIPEID, AUTHOR, STEPS, DESCRIPTION, COOKTIME, SERVINGS, " +
+                                        "DIFFICULTY, NAME, DATE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);");
+            st.setInt(1, newid);
+            st.setString(2, username);
+            st.setString(3, steps);
+            st.setString(4, description);
+            st.setInt(5, cooktime);
+            st.setInt(6, servings);
+            st.setInt(7, difficulty);
+            st.setString(8, name);
+            st.setDate(9, java.sql.Date.valueOf(java.time.LocalDate.now()));
+
+            int rs = st.executeUpdate();
+            if(rs == 1){
+                //display(rs);      // nvm lol
+                return 1;
+            }
+        }
+        catch (SQLException e) {
+            printSQLException(e);
+        }
+        return -1;                  // try failed
+    }
+
+
+    /**
+     * Gets the current maximum recipeid value from the recipe table
+     * @return int
+     */
+    public static int getMaxRecipeId (){
+        Connection conn = DataBase.getConnect();
+        int newId;
+        try{
+            PreparedStatement id = (PreparedStatement) conn .prepareStatement("SELECT MAX(R.RECIPEID) " +
+                                                                                "FROM RECIPE AS R");
+            ResultSet idEx = id.executeQuery();
+            //empnum = rs.getString(1);
+            while (idEx.next()){
+                return idEx.getInt(1);
+            }
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+
+public static int deleteFromPantry(String username, String item) throws IOException {
+        Connection conn = DataBase.getConnect();
+
+        try {
+                int ingID = 0;
+                PreparedStatement st0 = (PreparedStatement) conn
+                    .prepareStatement("SELECT ingredientid from ingredient where name = ? ");
+                st0.setString(1, item);
+                ResultSet rs0 = st0.executeQuery();
+                while (rs0.next()) {
+                         ingID = rs0.getInt("ingredientID");
+                        }
+            PreparedStatement st = (PreparedStatement) conn
+                    .prepareStatement("DELETE FROM in_pantry WHERE username = ? and ingredientid = ?"); 
+            st.setString(1, username);
+            st.setInt(2, ingID);
+            int rs = st.executeUpdate();
+            if(rs == 1){
+                return 1;
+            }
+        } catch (SQLException e) {
+
+                // print SQL exception information
+                printSQLException(e);
+            }
+
+        return -1;
+
+    }
 
 }
 
