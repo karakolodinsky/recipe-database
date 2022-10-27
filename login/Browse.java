@@ -26,9 +26,12 @@ public class Browse extends JFrame {
      */
     public static final int HEIGHT_FRAME = 960;
 
-    //Initializing Components  
+    //Initializing Components 
+    JScrollPane pane = new JScrollPane();
     GridBagLayout bag = new GridBagLayout();
     GridBagConstraints bagConstraints = new GridBagConstraints();
+    JScrollPane scroll = new JScrollPane();
+    
     JLabel lb, lb1, lb2, lb3, lb4, lb5;  
     JTextField tf1, tf2, tf3, tf4, tf5;  
     JButton btn;  
@@ -146,6 +149,9 @@ public class Browse extends JFrame {
         bagConstraints.gridx = 4;
         bagConstraints.gridy = 0;
         add(menu3, bagConstraints);
+        bagConstraints.gridx = 0;
+        bagConstraints.gridy = 3;
+        add(scroll, bagConstraints);
 
 
         validate();
@@ -216,35 +222,17 @@ public class Browse extends JFrame {
             if (exec) {
                 ResultSet rs = ps.getResultSet();
                 if ((rs.isBeforeFirst())) {
-                    addResult(rs);
+                    new BrowseResult(user, rs);
                 }
 
             }
+
         }  catch (SQLException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
         
-    }
-
-    private void addResult (ResultSet rs) throws SQLException {
-        int x = 0;
-        int y = 3;
-        while (rs.next()) {
-            String name = rs.getString("name");
-            int recipeId = rs.getInt("recipeId");
-            JButton recipe = new JButton(name);
-            recipe.setName(String.valueOf(recipeId));
-            bagConstraints.gridx = x;
-            bagConstraints.gridy = y;
-            add(recipe, bagConstraints);
-            x++;
-            if (x > 4) {
-                x = 0;
-                y++;
-            }
-        }
     }
 
     private JButton logout () {
