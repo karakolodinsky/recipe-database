@@ -199,8 +199,41 @@ public class Browse extends JFrame {
         PreparedStatement ps;
         Connection con = DataBase.getCon();
         String searchVal = tf1.getText().toString().strip();
+        boolean asc = order.equals("Ascending");
         try {
-            if (search.equals("Name")) {
+            // no search value -> just browsing
+            if (searchVal.equals("")) {
+                //sort on name
+                if (sort.equals("Name")) {
+                    if (asc) {
+                        ps = con.prepareStatement("SELECT name, recipeId FROM recipe ORDER BY ? ASC;");
+                    }
+                    else {
+                        ps = con.prepareStatement("SELECT name, recipeId FROM recipe ORDER BY ? DESC;");
+                    }
+                    ps.setString(1, "name");
+                }
+                //sort on date
+                else if (sort.equals("Date")) {
+                    if (asc) {
+                        ps = con.prepareStatement("SELECT name, recipeId FROM recipe ORDER BY ? ASC;");
+                    }
+                    else {
+                        ps = con.prepareStatement("SELECT name, recipeId FROM recipe ORDER BY ? DESC;");
+                    }
+                    ps.setString(1, "date");
+                }
+                else { //sort on rating
+                    if (asc) {
+                        ps = con.prepareStatement("SELECT name, recipeId FROM recipe ORDER BY ? ASC;");
+                    }
+                    else {
+                        ps = con.prepareStatement("SELECT name, recipeId FROM recipe ORDER BY ? DESC;");
+                    }
+                    ps.setString(1, "name");
+                }
+            }
+            else if (search.equals("Name")) {
                 
                 if (order.equals("Ascending")) {
                     ps = con.prepareStatement("SELECT name, recipeId FROM recipe WHERE name like ? ORDER BY ? ASC;");
@@ -212,13 +245,14 @@ public class Browse extends JFrame {
                     if (sort.equals("Name")) {
                         ps.setString(2, "name");
                     }
-            
-                    exec = ps.execute();
 
             }
             else { // change this it's stubbed out
                 ps = con.prepareStatement("SELECT recipeId, name FROM recipe WHERE name like %?% ORDER BY ?;");
             }
+
+            exec = ps.execute();
+            
             if (exec) {
                 ResultSet rs = ps.getResultSet();
                 if ((rs.isBeforeFirst())) {
