@@ -7,9 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Connection;
-
 import javax.swing.JOptionPane;
-
 import login.DataBase;
 
 public class readData {
