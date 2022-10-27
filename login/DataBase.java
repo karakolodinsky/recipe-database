@@ -282,7 +282,7 @@ public class DataBase {
             st.setInt(5, quantity);
             st.setDate(6, (java.sql.Date) exp);
             if (unit != "item name"){
-                st.setString(5, unit);   
+                st.setString(7, unit);   
         }
                 else {
                 st.setString(7, item);
