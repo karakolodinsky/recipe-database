@@ -242,19 +242,17 @@ public class DataBase {
      */
     public static int createRecipe(String steps, String description, Integer cooktime,
                                     Integer servings, Integer difficulty, String name){
-        //(recipeid, author, steps, description, cooktime, servings, difficulty, name, date)
         String username = UserLogin.getUsername();
         Connection conn = DataBase.getConnect();
         //Q; does insert auto-assign recipeIDs?
         try{
+            //recipe: (recipeid, author, steps, description, cooktime, servings, difficulty, name, date)
             PreparedStatement st = (PreparedStatement) conn
-                    .prepareStatement("INSERT INTO recipe VALUES (RECIPE_ID, ?, ?, ?, ?, ?, ?, ?, ?);");
+                    .prepareStatement("INSERT INTO recipe (AUTHOR, STEPS, DESCRIPTION, COOKTIME, SERVINGS, " +
+                            "DIFFICULTY, NAME, DATE) VALUES (?, ?, ?, ?, ?, ?, ?, ?);");
             st.setString(1, username);
             st.setString(2, steps);
             st.setString(3, description);
-            //st.setString(4, cooktime.toString());
-            //st.setString(5, servings.toString());
-            //st.setString(6, difficulty.toString());
             st.setInt(4, cooktime);
             st.setInt(5, servings);
             st.setInt(6, difficulty);
@@ -263,16 +261,14 @@ public class DataBase {
 
             int rs = st.executeUpdate();
             if(rs == 1){
-                //display(rs);
+                //display(rs);      // nvm lol
                 return 1;
             }
         }
         catch (SQLException e) {
-
-            // print SQL exception information
             printSQLException(e);
         }
-        return -1;      // try failed
+        return -1;                  // try failed
     }
 
 
