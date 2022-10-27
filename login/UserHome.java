@@ -3,6 +3,7 @@ package login;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.ResultSet;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -46,7 +47,7 @@ public class UserHome extends JFrame {
     private JMenuBar menuBar_menubar;
     private JPanel contentPane;
 
-    public UserHome(String usersess){
+    public UserHome(){
         super("UserHome");
         setResizable(false);
         setLayout(null);
@@ -104,15 +105,30 @@ public class UserHome extends JFrame {
         browseButton.setFont(new Font("Tahoma", Font.PLAIN, 15));
         browseButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                dispose();
-                Browse browse = new Browse();
+                UserHome.this.dispose();
+                new Browse(user);
                 //browse.setTitle("Browse Recipes");
-                browse.setVisible(true);
+                //browse.setVisible(true);
             }
-
         });
         browseButton.setBounds(20, 120, 200, 30);
         contentPane.add(browseButton);
+
+        JButton pantryButton = new JButton("My Pantry");
+        pantryButton.setForeground(new Color(0, 0, 0));
+        pantryButton.setBackground(UIManager.getColor("Button.disabledForeground"));
+        pantryButton.setFont(new Font("Tahoma", Font.PLAIN, 15));
+        pantryButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                    dispose();
+                    Pantry pan = new Pantry();
+                    pan.setTitle("My Pantry");
+                        pan.setVisible(true);
+                }
+            
+        });
+        pantryButton.setBounds(20, 160, 200, 30);
+        contentPane.add(pantryButton);
         // JButton button = new JButton("Change-password\r\n");
         // button.setBackground(UIManager.getColor("Button.disabledForeground"));
         // button.addActionListener(new ActionListener() {
@@ -176,7 +192,11 @@ public class UserHome extends JFrame {
         makeRecipeButton.setBounds((20 + (3 * (strdButtonWidth + borderSize))), 320, strdButtonWidth, strdButtonHeight);
         makeRecipeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                //functionality
+                //functionality todo on make-bake-cook branch
+                dispose();
+                Cook cook = new Cook();
+                cook.setTitle("Choose Recipe to cook");
+                cook.setVisible(true);
             }
         });
         contentPane.add(makeRecipeButton);
@@ -204,7 +224,7 @@ public class UserHome extends JFrame {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    UserHome frame = new UserHome("user");
+                    UserHome frame = new UserHome();
                     frame.setVisible(true);
                 } catch (Exception e) {
                     e.printStackTrace();
