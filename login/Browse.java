@@ -206,22 +206,20 @@ public class Browse extends JFrame {
                 //sort on name
                 if (sort.equals("Name")) {
                     if (asc) {
-                        ps = con.prepareStatement("SELECT name, recipeId FROM recipe ORDER BY ? ASC;");
+                        ps = con.prepareStatement("SELECT name, recipeId FROM recipe ORDER BY name;");
                     }
                     else {
-                        ps = con.prepareStatement("SELECT name, recipeId FROM recipe ORDER BY ? DESC;");
+                        ps = con.prepareStatement("SELECT name, recipeId FROM recipe ORDER BY name DESC;");
                     }
-                    ps.setString(1, "name");
                 }
                 //sort on date
                 else if (sort.equals("Date")) {
                     if (asc) {
-                        ps = con.prepareStatement("SELECT name, recipeId FROM recipe ORDER BY ? ASC;");
+                        ps = con.prepareStatement("SELECT name, recipeId FROM recipe ORDER BY date;");
                     }
                     else {
-                        ps = con.prepareStatement("SELECT name, recipeId FROM recipe ORDER BY ? DESC;");
+                        ps = con.prepareStatement("SELECT name, recipeId FROM recipe ORDER BY date DESC;");
                     }
-                    ps.setString(1, "date");
                 }
                 else { //sort on rating
                     if (asc) {
@@ -233,18 +231,38 @@ public class Browse extends JFrame {
                     ps.setString(1, "name");
                 }
             }
+            // searched name of recipe
             else if (search.equals("Name")) {
-                
-                if (order.equals("Ascending")) {
-                    ps = con.prepareStatement("SELECT name, recipeId FROM recipe WHERE name like ? ORDER BY ? ASC;");
+                // sort by name
+                if (sort.equals("Name")) {
+                    if (asc) {
+                        ps = con.prepareStatement("SELECT name, recipeId FROM recipe WHERE name like ? ORDER BY name;");
+                    }
+                    else {
+                        ps = con.prepareStatement("SELECT name, recipeId FROM recipe WHERE name like ? ORDER BY name DESC;");
+                    }
                 }
-                else {
-                    ps = con.prepareStatement("SELECT name, recipeId FROM recipe WHERE name like ? ORDER BY ? DESC;");
+                //sort by date
+                else if (sort.equals("Date")) {
+                    if (asc) {
+                        ps = con.prepareStatement("SELECT name, recipeId FROM recipe WHERE name like ? ORDER BY date;");
+                    }
+                    else {
+                        ps = con.prepareStatement("SELECT name, recipeId FROM recipe WHERE name like ? ORDER BY date DESC;");
+                    }
+                }
+                else { //sort on rating
+                    if (asc) {
+                        ps = con.prepareStatement("SELECT name, recipeId FROM recipe ORDER BY ? ASC;");
+                    }
+                    else {
+                        ps = con.prepareStatement("SELECT name, recipeId FROM recipe ORDER BY ? DESC;");
+                    }
+                    ps.setString(1, "name");
                 }
                 ps.setString(1, "%" + searchVal + "%");
-                    if (sort.equals("Name")) {
-                        ps.setString(2, "name");
-                    }
+                
+                    
 
             }
             else { // change this it's stubbed out
@@ -298,7 +316,7 @@ public class Browse extends JFrame {
                     @Override
                     public void run() {
                         Browse.this.dispose();
-                        new UserHome(user);
+                        new UserHome();
                     }
                 });
             }
