@@ -95,10 +95,10 @@ public class Pantry extends JFrame {
             });
         contentPane.add(backButton);
 
-        JButton updButton = new JButton("Update Pantry");
-        updButton.setFont(new Font("80er Teenie Demo", Font.BOLD, 26));
-        updButton.setBounds(750,500 , 200, 50);
-        contentPane.add(updButton);
+        // JButton updButton = new JButton("Update Pantry");
+        // updButton.setFont(new Font("80er Teenie Demo", Font.BOLD, 26));
+        // updButton.setBounds(750,500 , 200, 50);
+        // contentPane.add(updButton);
 
         JLabel iJLabel = new JLabel("Ingredient Name");
         iJLabel.setBackground(new Color(181, 151, 207));

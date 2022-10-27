@@ -255,7 +255,12 @@ public class DataBase {
                         st2.setInt(1, quantity + qOLD);
                         st2.setInt(2, qbought+ bqOLD);
                         st2.setDate(4, (java.sql.Date) exp);
-                        st2.setString(5, unit);
+                        if (unit != "item name"){
+                                st2.setString(5, unit);   
+                        }
+                        else {
+                                st2.setString(5, item);
+                        }
                         st2.setString(6, user);
                         st2.setInt(7, Integer.parseInt(ingID));
 
@@ -267,7 +272,7 @@ public class DataBase {
                       }
                       else{
                       
-           if (unit != "item name"){
+          
                 PreparedStatement st = (PreparedStatement) conn
                 .prepareStatement("INSERT INTO in_pantry VALUES (?,?,?,?,?,?,?);");
                 st.setString(1, user);
@@ -276,27 +281,17 @@ public class DataBase {
             st.setInt(4, qbought);
             st.setInt(5, quantity);
             st.setDate(6, (java.sql.Date) exp);
-            st.setString(7, unit);
+            if (unit != "item name"){
+                st.setString(5, unit);   
+        }
+                else {
+                st.setString(7, item);
+        }
             int rs = st.executeUpdate();
             if(rs == 1){
                 return 1;
             }
-           } else {
-                PreparedStatement st = (PreparedStatement) conn
-                    .prepareStatement("INSERT INTO in_pantry VALUES (?,?,?,?,?,?,?);");
-        st.setString(1, user);
-            st.setInt(2, Integer.parseInt(ingID));
-            st.setDate(3, (java.sql.Date) purch);
-            st.setInt(4, qbought);
-            st.setInt(5, quantity);
-            st.setDate(6, (java.sql.Date) exp);
-            st.setString(7, item);
-            int rs = st.executeUpdate();
-            if(rs == 1){
-                return 1;
-            }
-
-           }}
+           }
         } catch (SQLException e) {
                 
 
