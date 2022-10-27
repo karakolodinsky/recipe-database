@@ -70,12 +70,15 @@ public class Pantry extends JFrame {
         contentPane.add(addButton);
         addButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                        dispose();
                     AddToPantry Add = new AddToPantry();
                     Add.setVisible(true);
                 }
             
         });
         contentPane.add(addButton);
+
+       
 
         JButton backButton = new JButton("Return to Home");
         backButton.setFont(new Font("80er Teenie Demo", Font.BOLD, 20));
@@ -100,47 +103,48 @@ public class Pantry extends JFrame {
         JLabel iJLabel = new JLabel("Ingredient Name");
         iJLabel.setBackground(new Color(181, 151, 207));
         iJLabel.setForeground(new Color(181, 151, 207));
-        iJLabel.setFont(new Font("80er Teenie Demo", Font.BOLD, 20));
+        iJLabel.setFont(new Font("80er Teenie Demo", Font.BOLD, 15));
         iJLabel.setBounds(100, 90, 200, 40);
         contentPane.add(iJLabel);
 
         JLabel pJLabel = new JLabel("Purchase Date");
         pJLabel.setBackground(new Color(181, 151, 207));
         pJLabel.setForeground(new Color(181, 151, 207));
-        pJLabel.setFont(new Font("80er Teenie Demo", Font.BOLD, 20));
-        pJLabel.setBounds(250, 90, 200, 40);
+        pJLabel.setFont(new Font("80er Teenie Demo", Font.BOLD, 15));
+        pJLabel.setBounds(225, 90, 200, 40);
         contentPane.add(pJLabel);
 
         JLabel eJLabel = new JLabel("Expiration Date");
         eJLabel.setBackground(new Color(181, 151, 207));
         eJLabel.setForeground(new Color(181, 151, 207));
-        eJLabel.setFont(new Font("80er Teenie Demo", Font.BOLD, 20));
-        eJLabel.setBounds(375, 90, 200, 40);
+        eJLabel.setFont(new Font("80er Teenie Demo", Font.BOLD, 15));
+        eJLabel.setBounds(350, 90, 200, 40);
         contentPane.add(eJLabel);
 
         JLabel qJLabel = new JLabel("Current Quantity");
         qJLabel.setBackground(new Color(181, 151, 207));
         qJLabel.setForeground(new Color(181, 151, 207));
-        qJLabel.setFont(new Font("80er Teenie Demo", Font.BOLD, 20));
-        qJLabel.setBounds(515, 90, 200, 40);
+        qJLabel.setFont(new Font("80er Teenie Demo", Font.BOLD, 15));
+        qJLabel.setBounds(475, 90, 200, 40);
         contentPane.add(qJLabel);
 
         JLabel bqJLabel = new JLabel("Bought Quantity");
         bqJLabel.setBackground(new Color(181, 151, 207));
         bqJLabel.setForeground(new Color(181, 151, 207));
-        bqJLabel.setFont(new Font("80er Teenie Demo", Font.BOLD, 20));
-        bqJLabel.setBounds(675, 90, 200, 40);
+        bqJLabel.setFont(new Font("80er Teenie Demo", Font.BOLD, 15));
+        bqJLabel.setBounds(600, 90, 200, 40);
         contentPane.add(bqJLabel);
 
         JLabel uJLabel = new JLabel("Unit");
         uJLabel.setBackground(new Color(181, 151, 207));
         uJLabel.setForeground(new Color(181, 151, 207));
-        uJLabel.setFont(new Font("80er Teenie Demo", Font.BOLD, 20));
-        uJLabel.setBounds(825, 90, 200, 40);
+        uJLabel.setFont(new Font("80er Teenie Demo", Font.BOLD, 15));
+        uJLabel.setBounds(750, 90, 200, 40);
         contentPane.add(uJLabel);
 
 
-
+        JLabel SelectedField = new JLabel("");
+        contentPane.add(SelectedField);
 
         JTable PantTbl = new JTable();
         PantTbl.setBounds(100, 125, 775, 350);
@@ -149,13 +153,51 @@ public class Pantry extends JFrame {
         try {
                 rs = DataBase.GetPantry(user);
                 PantTbl.setModel(DbUtils.resultSetToTableModel(rs));
+                PantTbl.setFocusable(false);
+                PantTbl.setRowSelectionAllowed(true);
+                PantTbl.setDefaultEditor(Object.class, null);
+
         } catch (IOException e1) {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
         }
+        PantTbl.setRowSelectionAllowed(true);
+        PantTbl.addMouseListener(new java.awt.event.MouseAdapter() {
+                @Override
+                public void mouseClicked(java.awt.event.MouseEvent evt) {
+                    int row = PantTbl.rowAtPoint(evt.getPoint());
+                    String ing = (String) PantTbl.getValueAt(row, 0);
+                    SelectedField.setText(ing);
+                }
+            });
+
+
 
         
         contentPane.add(PantTbl);
+
+        JButton delButton = new JButton("Delete from Pantry");
+        delButton.setFont(new Font("80er Teenie Demo", Font.BOLD, 26));
+        delButton.setBounds(750,20 , 200, 50);
+        contentPane.add(delButton);
+        delButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                        if (DataBase.deleteFromPantry(UserLogin.getUsername() , SelectedField.getText()) != -1){
+                                JOptionPane.showMessageDialog(contentPane, "Item deleted from your pantry.", "Deleted",
+                                JOptionPane.INFORMATION_MESSAGE);
+                                        dispose();
+                                    Pantry Add = new Pantry();
+                                    Add.setVisible(true);
+                        }
+                } catch (IOException e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
+                }
+                }
+            
+        });
+        contentPane.add(delButton);
         
 
 

@@ -109,20 +109,14 @@ public class AddToPantry extends JFrame {
         eJLabel.setBounds(360, 150, 200, 40);
         contentPane.add(eJLabel);
 
-        JLabel qJLabel = new JLabel("Current Quantity");
-        qJLabel.setBackground(new Color(181, 151, 207));
-        qJLabel.setVisible(false);
-        qJLabel.setForeground(new Color(181, 151, 207));
-        qJLabel.setFont(new Font("80er Teenie Demo", Font.BOLD, 20));
-        qJLabel.setBounds(350, 200, 200, 40);
-        contentPane.add(qJLabel);
+
 
         JLabel bqJLabel = new JLabel("Bought Quantity");
         bqJLabel.setBackground(new Color(181, 151, 207));
         bqJLabel.setVisible(false);
         bqJLabel.setForeground(new Color(181, 151, 207));
         bqJLabel.setFont(new Font("80er Teenie Demo", Font.BOLD, 20));
-        bqJLabel.setBounds(350, 250, 200, 40);
+        bqJLabel.setBounds(350, 200, 200, 40);
         contentPane.add(bqJLabel);
 
         JLabel uJLabel = new JLabel("Unit of Measurement");
@@ -130,12 +124,12 @@ public class AddToPantry extends JFrame {
         uJLabel.setVisible(false);
         uJLabel.setForeground(new Color(181, 151, 207));
         uJLabel.setFont(new Font("80er Teenie Demo", Font.BOLD, 20));
-        uJLabel.setBounds(320, 300, 200, 40);
+        uJLabel.setBounds(320, 250, 200, 40);
         contentPane.add(uJLabel);
 
         String[] unit = { "grams","ounces", "fl oz", "item name"};
         JComboBox<String> units = new JComboBox<String>(unit);
-        units.setBounds(500, 300, 200, 30);
+        units.setBounds(500, 250, 200, 30);
         units.setVisible(false);
         contentPane.add(units);
         
@@ -187,16 +181,9 @@ public class AddToPantry extends JFrame {
         // datePicker2.setVisible(false);
         // contentPane.add(datePicker2);
 
-        JTextField QuantField = new JTextField();
-        QuantField.setFont(new Font("Juice ITC", Font.PLAIN, 20));
-        QuantField.setBounds(500, 200, 200, 30);
-        QuantField.setColumns(10);
-        QuantField.setVisible(false);
-        contentPane.add(QuantField);
-
         JTextField QuantBoughtField = new JTextField();
         QuantBoughtField.setFont(new Font("Juice ITC", Font.PLAIN, 20));
-        QuantBoughtField.setBounds(500, 250, 200, 30);
+        QuantBoughtField.setBounds(500, 200, 200, 30);
         QuantBoughtField.setColumns(10);
         QuantBoughtField.setVisible(false);
         contentPane.add(QuantBoughtField);
@@ -235,11 +222,9 @@ public class AddToPantry extends JFrame {
                     String ing = (String) SearchTbl.getValueAt(row, 0);
                     SIngredientField.setText(ing);
                     SIngredientField.setVisible(true);
-                    QuantField.setVisible(true);
                     QuantBoughtField.setVisible(true);
                     iJLabel.setVisible(true);
                     uJLabel.setVisible(true);
-                    qJLabel.setVisible(true);
                     bqJLabel.setVisible(true);
                     uJLabel.setVisible(true);
                     eJLabel.setVisible(true);
@@ -316,7 +301,7 @@ public class AddToPantry extends JFrame {
                                 java.util.Date date2 = format.parse(dateField2.getText());
                                 java.sql.Date sqlStartDate2 = new java.sql.Date(date2.getTime()); 
                 
-                                if (DataBase.addtoPantry(SIngredientField.getText(), UserLogin.getUsername(), Integer.parseInt(QuantField.getText()),sqlStartDate, sqlStartDate2, Integer.parseInt(QuantBoughtField.getText()), String.valueOf(units.getSelectedItem()) ) != -1) {
+                                if (DataBase.addtoPantry(SIngredientField.getText(), UserLogin.getUsername(), Integer.parseInt(QuantBoughtField.getText()),sqlStartDate, sqlStartDate2, Integer.parseInt(QuantBoughtField.getText()), String.valueOf(units.getSelectedItem()) ) != -1) {
                                         
                                         JOptionPane.showMessageDialog(contentPane, SIngredientField.getText()+ " added to "+ UserLogin.getUsername() + "'s pantry.", "Login",
                                         JOptionPane.INFORMATION_MESSAGE);
@@ -347,6 +332,22 @@ public class AddToPantry extends JFrame {
                    }
                });
                contentPane.add(AddButton);
+
+               JButton backButton = new JButton("Return to Pantry");
+        backButton.setFont(new Font("80er Teenie Demo", Font.BOLD, 15));
+        backButton.setBounds(20, 5, 150, 30);
+        contentPane.add(backButton);
+        backButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                        dispose();
+                        Pantry userHome = new Pantry();
+                        userHome.setTitle("Pantry");
+                        userHome.setVisible(true);
+                    }
+                
+            });
+        contentPane.add(backButton);
+
 
                
 

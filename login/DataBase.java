@@ -218,6 +218,8 @@ public class DataBase {
 
         try {
                 String ingID = "";
+                int qOLD = 0;
+                int bqOLD = 0;
                 PreparedStatement st0 = (PreparedStatement) conn
                     .prepareStatement("SELECT ingredientid from ingredient where name = ? ");
                 st0.setString(1, item);
@@ -225,8 +227,46 @@ public class DataBase {
                 while (rs0.next()) {
                          ingID = rs0.getString("ingredientID");
                         System.out.println(ingID + "\n");
+                        System.out.println(ingID + "\n");
                       }
+                      PreparedStatement st1 = (PreparedStatement) conn
+                      .prepareStatement("SELECT ingredientid from in_pantry where ingredientid = ? and username = ? ");
+                      st1.setInt(1,Integer.parseInt(ingID));
+                      st1.setString(2, user);
+                      ResultSet rs1 = st1.executeQuery();
+                      boolean in_pantry = true;
+                      if (!rs1.isBeforeFirst() ) {    
+                        in_pantry = false;
+                      } 
 
+                      if (in_pantry){
+                        PreparedStatement st3 = (PreparedStatement) conn
+                        .prepareStatement("Select quantitycurr, quantitybought from in_pantry where username = ? and ingredientid = ?");
+                        st3.setString(1, user);
+                        st3.setInt(2, Integer.parseInt(ingID));
+                        ResultSet rs3 = st3.executeQuery();
+                        while (rs3.next()) {
+                                        qOLD = rs3.getInt(1);
+                                        bqOLD = rs3.getInt(2);
+                                }
+                        PreparedStatement st2 = (PreparedStatement) conn
+                        .prepareStatement("UPDATE in_pantry SET quantitycurr = ?, quantitybought = ?, purchasedate = ? , expirationdate = ?, unit = ? WHERE username = ? and ingredientid = ?;  ");
+                        st2.setDate(3, (java.sql.Date) purch);
+                        st2.setInt(1, quantity + qOLD);
+                        st2.setInt(2, qbought+ bqOLD);
+                        st2.setDate(4, (java.sql.Date) exp);
+                        st2.setString(5, unit);
+                        st2.setString(6, user);
+                        st2.setInt(7, Integer.parseInt(ingID));
+
+                       int rs2 = st2.executeUpdate();
+
+                        if(rs2 == 1){
+                                return 1;
+                            }
+                      }
+                      else{
+                      
            if (unit != "item name"){
                 PreparedStatement st = (PreparedStatement) conn
                 .prepareStatement("INSERT INTO in_pantry VALUES (?,?,?,?,?,?,?);");
@@ -256,8 +296,9 @@ public class DataBase {
                 return 1;
             }
 
-           }
+           }}
         } catch (SQLException e) {
+                
 
                 // print SQL exception information
                 printSQLException(e);
@@ -348,6 +389,37 @@ public class DataBase {
             }
         }
 }
+
+public static int deleteFromPantry(String username, String item) throws IOException {
+        Connection conn = DataBase.getConnect();
+
+        try {
+                int ingID = 0;
+                PreparedStatement st0 = (PreparedStatement) conn
+                    .prepareStatement("SELECT ingredientid from ingredient where name = ? ");
+                st0.setString(1, item);
+                ResultSet rs0 = st0.executeQuery();
+                while (rs0.next()) {
+                         ingID = rs0.getInt("ingredientID");
+                        }
+            PreparedStatement st = (PreparedStatement) conn
+                    .prepareStatement("DELETE FROM in_pantry WHERE username = ? and ingredientid = ?"); 
+            st.setString(1, username);
+            st.setInt(2, ingID);
+            int rs = st.executeUpdate();
+            if(rs == 1){
+                return 1;
+            }
+        } catch (SQLException e) {
+
+                // print SQL exception information
+                printSQLException(e);
+            }
+
+        return -1;
+
+    }
+
 
 
 }
