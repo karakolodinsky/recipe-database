@@ -8,6 +8,16 @@ import java.sql.ResultSet;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
+/**
+ * DataBase functionality for accessing/requesting data from the SQL database
+ *
+ * @author Kara Kolodinsky
+ * @author Ainsley Ross
+ * @author Teagan Nester
+ * @author Caitlyn Cyrek
+ * @author Serene Wood
+ */
+
 public class UserHome extends JFrame {
 
     private static final long serialVersionUID = 1;

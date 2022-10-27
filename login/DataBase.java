@@ -17,6 +17,15 @@ import java.util.Date;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.swing.JOptionPane;
+/**
+ * DataBase functionality for accessing/requesting data from the SQL database
+ *
+ * @author Kara Kolodinsky
+ * @author Ainsley Ross
+ * @author Teagan Nester
+ * @author Caitlyn Cyrek
+ * @author Serene Wood
+ */
 
 public class DataBase {
 
@@ -413,16 +422,16 @@ public class DataBase {
      * @param servings          Integer 1-12
      * @param difficulty        Integer 1-5
      * @param name              String <= 50 chars long
-     * @return                  1 on success, -1 on failure
+     * @return                  new recipe's ID on success, -1 on failure
      */
     public static int createRecipe(String steps, String description, Integer cooktime,
                                     Integer servings, Integer difficulty, String name){
         String username = UserLogin.getUsername();
         Connection conn = DataBase.getConnect();
-        //Q; does insert auto-assign recipeIDs?
         try{
             int newid = (getMaxRecipeId() + 1);
-            //recipe: (recipeid, author, steps, description, cooktime, servings, difficulty, name, date)
+
+            /** recipe: (recipeid, author, steps, description, cooktime, servings, difficulty, name, date) */
             PreparedStatement st = (PreparedStatement) conn
                     .prepareStatement("INSERT INTO recipe (RECIPEID, AUTHOR, STEPS, DESCRIPTION, COOKTIME, SERVINGS, " +
                                         "DIFFICULTY, NAME, DATE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);");
@@ -438,14 +447,13 @@ public class DataBase {
 
             int rs = st.executeUpdate();
             if(rs == 1){
-                //display(rs);      // nvm lol
-                return 1;
+                return newid;
             }
         }
         catch (SQLException e) {
             printSQLException(e);
         }
-        return -1;                  // try failed
+        return -1;
     }
 
 
@@ -455,7 +463,6 @@ public class DataBase {
      */
     public static int getMaxRecipeId (){
         Connection conn = DataBase.getConnect();
-        int newId;
         try{
             PreparedStatement id = (PreparedStatement) conn .prepareStatement("SELECT MAX(R.RECIPEID) " +
                                                                                 "FROM RECIPE AS R");

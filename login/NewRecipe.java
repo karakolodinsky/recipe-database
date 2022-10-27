@@ -13,26 +13,33 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.NumberFormatter;
 
+/**
+ * UI-Interface for the New-Recipe functionality
+ *
+ * @author Serene Wood
+ */
+
 public class NewRecipe extends JFrame{
 
+    /** Java Swing vars */
     private static final long serialVersionUID = 1;
     private JPanel contentPane;
 
-    // standardized variables for buttons:
+    /** standardized variables for buttons: */
     private int strdButtonWidth = 150;
     private int strdButtonHeight = 40;
     private int strdFontSize = 10;
     private int borderSize = 20;
 
-    // standardized variables for text-boxes:
+    /** standardized variables for text-boxes: */
     private int TEXT_BOX_WIDTH = 100;
     private int COMBO_BOX_WIDTH = 100;
     private int COMBO_BOX_HEIGHT = 50;
 
-    // Current user
+    /** Current user: */
     static private String currUser;
 
-    // SQL variables:
+    /** SQL Recipe-Table Variables: */
     String name;            // <= 500 chars
     String author;
     String description;     // <= 200 chars
@@ -58,17 +65,22 @@ public class NewRecipe extends JFrame{
         });
     }
 
+    /**
+     * Unused constructor
+     */
     public NewRecipe() {
 
     }
 
+    /**
+     * Main NewRecipe Constructor
+     * @param user  Current user's username'
+     */
     public NewRecipe(String user) {
-        //solve s = new solve();
-        currUser = user;
-
+        currUser = user;                        // unnecessary
         author = UserLogin.getUsername();
 
-        // yoinked code:
+        /** yoinked code: **/
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(450, 190, 1014, 597);
         setResizable(false);
@@ -77,28 +89,25 @@ public class NewRecipe extends JFrame{
         setContentPane(contentPane);
         contentPane.setLayout(new FlowLayout());
 
-        //JTextField create = new JTextField("Create a new Recipe:", 20);
-        JLabel create = new JLabel("Create a new recipe");
-        contentPane.add(create);
-
+        /** Enter Recipe Name Label & Text-box **/
         JLabel rNameLabel = new JLabel("Enter Recipe Name:");
         JTextField rNameTxt = new JTextField(TEXT_BOX_WIDTH);
         contentPane.add(rNameLabel);
         contentPane.add(rNameTxt);
 
-        /**
-         * ADD RECIPE DESCRIPTION INPUT: VARCHAR(200)
-         */
+        /** Enter Recipe Description Label & Text-box **/
         JLabel rDescLabel = new JLabel("Enter Recipe Description:");
         JTextField rDescTxt = new JTextField(TEXT_BOX_WIDTH);
         contentPane.add(rDescLabel);
         contentPane.add(rDescTxt);
 
+        /** Enter Recipe Steps Label & Textbox **/
         JLabel rStepsLabel = new JLabel("Enter Recipe Steps:");
         JTextField rStepsTxt = new JTextField(TEXT_BOX_WIDTH);
         contentPane.add(rStepsLabel);
         contentPane.add(rStepsTxt);
 
+        /** Cooktime Formatter (Integers must be >= 0) **/
         NumberFormat format = NumberFormat.getInstance();
         NumberFormatter formatter = new NumberFormatter(format);
         formatter.setValueClass(Integer.class);
@@ -106,13 +115,14 @@ public class NewRecipe extends JFrame{
         formatter.setMaximum(Integer.MAX_VALUE);
         formatter.setAllowsInvalid(false);
 
+        /** Enter Recipe Cooktime Label & Text-box **/
         JLabel rCookTimeLabel = new JLabel("Enter Recipe Cooktime(in minutes):");
         JFormattedTextField rCookTimeInt = new JFormattedTextField(formatter);
         rCookTimeInt.setColumns(TEXT_BOX_WIDTH);
-
         contentPane.add(rCookTimeLabel);
         contentPane.add(rCookTimeInt);
 
+        /** Enter Recipe Difficulty Label & Drop-down **/
         JLabel rDifficultyLabel = new JLabel("Select Recipe Difficulty:");
         Integer[] diffChoices = {1, 2, 3, 4, 5};
         JComboBox rDiffTime = new JComboBox(diffChoices);
@@ -120,6 +130,7 @@ public class NewRecipe extends JFrame{
         contentPane.add(rDifficultyLabel);
         contentPane.add(rDiffTime);
 
+        /** Enter Recipe Servings Label & Drop-down **/
         JLabel rServingsLable = new JLabel("Select Recipe Servings:");
         Integer[] ServingsChoices = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
         JComboBox rServings = new JComboBox(ServingsChoices);
@@ -127,26 +138,22 @@ public class NewRecipe extends JFrame{
         contentPane.add(rServingsLable);
         contentPane.add(rServings);
 
+        /** Enter-Button calls DataBase.createRecipe() **/
         JButton enter = new JButton("Enter");
         contentPane.add(enter);
-
         enter.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // String name;            // <= 500 chars
-                //    String author;
-                //    String steps;           // <= 5000 chars
-                //    int cooktime;
-                //    int servings;
-                //    int difficulty;
-
                 // don't judge my shitty != null checks
+                /** Check for all fields filled */
                 if (rNameTxt.getText() != null && rStepsTxt.getText()!= null && rCookTimeInt.getValue()!= null &&
                         rServings.getItemAt(rServings.getSelectedIndex())!= null &&
                         rDiffTime.getItemAt(rDiffTime.getSelectedIndex())!= null && rDescTxt.getText() != null){
-                    // Check for acceptable str length
+
+                    /** Check for acceptable str length */
                     if (rNameTxt.getText().length() < 500 && rStepsTxt.getText().length() < 5000 &&
                             rDescTxt.getText().length() <= 200){
+                        /* Pull & save entered values: */
                         name = rNameTxt.getText();
                         System.out.println("set var name as: " + name);
                         description = rDescTxt.getText();
@@ -163,12 +170,17 @@ public class NewRecipe extends JFrame{
                         System.out.println("The author of "+name+" is "+author);
 
                         /** Create recipe in SQL database; do not run until RecipeId is auto-generated **/
-                        DataBase.createRecipe(steps, description, cooktime, servings, difficulty, name);
-
-
-                        NewRecipe.this.dispose();
+                        int newId = DataBase.createRecipe(steps, description, cooktime, servings, difficulty, name);
+                        if (newId == -1){
+                            System.out.println("ERROR: FAILED TO ADD NEW RECIPE TO DATABASE");
+                        }
+                        else{
+                            NewRecipe.this.dispose();
+                        }
                     }
-                    else{                                                       // strings too long
+
+                    /** Error message pop-up for when string input exceed limits */
+                    else{       // strings too long
                         JFrame errorPopup = new JFrame("Error");
                         errorPopup.setSize(350,175);
                         PopupFactory pop = new PopupFactory();
@@ -180,7 +192,9 @@ public class NewRecipe extends JFrame{
                         p.show();
                     }
                 }
-                else{                                                           // Empty fields
+
+                /** Error message pop-up for field values are unfilled */
+                else{       // Empty fields
                     JFrame errorPopup = new JFrame("Error");
                     errorPopup.setSize(325,100);
                     PopupFactory pop = new PopupFactory();
@@ -188,14 +202,10 @@ public class NewRecipe extends JFrame{
                     errorPopup.add(new JLabel("Fill out all fields"));
                     errorPopup.show();
                     p.show();
-
                 }
-
             }
         });
-
         contentPane.setVisible(true);
-
     }
 
 }
