@@ -25,6 +25,7 @@ public class EditRecipe extends JFrame {
     public static final int HEIGHT_FRAME = 600;
     private JPanel panel;
     private ResultSet rs;
+    private int newDiff;
 
 
     public EditRecipe (String user, int recipeId, String btnText) throws SQLException {
@@ -84,10 +85,7 @@ public class EditRecipe extends JFrame {
         JLabel labelLabel = new JLabel("Uploaded On: " + date);
         panel.add(labelLabel);
         int diff = rs.getInt("difficulty");
-        labelLabel = new JLabel("Difficulty:");
-        panel.add(labelLabel);
-        String diffString = difficulty(diff);
-        labelMaker(diffString);
+        diffMenu(diff);
         int time = rs.getInt("cooktime");
         labelLabel = new JLabel("Cook Time (Minutes):");
         panel.add(labelLabel);
@@ -142,6 +140,77 @@ public class EditRecipe extends JFrame {
             }
         });
         return home;
+    }
+
+    private void diffMenu (int diff) {
+        String diffString = difficulty(diff);
+        JMenuBar menu = new JMenuBar();
+        JMenu difficult = new JMenu("Difficulty");
+        menu.add(difficult);
+        panel.add(menu);
+        ButtonGroup group = new ButtonGroup();
+        JRadioButtonMenuItem rbMenuItem = new JRadioButtonMenuItem("Easy");
+        if (diff == 1) {
+            rbMenuItem.setSelected(true);
+        }
+        diffClick(rbMenuItem);
+        group.add(rbMenuItem);
+        difficult.add(rbMenuItem);
+        rbMenuItem = new JRadioButtonMenuItem("Easy-Medium");
+        if (diff == 2) {
+            rbMenuItem.setSelected(true);
+        }
+        diffClick(rbMenuItem);
+        group.add(rbMenuItem);
+        difficult.add(rbMenuItem);
+        rbMenuItem = new JRadioButtonMenuItem("Medium");
+        if (diff == 3) {
+            rbMenuItem.setSelected(true);
+        }
+        diffClick(rbMenuItem);
+        group.add(rbMenuItem);
+        difficult.add(rbMenuItem);
+        rbMenuItem = new JRadioButtonMenuItem("Medium-Hard");
+        if (diff == 4) {
+            rbMenuItem.setSelected(true);
+        }
+        diffClick(rbMenuItem);
+        group.add(rbMenuItem);
+        difficult.add(rbMenuItem);
+        rbMenuItem = new JRadioButtonMenuItem("Hard");
+        if (diff == 5) {
+            rbMenuItem.setSelected(true);
+        }
+        diffClick(rbMenuItem);
+        group.add(rbMenuItem);
+        difficult.add(rbMenuItem);
+    }
+
+    private void diffClick (JRadioButtonMenuItem m) {
+        m.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String text = m.getText();
+                String newDiffText = text;
+                if (newDiffText.equals("Easy")) {
+                    newDiff = 1;
+                }
+                else if (newDiffText.equals("Easy-Medium")) {
+                    newDiff = 2;
+                }
+                else if (newDiffText.equals("Medium")) {
+                    newDiff = 3;
+                }
+                else if (newDiffText.equals("Medium-Hard")) {
+                    newDiff = 4;
+                }
+                else {
+                    newDiff = 5;
+                }
+            }
+
+        });
     }
 
     private String difficulty (int diff) {
