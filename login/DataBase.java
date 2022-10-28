@@ -399,7 +399,7 @@ public class DataBase {
                 if (rsFirstCheck.next()) {
                     PreparedStatement st2 = (PreparedStatement) conn
                             .prepareStatement("SELECT purchasedate, ingredientid, quantitycurr, unit FROM in_pantry WHERE ingredientid=? AND username=? " +
-                                            "group by purchasedate, ingredientid, quantitycurr, unit, expirationdate ORDER BY expirationdate DESC;", ResultSet.TYPE_SCROLL_SENSITIVE,
+                                            "group by purchasedate, ingredientid, quantitycurr, unit, expirationdate ORDER BY expirationdate ASC;", ResultSet.TYPE_SCROLL_SENSITIVE,
                                     ResultSet.CONCUR_UPDATABLE);
                     st2.setInt(1, rsFirstCheck.getInt("ingredientid"));
                     st2.setString(2, user);
@@ -466,7 +466,7 @@ public class DataBase {
 //                    }
                     PreparedStatement st2 = (PreparedStatement)  conn
                             .prepareStatement("SELECT purchasedate, ingredientid, quantitycurr, unit FROM in_pantry WHERE ingredientid=? AND username=? " +
-                                    "group by purchasedate, ingredientid, quantitycurr, unit, expirationdate ORDER BY expirationdate DESC;", ResultSet.TYPE_SCROLL_SENSITIVE,
+                                    "group by purchasedate, ingredientid, quantitycurr, unit, expirationdate ORDER BY expirationdate ASC;", ResultSet.TYPE_SCROLL_SENSITIVE,
                                     ResultSet.CONCUR_UPDATABLE);
                     st2.setInt(1, rs1.getInt("ingredientid"));
                     st2.setString(2, user);
