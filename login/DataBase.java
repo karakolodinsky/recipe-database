@@ -331,7 +331,7 @@ public class DataBase {
 
         try {
             PreparedStatement st = (PreparedStatement) conn
-                    .prepareStatement("SELECT name FROM ingredient WHERE name LIKE '%" + ingredient + "%'");
+                    .prepareStatement("SELECT name FROM ingredient WHERE name LIKE '" + ingredient + "%' order by name");
                 //     st.setString(1, ingredient);
             System.out.println(st);
             ResultSet rs = st.executeQuery();
@@ -351,7 +351,7 @@ public class DataBase {
 
         try {
             PreparedStatement st = (PreparedStatement) conn
-                    .prepareStatement("SELECT i.name, p.purchasedate, p.expirationdate, p.quantitycurr, p.quantitybought, p.unit from ingredient i, in_pantry p where i.ingredientid = p.ingredientid and p.username = ?");
+                    .prepareStatement("SELECT i.name, p.purchasedate, p.expirationdate, p.quantitycurr, p.quantitybought, p.unit from ingredient i, in_pantry p where i.ingredientid = p.ingredientid and p.username = ? order by name");
                 st.setString(1, user);
             System.out.println(st);
             ResultSet rs = st.executeQuery();
