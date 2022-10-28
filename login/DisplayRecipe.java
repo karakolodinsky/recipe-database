@@ -1,6 +1,7 @@
 package login;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -25,9 +26,18 @@ public class DisplayRecipe extends JFrame {
     private JScrollPane contentPane;
     public static final int WIDTH_FRAME = 1200;
     public static final int HEIGHT_FRAME = 600;
+    private int TEXT_BOX_WIDTH = 150;
+    private int TEXT_BOX_HEIGHT = 30;
     private JPanel panel;
     private ResultSet rs;
     private JButton cookButton;
+    private JPanel ingredientContainer;
+    private JPanel descriptionContainer;
+
+    /** standardized variables for containers: */
+    private int CONTAINER_HEIGHT = 500;
+    private int CONTAINER_WIDTH = 450;
+    //private int SMALL_CONTAINER_HEIGHT = ;
 
 
     public DisplayRecipe (String user, int recipeId, String btnText) throws SQLException {
@@ -36,11 +46,12 @@ public class DisplayRecipe extends JFrame {
         this.recipeId = recipeId;
         this.btnText = btnText;
         setResizable(false);
-        setLayout(null);
+
         setSize(WIDTH_FRAME, HEIGHT_FRAME);
         setLocationRelativeTo(null);
         setLocation(getX() - 80, getY() - 80);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+
         setVisible(true);
 
         init ();
@@ -49,15 +60,30 @@ public class DisplayRecipe extends JFrame {
 
     private void init () throws SQLException {
         panel = new JPanel();
+        panel.setLayout(new FlowLayout());
+        panel.setBorder(new EmptyBorder(5, 5, 5, 5));
         JScrollPane scrollPane = new JScrollPane(panel);
 
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        ingredientContainer = new JPanel();
+        ingredientContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
+        ingredientContainer.setPreferredSize(new Dimension(CONTAINER_WIDTH, CONTAINER_HEIGHT));
+        ingredientContainer.setMaximumSize(new Dimension(CONTAINER_WIDTH, CONTAINER_HEIGHT));
+
+        descriptionContainer = new JPanel();
+        descriptionContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
+        descriptionContainer.setPreferredSize(new Dimension(CONTAINER_WIDTH, CONTAINER_HEIGHT));
+        descriptionContainer.setMaximumSize(new Dimension(CONTAINER_WIDTH, CONTAINER_HEIGHT));
+
+        panel.add(descriptionContainer);
+        panel.add(ingredientContainer);
+
+        //panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setAlignmentY(TOP_ALIGNMENT);
 
         panel.add(Box.createVerticalGlue());
+        RecipeIngredients();
         formatRecipe();
         RecipeTags();
-        RecipeIngredients();
         this.getContentPane().add(scrollPane);
         setContentPane(scrollPane);
     }
@@ -71,7 +97,7 @@ public class DisplayRecipe extends JFrame {
         }
         cookButton = new JButton("cook/make/bake");
         cookButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        panel.add(cookButton);
+        descriptionContainer.add(cookButton);
         cookButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //functionality for make-bake-cook
@@ -81,11 +107,11 @@ public class DisplayRecipe extends JFrame {
         });
         JLabel label = new JLabel(info[0]);
         label.setAlignmentX(Component.CENTER_ALIGNMENT);
-        panel.add(label);
+        descriptionContainer.add(label);
         if (!(avg.equals(""))) {
             label = new JLabel("Average Rating: " + avg);
             label.setAlignmentX(Component.CENTER_ALIGNMENT);
-            panel.add(label);
+            descriptionContainer.add(label);
         }
         PreparedStatement ps = con.prepareStatement("SELECT cooktime, steps, description, servings, difficulty, date " +
                                 "FROM recipe WHERE recipeId=?;");
@@ -123,7 +149,7 @@ public class DisplayRecipe extends JFrame {
      * Pulls all ingredients for the current recipe and displays them
      */
     private void RecipeIngredients(){
-        String ingredientsList = "<html>";
+        String ingredientsList = "<html>Ingredients:";
         try{
             ResultSet categoryList = DataBase.getIngredients(recipeId);
             //SELECT r.ingredientid, r.quantity, r.unit
@@ -137,7 +163,7 @@ public class DisplayRecipe extends JFrame {
                 ingredientsList += "<html/>";
                 JLabel comp = new JLabel(ingredientsList);
                 System.out.println(ingredientsList);
-                panel.add(comp);
+                ingredientContainer.add(comp);
             }
             else{
                 System.out.println("No ingredients");
@@ -150,12 +176,14 @@ public class DisplayRecipe extends JFrame {
 
     private void labelMaker (String text) {
         JLabel label = new JLabel(text);
+        label.setPreferredSize(new Dimension(TEXT_BOX_WIDTH, TEXT_BOX_HEIGHT));
         label.setAlignmentX(Component.CENTER_ALIGNMENT);
-        panel.add(label);
+        descriptionContainer.add(label);
     }
 
     private void textArea (String text) {
         JTextArea textArea = new JTextArea(text);
+        textArea.setColumns(TEXT_BOX_WIDTH = 100);
         textArea.setEditable(false);  
         textArea.setCursor(null);  
         textArea.setOpaque(false);  
@@ -163,8 +191,8 @@ public class DisplayRecipe extends JFrame {
         textArea.setLineWrap(true);
         textArea.setWrapStyleWord(true);
         textArea.setAlignmentX(CENTER_ALIGNMENT);
-        panel.add(textArea);
-        panel.add(textArea);
+        descriptionContainer.add(textArea);
+        descriptionContainer.add(textArea);
     }
 
     private String difficulty (int diff) {
