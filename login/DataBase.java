@@ -776,8 +776,11 @@ public static ResultSet getUserRecipes (String user){
     }
 
 
-
-
+    /**
+     * Gets all ingredients belonging to a selected recipe
+     * @param recipeID the recipes ID number / foreign key to recipe in recipe_requires
+     * @return  ResultSet of ingredients' recipe-specific name, quantity, unit
+     */
     public static ResultSet getIngredients(int recipeID){
         Connection conn = getCon();
         try{
@@ -799,6 +802,11 @@ public static ResultSet getUserRecipes (String user){
     }
 
 
+    /**
+     * Gets all categories belonging to a selected recipe
+     * @param recipeID the recipes ID number / foreign key to recipe in recipe_requires
+     * @return  ResultSet of categories' name
+     */
     public static ResultSet getCategories(int recipeID){
         Connection conn = getCon();
         try{

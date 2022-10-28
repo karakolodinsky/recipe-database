@@ -24,10 +24,6 @@ public class DisplayRecipe extends JFrame {
     private static int recipeId;
     private String btnText;
     private JScrollPane contentPane;
-    public static final int WIDTH_FRAME = 1200;
-    public static final int HEIGHT_FRAME = 600;
-    private int TEXT_BOX_WIDTH = 150;
-    private int TEXT_BOX_HEIGHT = 30;
     private JPanel panel;
     private ResultSet rs;
     private JButton cookButton;
@@ -35,10 +31,16 @@ public class DisplayRecipe extends JFrame {
     private JPanel descriptionContainer;
     private JPanel categoriesContainer;
 
-    /** standardized variables for containers: */
+    /** standardized variables for containers/text-boxes: */
     private int CONTAINER_HEIGHT = 500;
     private int CONTAINER_WIDTH = 400;
     private int HALF_CONTAINER_HEIGHT = 250;
+
+    public static final int WIDTH_FRAME = 1200;
+    public static final int HEIGHT_FRAME = 600;
+
+    private int TEXT_BOX_WIDTH = 150;
+    private int TEXT_BOX_HEIGHT = 30;
     //private int SMALL_CONTAINER_HEIGHT = ;
 
 
@@ -71,16 +73,19 @@ public class DisplayRecipe extends JFrame {
         //categoriesContainer.setPreferredSize(new Dimension(CONTAINER_WIDTH, HALF_CONTAINER_HEIGHT));
         //categoriesContainer.setMaximumSize(new Dimension(CONTAINER_WIDTH, HALF_CONTAINER_HEIGHT));
 
+        /** contains ingredient-list */
         ingredientContainer = new JPanel();
         ingredientContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
         ingredientContainer.setPreferredSize(new Dimension(CONTAINER_WIDTH, HALF_CONTAINER_HEIGHT));
         ingredientContainer.setMaximumSize(new Dimension(CONTAINER_WIDTH, HALF_CONTAINER_HEIGHT));
 
+        /** contains category-list */
         categoriesContainer = new JPanel();
         categoriesContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
         categoriesContainer.setPreferredSize(new Dimension(CONTAINER_WIDTH, HALF_CONTAINER_HEIGHT));
         categoriesContainer.setMaximumSize(new Dimension(CONTAINER_WIDTH, HALF_CONTAINER_HEIGHT));
 
+        /** contains description and recipe info */
         descriptionContainer = new JPanel();
         descriptionContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
         descriptionContainer.setPreferredSize(new Dimension(CONTAINER_WIDTH, CONTAINER_HEIGHT));
@@ -168,7 +173,11 @@ public class DisplayRecipe extends JFrame {
 
 
     /**
-     * Adds recipe's "tags": categories
+     * adds the recipes 'tags' (categories) to the recipe display
+     * ie:
+     *      desert,
+     *      north-american,
+     *      ...
      */
     private void RecipeTags(){
         String categorysList = "<html>Categories:<br/><br/>";
@@ -191,7 +200,12 @@ public class DisplayRecipe extends JFrame {
     }
 
     /**
-     * Pulls all ingredients for the current recipe and displays them
+     * Pulls all ingredients for the current recipe and displays them in an ingredient list, including
+     * their name, units, and amount
+     * ie:
+     *      flour:      3 cups
+     *      egg:        12
+     *      ...
      */
     private void RecipeIngredients(){
         String ingredientsList = "<html>Ingredients:<br/><br/>";
@@ -200,9 +214,12 @@ public class DisplayRecipe extends JFrame {
             //SELECT r.ingredientid, r.quantity, r.unit
             if (categoryList != null){
                 while (categoryList.next()){
-                    ingredientsList += categoryList.getString(1);
+                    ingredientsList += categoryList.getString(1) + ":\t\t";
+                    ingredientsList += categoryList.getInt(2) + "  ";
                     ingredientsList += (categoryList.getString(3));
-                    ingredientsList += categoryList.getInt(2);
+                    if (categoryList.getInt(2) > 1 && categoryList.getString(3).length() > 0){
+                        ingredientsList += "s";
+                    }
                     ingredientsList += ", <br/>"; //ingredientsList += ", <br/>";             // newlines
                 }
                 ingredientsList += "<html/>";
