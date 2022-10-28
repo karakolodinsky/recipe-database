@@ -66,6 +66,7 @@ public class DisplayRecipe extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 //functionality for make-bake-cook
                 // will need to pass in recipeid to to Database.cookRecipe(int recipeid)
+                int x = DataBase.cookRecipe(recipeId);
             }
         });
         JLabel label = new JLabel(info[0]);
