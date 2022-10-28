@@ -689,6 +689,39 @@ public class DataBase {
         return -1;                  // try failed
     }
 
+   
+    /**
+     * Deletes a recipe as long as no one has cooked/reviewed it yet
+     * @param recipeId the recipe to be deleted
+     * @return 1 if the recipe was deleted, 0 otherwise
+     */
+    public static int DeleteRecipe(Integer recipeId){
+
+        try {
+            ResultSet rs = null;
+            PreparedStatement st = con.prepareStatement("SELECT recipeId FROM netizen_creates WHERE recipeId=?;");
+            st.setString(1, String.valueOf(recipeId));
+            boolean exists = st.execute();
+            if (!exists) { 
+                st = con.prepareStatement("DELETE FROM recipe WHERE recipeid=?;");
+                st.setString(1, String.valueOf(recipeId));
+                st.executeUpdate();
+                st = con.prepareStatement("DELETE FROM recipe_category WHERE recipeid=?");
+                st.setString(1, String.valueOf(recipeId));
+                st.executeUpdate();
+                st = con.prepareStatement("DELETE FROM recipe_requires WHERE recipeid=?");
+                st.setString(1, String.valueOf(recipeId));
+                st.executeUpdate();
+                return 1;
+            }
+        }
+        catch (SQLException e){
+            printSQLException(e);
+        }
+        return 0;
+    }
+
+
     /**
      * Categorize a recipe with the given categories
      * @param categoryString the string of categories
