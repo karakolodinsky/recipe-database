@@ -42,6 +42,7 @@ public class DisplayRecipe extends JFrame {
     private int TEXT_BOX_WIDTH = 150;
     private int TEXT_BOX_HEIGHT = 30;
     //private int SMALL_CONTAINER_HEIGHT = ;
+    private JLabel db_label_errorText;
 
 
     public DisplayRecipe (String user, int recipeId, String btnText) throws SQLException {
