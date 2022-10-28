@@ -2,10 +2,18 @@ package login;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException; 
+import java.sql.SQLException;
+/**
+ * UI-Interface for the display recipe
+ *
+ * @author Teagan Nester
+ * @author ?
+ */
 
 public class DisplayRecipe extends JFrame {
 
@@ -17,6 +25,7 @@ public class DisplayRecipe extends JFrame {
     public static final int HEIGHT_FRAME = 600;
     private JPanel panel;
     private ResultSet rs;
+    private JButton cookButton;
 
 
     public DisplayRecipe (String user, int recipeId, String btnText) throws SQLException {
@@ -56,6 +65,16 @@ public class DisplayRecipe extends JFrame {
         if (info.length > 1) {
             avg = info[1];
         }
+        cookButton = new JButton("cook/make/bake");
+        cookButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panel.add(cookButton);
+        cookButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                //functionality for make-bake-cook
+                // will need to pass in recipeid to to Database.cookRecipe(int recipeid)
+                int x = DataBase.cookRecipe(recipeId);
+            }
+        });
         JLabel label = new JLabel(info[0]);
         label.setAlignmentX(Component.CENTER_ALIGNMENT);
         panel.add(label);

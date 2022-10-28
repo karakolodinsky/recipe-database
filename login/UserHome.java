@@ -8,6 +8,16 @@ import java.sql.ResultSet;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
+/**
+ * UI-Interface for the User-home; offers buttons that link to database-functionality
+ *
+ * @author Kara Kolodinsky
+ * @author Ainsley Ross
+ * @author Teagan Nester
+ * @author Caitlyn Cyrek
+ * @author Serene Wood
+ */
+
 public class UserHome extends JFrame {
 
     private static final long serialVersionUID = 1;
@@ -154,6 +164,7 @@ public class UserHome extends JFrame {
                 NewRecipe newR = new NewRecipe(user);
                 newR.setTitle("Create a recipe:");
                 newR.setVisible(true);
+                //System.out.print("Current max recipeID" + DataBase.getMaxRecipeId());                 DEBUG
                 //JOptionPane.showMessageDialog(btnNewButton, "You have successfully logged in");
             }
         });
@@ -184,23 +195,24 @@ public class UserHome extends JFrame {
         });
         contentPane.add(searchRecipeButton);
 
-        JButton makeRecipeButton = new JButton("Bake/Cook Recipe");
+        /* JButton makeRecipeButton = new JButton("Bake/Cook Recipe");
         makeRecipeButton.setBackground(UIManager.getColor("Button.disabledForeground"));
         makeRecipeButton.setFont(new Font("Tahoma", Font.PLAIN, strdFontSize));
         //editRecipeButton.setBounds(247, 320, 491, 114);
         makeRecipeButton.setBounds((20 + (3 * (strdButtonWidth + borderSize))), 320, strdButtonWidth, strdButtonHeight);
         makeRecipeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                //functionality todo on make-bake-cook branch
                 dispose();
                 Cook cook = new Cook();
                 cook.setTitle("Choose Recipe to cook");
                 cook.setVisible(true);
             }
         });
-        contentPane.add(makeRecipeButton);
-    }
+        contentPane.add(makeRecipeButton);*/
 
+
+
+    }
 
 
 

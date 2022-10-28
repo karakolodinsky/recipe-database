@@ -21,6 +21,13 @@ import javax.swing.text.DateFormatter;
 import javax.swing.text.AbstractDocument.Content;
 import java.util.Date;
 
+/**
+ * UI-Interface for adding new ingredient to pantry
+ *
+ * @author Kara Kolodinsky
+ * @author ?
+ */
+
 public class AddToPantry extends JFrame {
 
     private static final long serialVersionUID = 1L;

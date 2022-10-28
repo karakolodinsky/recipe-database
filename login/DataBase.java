@@ -10,7 +10,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Calendar;
 import java.util.Date;
 
 import javax.crypto.SecretKeyFactory;
@@ -346,6 +348,45 @@ public class DataBase {
 
     }
 
+    public static ResultSet GetCategories (String category) throws IOException {
+        Connection conn = DataBase.getConnect();
+
+        try {
+            PreparedStatement st = (PreparedStatement) conn
+                    .prepareStatement("SELECT categoryname FROM category WHERE categoryname LIKE '%" + category + "%'");
+                //     st.setString(1, ingredient);
+            System.out.println(st);
+            ResultSet rs = st.executeQuery();
+            return rs;
+        } catch (SQLException e) {
+
+                // print SQL exception information
+                printSQLException(e);
+            }
+
+        return null;
+
+    }
+
+    public static Integer GetCategoryByName(String name) throws IOException {
+        Connection conn = DataBase.getConnect(); 
+
+        try{
+            PreparedStatement st = (PreparedStatement) conn
+                .prepareStatement("SELECT categoryId FROM category WHERE categoryname LIKE '%" + name + "%'");
+            System.out.println(st);
+            boolean exists = st.execute();
+            if(exists){
+                ResultSet rs = st.getResultSet();
+                return rs.getInt(1);
+            }
+        }
+        catch(SQLException e){
+            printSQLException(e);
+        }
+        return -1;
+    }
+
     public static ResultSet GetPantry (String user) throws IOException {
         Connection conn = DataBase.getConnect();
 
@@ -368,20 +409,76 @@ public class DataBase {
 
     // STUB
     // todo on make-bake-cook branch
-    public static ResultSet cookRecipe (int recipeID) {
-        Connection conn = DataBase.getConnect();
-
+    public static int cookRecipe (int recipeID) {
+        Connection conn = DataBase.getCon();
         try{
             PreparedStatement st = (PreparedStatement)  conn
-                    .prepareStatement("SELECT recipeid FROM recipe_requires");
+                    .prepareStatement("SELECT COUNT(*) AS ingredientCount FROM recipe_requires WHERE recipeid=?");
+            st.setInt(1, recipeID);
+            System.out.println(st);
             ResultSet rs = st.executeQuery();
-            return rs;
+            rs.next();
+
+            PreparedStatement st1 = (PreparedStatement)  conn
+                    .prepareStatement("SELECT ingredientid, quantity FROM recipe_requires WHERE recipeid=?",
+                            ResultSet.TYPE_SCROLL_SENSITIVE,
+                            ResultSet.CONCUR_UPDATABLE);
+            st1.setInt(1, recipeID);
+            System.out.println(st1);
+            ResultSet rs1 = st1.executeQuery();
+
+            boolean notenough = false;
+            int quantityInPantry = 0;
+            int ingredientCount = rs.getInt("ingredientCount");
+            for(int i = 0; i < ingredientCount; i++){
+                if(rs1.next()){
+                    if(notenough){
+                        rs1.previous();
+                    }
+                    if(!notenough){
+                        quantityInPantry = rs1.getInt("quantity");
+                    }
+                    PreparedStatement st2 = (PreparedStatement)  conn
+                            .prepareStatement("SELECT ingredientid, expirationdate, quantitycurr, unit FROM in_pantry WHERE ingredientid=?" +
+                                    "group by ingredientid, quantitycurr, unit, expirationdate ORDER BY expirationdate DESC;" );
+                    st2.setInt(1, rs1.getInt("ingredientid"));
+                    ResultSet rs2 = st2.executeQuery();
+                    if(rs2.next()){
+                        int quantitycurr = rs2.getInt("quantitycurr");
+                        int recipequantity = rs1.getInt("quantity");
+                        int ingrediantIDcurrent = rs1.getInt("ingredientid");
+                        if(rs2.getInt("quantitycurr") < rs1.getInt("quantity")){
+                            i--;
+                            notenough = true;
+                            PreparedStatement st3 = (PreparedStatement)  conn
+                                    .prepareStatement("UPDATE in_pantry SET quantitycurr=0 WHERE ingredientid=?; " +
+                                            "DELETE FROM in_pantry WHERE quantitycurr=0");
+                            st3.setInt(1, rs2.getInt("ingredientid"));
+                            int rs3 = st3.executeUpdate();
+                            quantityInPantry = quantityInPantry - rs2.getInt("quantitycurr");
+                        }
+                        else{
+                            quantityInPantry = rs2.getInt("quantitycurr") - rs1.getInt("quantity");
+                            PreparedStatement st4 = (PreparedStatement)  conn
+                                    .prepareStatement("UPDATE in_pantry SET quantitycurr=? WHERE ingredientid=?");
+                            st4.setInt(1, quantityInPantry);
+                            st4.setInt(2, rs2.getInt("ingredientid"));
+                            int rs4 = st4.executeUpdate();
+                        }
+                    }
+                }
+
+            }
+
+
+
+            return 0;
         } catch (SQLException e) {
 
             // print SQL exception information
             printSQLException(e);
         }
-        return null;
+        return 0;
     }
 
 
@@ -402,6 +499,131 @@ public class DataBase {
             }
         }
 }
+
+
+    /**
+     * Creates a recipe with information passed from the UI
+     * @param steps             String <= 5000 chars long
+     * @param description       String <= 200 chars long
+     * @param cooktime          Positive integer
+     * @param servings          Integer 1-12
+     * @param difficulty        Integer 1-5
+     * @param name              String <= 50 chars long
+     * @return                  New recipe's ID
+     */
+    public static int createRecipe(String steps, String description, Integer cooktime,
+                                    Integer servings, Integer difficulty, String name){
+        String username = UserLogin.getUsername();
+        Connection conn = DataBase.getConnect();
+        //Q; does insert auto-assign recipeIDs?
+        try{
+            int newid = (getMaxRecipeId() + 1);
+            //recipe: (recipeid, author, steps, description, cooktime, servings, difficulty, name, date)
+            PreparedStatement st = (PreparedStatement) conn
+                    .prepareStatement("INSERT INTO recipe (RECIPEID, AUTHOR, STEPS, DESCRIPTION, COOKTIME, SERVINGS, " +
+                                        "DIFFICULTY, NAME, DATE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);");
+            st.setInt(1, newid);
+            st.setString(2, username);
+            st.setString(3, steps);
+            st.setString(4, description);
+            st.setInt(5, cooktime);
+            st.setInt(6, servings);
+            st.setInt(7, difficulty);
+            st.setString(8, name);
+            st.setDate(9, java.sql.Date.valueOf(java.time.LocalDate.now()));
+
+            int rs = st.executeUpdate();
+            if(rs == 1){
+                //display(rs);      // nvm lol
+                return newid;
+            }
+        }
+        catch (SQLException e) {
+            printSQLException(e);
+        }
+        return -1;                  // try failed
+    }
+
+    /**
+     * Categorize a recipe with the given categories
+     * @param categoryString the string of categories
+     * @param recipeId the recipe to add these tags to
+     */
+    public static void categorizeRecipe(String categoryString, Integer recipeId){
+
+        // make the categories a list of strings
+        String[] categories = categoryString.split(",");
+
+        int size = categories.length;
+        for(int i = 0; i < size; i++){
+
+            String currTag = categories[i];
+
+            //check that element of categories is not "" or ", " or " "
+            if(!(currTag.equals("") || currTag.equals(", ") || currTag.equals(" "))){
+            
+                try {
+                    ResultSet rs = null;
+                    PreparedStatement st = con.prepareStatement("SELECT categoryId FROM category WHERE categoryname=?;");
+                    st.setString(1, currTag.strip());
+                    boolean exists = st.execute();
+                    int categoryId = -1;
+                    if (exists) {
+                        // if category does not already exist, create it, else grab existing category's Id
+                        rs = st.getResultSet();
+                        if (!rs.isBeforeFirst()) {
+                            st = con.prepareStatement("Select max(categoryId) from category;");
+                            rs = st.executeQuery();
+                            rs.next();
+                            categoryId = rs.getInt(1) + 1;
+                            st = con.prepareStatement("Insert into category values(?, ?);");
+                            st.setInt(1, categoryId);
+                            st.setString(2, currTag);
+                            st.executeUpdate();
+                        }
+                        else{
+                            rs.next();
+                            categoryId = rs.getInt(1);
+                        }
+                    }
+
+                    // add category to recipeCategory
+                    st = con.prepareStatement("insert into recipe_category values(?, ?);");
+                    st.setInt(1, recipeId);
+                    st.setInt(2, categoryId);
+                    st.executeUpdate();
+
+                } catch (SQLException e) {
+                    System.exit(0);
+                } 
+            }       
+        }
+    }
+
+
+    /**
+     * Gets the current maximum recipeid value from the recipe table
+     * @return int
+     */
+    public static int getMaxRecipeId (){
+        Connection conn = DataBase.getConnect();
+        int newId;
+        try{
+            PreparedStatement id = (PreparedStatement) conn .prepareStatement("SELECT MAX(R.RECIPEID) " +
+                                                                                "FROM RECIPE AS R;");
+            ResultSet idEx = id.executeQuery();
+            //empnum = rs.getString(1);
+            while (idEx.next()){
+                return idEx.getInt(1);
+            }
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Select max failed");
+        return 0;
+    }
+
 
 public static int deleteFromPantry(String username, String item) throws IOException {
         Connection conn = DataBase.getConnect();
@@ -433,7 +655,50 @@ public static int deleteFromPantry(String username, String item) throws IOExcept
 
     }
 
+    /**
+     * Adds all the arraylist's ingredients to the SQL recipe_requires table
+     * @param recipeID      ID number for recipe in database (Foreign Key)
+     * @param ingredients   Array of all ingredients for the recipe
+     * @return          1 on success, -1 on fail
+     */
+    public static int recipeRequires(int recipeID, ArrayList<Ingredient> ingredients){
+        Connection conn = getCon();
+        Integer ingID = null;
+        try{
+            for (Ingredient i : ingredients){
+                /** get the ID for the current ingredient */
+                PreparedStatement st0 = (PreparedStatement) conn
+                        .prepareStatement("SELECT ingredientid from ingredient where name = ? ");
+                st0.setString(1, i.getName());
+                ResultSet rs0 = st0.executeQuery();
+                while (rs0.next()) {
+                    ingID = rs0.getInt("ingredientID");
+                }
 
+                if (ingID != null) {
+                    PreparedStatement st = (PreparedStatement) conn
+                            .prepareStatement("INSERT INTO recipe_requires (RECIPEID, INGREDIENTID, QUANTITY, UNIT) "
+                                    + "VALUES (?, ?, ?, ?)" );
+                    st.setInt(1, recipeID);
+                    st.setInt(2, ingID);
+                    st.setInt(3, i.getQuantity());
+                    if (i.getUnit() != null){
+                        st.setString(4, i.getUnit());
+                    }
+
+                    int rs = st.executeUpdate();
+                    if (rs == 1) {
+                        return 1;
+                    }
+                }
+            }
+        }
+        catch (SQLException throwables) {
+            throwables.printStackTrace();
+            return -1;
+        }
+        return -1;
+    }
 
 }
 
