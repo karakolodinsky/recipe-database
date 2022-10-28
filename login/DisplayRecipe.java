@@ -59,8 +59,8 @@ public class DisplayRecipe extends JFrame {
         setVisible(true);
 
         init ();
-
     }
+
 
     private void init () throws SQLException {
         panel = new JPanel();
@@ -105,6 +105,7 @@ public class DisplayRecipe extends JFrame {
         this.getContentPane().add(scrollPane);
         setContentPane(scrollPane);
     }
+
 
     private void formatRecipe () throws SQLException {
         Connection con = DataBase.getCon();
@@ -199,6 +200,7 @@ public class DisplayRecipe extends JFrame {
         }
     }
 
+
     /**
      * Pulls all ingredients for the current recipe and displays them in an ingredient list, including
      * their name, units, and amount
@@ -236,6 +238,7 @@ public class DisplayRecipe extends JFrame {
         //textArea(ingredientsList);
     }
 
+
     private void labelMaker (String text) {
         JLabel label = new JLabel(text);
         label.setPreferredSize(new Dimension(TEXT_BOX_WIDTH, TEXT_BOX_HEIGHT));
@@ -243,12 +246,12 @@ public class DisplayRecipe extends JFrame {
         descriptionContainer.add(label);
     }
 
+
     private void textArea (String text) {
         JTextArea textArea = new JTextArea(text);
         //textArea.setColumns(300);
         textArea.setLineWrap(true);
         textArea.setWrapStyleWord(true);
-
 
         textArea.setEditable(false);  
         textArea.setCursor(null);  
@@ -260,6 +263,7 @@ public class DisplayRecipe extends JFrame {
         descriptionContainer.add(textArea);
         descriptionContainer.add(textArea);
     }
+
 
     private String difficulty (int diff) {
         String diffString = "";
@@ -282,6 +286,7 @@ public class DisplayRecipe extends JFrame {
             
     }
 
+
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -294,6 +299,7 @@ public class DisplayRecipe extends JFrame {
             }
         });
     }
+
 
     public static int getRecipeId() {
             return recipeId;
