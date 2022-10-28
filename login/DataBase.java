@@ -19,7 +19,7 @@ import java.lang.Math;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
-import javax.swing.JOptionPane;
+import javax.swing.*;
 
 public class DataBase {
 
@@ -868,29 +868,30 @@ public static int deleteFromPantry(String username, String item) throws IOExcept
         return -1;
     }
 
-    public static int leaveReview(String user, int quant, int stars, String revtext, int recipeID){
+    public static int leaveReview(int stars, String revtext, int recipeID, double scaleQuant){
         Connection conn = getCon();
         try{
-                if(DataBase.cookRecipe(recipeID, quant) != -1){
-                        PreparedStatement st = (PreparedStatement) conn
+            PreparedStatement st = (PreparedStatement) conn
                 .prepareStatement("INSERT INTO netizen_creates values (?,?, now(), ?,?,? );");
-                st.setString(1, user);
-                st.setInt(2, recipeID);
-                st.setInt(3, stars);
-                st.setString(4, revtext);
-                st.setInt(5, quant);
-                }
-                else return -1;
-        } 
-        
-
-
-
+            st.setString(1, user);
+            st.setInt(2, recipeID);
+            st.setInt(3, stars);
+            st.setString(4, revtext);
+            st.setDouble(5, scaleQuant);
+            int rs = st.executeUpdate();
+            if(rs != -1){
+                JOptionPane.showMessageDialog(new JFrame(), "Success on writing a review",
+                        "review_status", JOptionPane.INFORMATION_MESSAGE);
+            }
+            else{
+                return -1;
+            }
+        }
          catch (SQLException throwables) {
              throwables.printStackTrace();
              return -1;
          }
-         return -1;
+         return 0;
     }
 //     public static int leaveReview(String user, int quant, int stars, String revtext, int recipeID){
 //         Connection conn = getCon();

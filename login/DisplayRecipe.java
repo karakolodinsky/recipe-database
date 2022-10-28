@@ -128,7 +128,7 @@ public class DisplayRecipe extends JFrame {
                         EventQueue.invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
-                                    new Review();
+                                    new Review(recipeId, scaleQuant);
                                     int y = DataBase.cookRecipe(recipeId, scaleQuant);
                                 }
                             });
