@@ -4,6 +4,10 @@ import java.awt.*;
 import java.awt.event.*;
 import java.sql.*;  
 
+/*
+ * author: Teagan
+ */
+
 public class Browse extends JFrame {
 
     static private String netizenUsername;

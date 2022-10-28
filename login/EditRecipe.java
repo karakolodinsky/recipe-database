@@ -1,13 +1,20 @@
 package login;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+
+import net.proteanit.sql.DbUtils;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.Vector;
 /**
  * UI-Interface for the edit recipe
  *
@@ -28,7 +35,7 @@ public class EditRecipe extends JFrame {
     private int newDiff;
 
 
-    public EditRecipe (String user, int recipeId, String btnText) throws SQLException {
+    public EditRecipe (String user, int recipeId, String btnText) throws Exception {
         super("Edit Recipe");
         this.user = user;
         this.recipeId = recipeId;
@@ -45,7 +52,7 @@ public class EditRecipe extends JFrame {
 
     }
 
-    private void init () throws SQLException {
+    private void init () throws Exception {
         panel = new JPanel();
         JScrollPane scrollPane = new JScrollPane(panel);
 
@@ -60,7 +67,7 @@ public class EditRecipe extends JFrame {
         setContentPane(scrollPane);
     }
 
-    private void formatRecipe () throws SQLException {
+    private void formatRecipe () throws Exception {
         Connection con = DataBase.getCon();
         String avg = "";
         String[] info = btnText.split("Avg Rating: ");
@@ -102,6 +109,7 @@ public class EditRecipe extends JFrame {
         labelLabel = new JLabel("Steps:");
         panel.add(labelLabel);
         textArea(steps);
+        displayIngred();
 
 
         validate();
@@ -109,7 +117,7 @@ public class EditRecipe extends JFrame {
 
     private void labelMaker (String text) {
         JTextField label = new JTextField(text);
-        label.setAlignmentX(Component.CENTER_ALIGNMENT);
+        label.setAlignmentX(Component.LEFT_ALIGNMENT);
         label.setEditable(true);
         panel.add(label);
     }
@@ -122,7 +130,7 @@ public class EditRecipe extends JFrame {
         textArea.setFocusable(false);
         textArea.setLineWrap(true);
         textArea.setWrapStyleWord(true);
-        textArea.setAlignmentX(CENTER_ALIGNMENT);
+        textArea.setAlignmentX(LEFT_ALIGNMENT);
         panel.add(textArea);
     }
 
@@ -234,12 +242,86 @@ public class EditRecipe extends JFrame {
             
     }
 
+    private void displayIngred () {
+        JPanel helper = new JPanel();
+        //helper.setSize(500, 500);
+        //helper.setAlignmentX(LEFT_ALIGNMENT);
+        JTable SearchTbl = new JTable();
+        //SearchTbl.setBounds(0, 0, 100, 100);
+        SearchTbl.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        SearchTbl.setDefaultEditor(Object.class, null);
+        SearchTbl.setAlignmentX(LEFT_ALIGNMENT);
+        PreparedStatement ps;
+        try {
+            ps = DataBase.getCon().prepareStatement("SELECT i.name FROM recipe_requires rr, ingredient i " +
+                                            "WHERE rr.ingredientid=i.ingredientid AND rr.recipeid=?;");
+            ps.setInt(1, recipeId);
+            ResultSet rs = ps.executeQuery();
+            SearchTbl.setModel(DbUtils.resultSetToTableModel(rs));
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+            
+        SearchTbl.setVisible(true);
+        SearchTbl.setRowSelectionAllowed(true);
+        SearchTbl.addMouseListener(new java.awt.event.MouseAdapter() {
+                @Override
+                public void mouseClicked(java.awt.event.MouseEvent evt) {
+                    int row = SearchTbl.rowAtPoint(evt.getPoint());
+                    String ing = (String) SearchTbl.getValueAt(row, 0);
+                }
+            });
+        //helper.add(SearchTbl);
+        panel.add(SearchTbl);
+    }
+    
+
+    public static void addIngredient(String ingredient) throws IOException {
+        Connection conn = DataBase.getConnect();
+
+        try {
+            PreparedStatement st = (PreparedStatement) conn
+                    .prepareStatement("SELECT ingredientid, name FROM ingredient where name = ?");
+                    st.setString(1, ingredient);
+            System.out.println(st);
+            boolean exec = st.execute();
+            ResultSet rs = st.getResultSet();
+            int ingredientid = 0;
+            if (rs.isBeforeFirst()) {
+                while(rs.next()){
+                    ingredientid = rs.getInt("ingredientid");
+                    // add to display
+                }
+            }
+
+            else {
+                st = conn.prepareStatement("SELECT MAX(ingredientid) as max FROM ingredient;");
+                rs = st.executeQuery();
+                rs.next();
+                ingredientid = rs.getInt(1) + 1;
+
+                //add to display
+            }
+            st = conn.prepareStatement("INSERT INTO ingredient VALUES(?, ?);");
+            st.setInt(1, ingredientid);
+            st.setString(2, ingredient);
+            st.executeUpdate();
+            
+        } catch (SQLException e) {
+            }
+
+    }
+
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
                     new EditRecipe("test", 1, "str");
                 } catch (SQLException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (Exception e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }

@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -172,7 +173,7 @@ public class UserHome extends JFrame {
         contentPane.add(newRecipeButton);
 
 
-        JButton editRecipeButton = new JButton("Edit Existing Recipe");
+        JButton editRecipeButton = new JButton("View My Recipes");
         editRecipeButton.setBackground(UIManager.getColor("Button.disabledForeground"));
         editRecipeButton.setFont(new Font("Tahoma", Font.PLAIN, strdFontSize));
         //editRecipeButton.setBounds(247, 320, 491, 114);
@@ -180,9 +181,31 @@ public class UserHome extends JFrame {
         editRecipeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //functionality
+                ResultSet rs = DataBase.getUserRecipes(netizenUsername);
+                myRecipes newR;
+                try {
+                        newR = new myRecipes(netizenUsername, rs);
+                        newR.setTitle("Create a recipe:");
+                        newR.setVisible(true);
+                } catch (SQLException e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
+                }
             }
         });
         contentPane.add(editRecipeButton);
+
+        // JButton searchRecipeButton = new JButton("Search for Recipe");
+        // searchRecipeButton.setBackground(UIManager.getColor("Button.disabledForeground"));
+        // searchRecipeButton.setFont(new Font("Tahoma", Font.PLAIN, strdFontSize));
+        // //editRecipeButton.setBounds(247, 320, 491, 114);
+        // searchRecipeButton.setBounds((20 + (2 * (strdButtonWidth + borderSize))), 320, strdButtonWidth, strdButtonHeight);
+        // searchRecipeButton.addActionListener(new ActionListener() {
+        //     public void actionPerformed(ActionEvent e) {
+        //         //functionality
+        //     }
+        // });
+        // contentPane.add(searchRecipeButton);
 
         /* JButton makeRecipeButton = new JButton("Bake/Cook Recipe");
         makeRecipeButton.setBackground(UIManager.getColor("Button.disabledForeground"));

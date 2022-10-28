@@ -13,7 +13,8 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Calendar;
-import java.util.Date;
+// import java.util.Date;
+import java.sql.Date;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
@@ -23,6 +24,7 @@ public class DataBase {
 
     private static String db_username;
     private static String db_password;
+    private static String user;
     protected static Connection con;
     public static final int ITERATIONS = 1000;
     // PBEWith<digest>And<encryption> Parameters for use with the PBEWith<digest>And<encryption> algorithm.
@@ -173,6 +175,7 @@ public class DataBase {
                     PreparedStatement st1 = (PreparedStatement) conn.prepareStatement("UPDATE netizen SET lastaccessdate = CURRENT_TIMESTAMP where username = ?");
                     st1.setString(1, username);
                     st1.executeUpdate();
+                    user = username;
                     return 1;
                     //update most recent access date
                 }
@@ -223,7 +226,7 @@ public class DataBase {
                 int qOLD = 0;
                 int bqOLD = 0;
                 PreparedStatement st0 = (PreparedStatement) conn
-                    .prepareStatement("SELECT ingredientid from ingredient where name = ? ");
+                    .prepareStatement("SELECT ingredientid from ingredient where name = ?;");
                 st0.setString(1, item);
                 ResultSet rs0 = st0.executeQuery();
                 while (rs0.next()) {
@@ -232,9 +235,10 @@ public class DataBase {
                         System.out.println(ingID + "\n");
                       }
                       PreparedStatement st1 = (PreparedStatement) conn
-                      .prepareStatement("SELECT ingredientid from in_pantry where ingredientid = ? and username = ? ");
+                      .prepareStatement("SELECT ingredientid from in_pantry where ingredientid = ? and username = ? and purchasedate = ?");
                       st1.setInt(1,Integer.parseInt(ingID));
                       st1.setString(2, user);
+                      st1.setDate(3, (java.sql.Date) purch);
                       ResultSet rs1 = st1.executeQuery();
                       boolean in_pantry = true;
                       if (!rs1.isBeforeFirst() ) {    
@@ -251,17 +255,23 @@ public class DataBase {
                                         qOLD = rs3.getInt(1);
                                         bqOLD = rs3.getInt(2);
                                 }
-                        PreparedStatement st2 = (PreparedStatement) conn
-                        .prepareStatement("UPDATE in_pantry SET quantitycurr = ?, quantitybought = ?, purchasedate = ? , expirationdate = ?, unit = ? WHERE username = ? and ingredientid = ?;  ");
-                        st2.setDate(3, (java.sql.Date) purch);
-                        st2.setInt(1, quantity + qOLD);
-                        st2.setInt(2, qbought+ bqOLD);
-                        st2.setDate(4, (java.sql.Date) exp);
+                        PreparedStatement st2;
                         if (unit != "item name"){
+                            st2 = (PreparedStatement) conn
+                            .prepareStatement("UPDATE in_pantry SET quantitycurr = ?, quantitybought = ?, purchasedate = ? , expirationdate = ?, unit = ? WHERE username = ? and ingredientid = ?;  ");
+                            st2.setDate(3, (java.sql.Date) purch);
+                            st2.setInt(1, quantity + qOLD);
+                            st2.setInt(2, qbought+ bqOLD);
+                            st2.setDate(4, (java.sql.Date) exp);
                                 st2.setString(5, unit);   
                         }
                         else {
-                                st2.setString(5, item);
+                            st2 = (PreparedStatement) conn
+                            .prepareStatement("UPDATE in_pantry SET quantitycurr = ?, quantitybought = ?, purchasedate = ? , expirationdate = ? WHERE username = ? and ingredientid = ?;  ");
+                            st2.setDate(3, (java.sql.Date) purch);
+                            st2.setInt(1, quantity + qOLD);
+                            st2.setInt(2, qbought+ bqOLD);
+                            st2.setDate(4, (java.sql.Date) exp);
                         }
                         st2.setString(6, user);
                         st2.setInt(7, Integer.parseInt(ingID));
@@ -409,7 +419,7 @@ public class DataBase {
 
     // STUB
     // todo on make-bake-cook branch
-    public static int cookRecipe (int recipeID) {
+    public static int cookRecipe (int recipeID, int quant) {
         Connection conn = DataBase.getCon();
         try{
             PreparedStatement st = (PreparedStatement)  conn
@@ -419,6 +429,69 @@ public class DataBase {
             ResultSet rs = st.executeQuery();
             rs.next();
 
+
+            // first loop to see if we have enough of all ingredients
+            // if we don't have enough of even 1 then exit
+            PreparedStatement stFirstCheck = (PreparedStatement)  conn
+                    .prepareStatement("SELECT ingredientid, quantity FROM recipe_requires WHERE recipeid=?",
+                            ResultSet.TYPE_SCROLL_SENSITIVE,
+                            ResultSet.CONCUR_UPDATABLE);
+            stFirstCheck.setInt(1, recipeID);
+            System.out.println(stFirstCheck);
+            ResultSet rsFirstCheck = stFirstCheck.executeQuery();
+
+            int ingredientCount = rs.getInt("ingredientCount");
+            for(int i = 0; i < ingredientCount; i++) {
+                if (rsFirstCheck.next()) {
+                    PreparedStatement st2 = (PreparedStatement) conn
+                            .prepareStatement("SELECT purchasedate, ingredientid, quantitycurr, unit FROM in_pantry WHERE ingredientid=? AND username=? " +
+                                            "group by purchasedate, ingredientid, quantitycurr, unit, expirationdate ORDER BY expirationdate ASC;", ResultSet.TYPE_SCROLL_SENSITIVE,
+                                    ResultSet.CONCUR_UPDATABLE);
+                    st2.setInt(1, rsFirstCheck.getInt("ingredientid"));
+                    st2.setString(2, user);
+                    boolean rscheck = st2.execute();
+                    if (rscheck) {
+                        ResultSet rs2 = st2.getResultSet();
+                        if (!rs2.isBeforeFirst()) {
+                            return -1;
+                        } else {
+                            rs2.next();
+                            int quantityLeft = rsFirstCheck.getInt("quantity");
+                            rs2.previous();
+                            boolean seen = false;
+                            while (rs2.next() && quantityLeft > 0) {
+                                // loop through all of one ingredient in pantry
+                                seen = false;
+                                int currentQuantity = rs2.getInt("quantitycurr");
+
+                                if (currentQuantity <= quantityLeft) {
+                                    //calculate qtyLeft
+                                    quantityLeft = quantityLeft - currentQuantity;
+                                    seen = true;
+
+                                }
+                                if (currentQuantity > quantityLeft && !seen) {
+                                    // you have enough break while
+                                    quantityLeft = 0;
+                                }
+                            }
+                            if (quantityLeft > 0){
+                                // never enough of one of the ingredients so return -1
+                                return -1;
+                            }
+                        }
+                    }
+                }
+            }
+
+
+
+
+
+
+
+
+
             PreparedStatement st1 = (PreparedStatement)  conn
                     .prepareStatement("SELECT ingredientid, quantity FROM recipe_requires WHERE recipeid=?",
                             ResultSet.TYPE_SCROLL_SENSITIVE,
@@ -427,51 +500,116 @@ public class DataBase {
             System.out.println(st1);
             ResultSet rs1 = st1.executeQuery();
 
-            boolean notenough = false;
-            int quantityInPantry = 0;
-            int ingredientCount = rs.getInt("ingredientCount");
+            // boolean notenough = false;
+            // int quantityInPantry = 0;
             for(int i = 0; i < ingredientCount; i++){
                 if(rs1.next()){
-                    if(notenough){
-                        rs1.previous();
-                    }
-                    if(!notenough){
-                        quantityInPantry = rs1.getInt("quantity");
-                    }
+//                    if(notenough){
+//                        rs1.previous();
+//                    }
+//                    if(!notenough){
+//                        quantityInPantry = rs1.getInt("quantity");
+//                    }
                     PreparedStatement st2 = (PreparedStatement)  conn
-                            .prepareStatement("SELECT ingredientid, expirationdate, quantitycurr, unit FROM in_pantry WHERE ingredientid=?" +
-                                    "group by ingredientid, quantitycurr, unit, expirationdate ORDER BY expirationdate DESC;" );
+                            .prepareStatement("SELECT purchasedate, ingredientid, quantitycurr, unit FROM in_pantry WHERE ingredientid=? AND username=? " +
+                                    "group by purchasedate, ingredientid, quantitycurr, unit, expirationdate ORDER BY expirationdate ASC;", ResultSet.TYPE_SCROLL_SENSITIVE,
+                                    ResultSet.CONCUR_UPDATABLE);
                     st2.setInt(1, rs1.getInt("ingredientid"));
-                    ResultSet rs2 = st2.executeQuery();
-                    if(rs2.next()){
-                        int quantitycurr = rs2.getInt("quantitycurr");
-                        int recipequantity = rs1.getInt("quantity");
-                        int ingrediantIDcurrent = rs1.getInt("ingredientid");
-                        if(rs2.getInt("quantitycurr") < rs1.getInt("quantity")){
-                            i--;
-                            notenough = true;
-                            PreparedStatement st3 = (PreparedStatement)  conn
-                                    .prepareStatement("UPDATE in_pantry SET quantitycurr=0 WHERE ingredientid=?; " +
-                                            "DELETE FROM in_pantry WHERE quantitycurr=0");
-                            st3.setInt(1, rs2.getInt("ingredientid"));
-                            int rs3 = st3.executeUpdate();
-                            quantityInPantry = quantityInPantry - rs2.getInt("quantitycurr");
+                    st2.setString(2, user);
+                    boolean rscheck = st2.execute();
+                    if(rscheck){
+                        ResultSet rs2 = st2.getResultSet();
+                        if(!rs2.isBeforeFirst()){
+                            return -1;
                         }
                         else{
-                            quantityInPantry = rs2.getInt("quantitycurr") - rs1.getInt("quantity");
-                            PreparedStatement st4 = (PreparedStatement)  conn
-                                    .prepareStatement("UPDATE in_pantry SET quantitycurr=? WHERE ingredientid=?");
-                            st4.setInt(1, quantityInPantry);
-                            st4.setInt(2, rs2.getInt("ingredientid"));
-                            int rs4 = st4.executeUpdate();
+                            rs2.next();
+                            int ingredientID = rs2.getInt("ingredientid");
+                            //String username = rs2.getString("username");
+                            ArrayList<Date> toDelete = new ArrayList<Date>();
+                            int quantityLeft = rs1.getInt("quantity");
+                            rs2.previous();
+                            boolean seen = false;
+                            while(rs2.next() && quantityLeft > 0){
+                                // loop through all of one ingredient in pantry
+                                seen = false;
+                                Date purchaseDate = rs2.getDate("purchasedate");
+                                int currentQuantity = rs2.getInt("quantitycurr");
+
+                                if(currentQuantity <= quantityLeft){
+                                    // add purchase date to list
+                                    //calculate qtyLeft
+                                    toDelete.add(purchaseDate);
+                                    quantityLeft = quantityLeft - currentQuantity;
+                                    seen = true;
+
+                                }
+                                 if (currentQuantity > quantityLeft && !seen){
+                                    // decrement quantityLeft
+                                    // update quantitycurr
+                                    // set quantityLeft = 0 or just subtract so we can exit while loop
+                                    currentQuantity = currentQuantity - quantityLeft;
+                                     if(currentQuantity == 0){
+                                         toDelete.add(purchaseDate);
+                                     }
+                                    //if currqty == 0 -> delete it
+                                    quantityLeft = 0;
+                                    PreparedStatement stUpdQty = (PreparedStatement)  conn
+                                            .prepareStatement("UPDATE in_pantry SET quantitycurr=? " +
+                                                    "WHERE ingredientid=? AND username=? AND purchasedate=?;");
+                                    stUpdQty.setInt(1, currentQuantity);
+                                    stUpdQty.setInt(2, ingredientID);
+                                    stUpdQty.setString(3, user);
+                                    stUpdQty.setDate(4, purchaseDate);
+                                    int rsUpdQty = stUpdQty.executeUpdate();
+                                }
+                            }
+                            if(quantityLeft <= 0){
+                                // delete everything from list
+                                for(int j = 0; j < toDelete.size(); j++){
+                                    // get each purchaseDate in list to delete
+                                    Date thisPurchaseDate = toDelete.get(j);
+
+                                    PreparedStatement stDelete = (PreparedStatement)  conn
+                                            .prepareStatement("DELETE FROM in_pantry WHERE ingredientid=? AND" +
+                                                    " username=? AND purchasedate=?;");
+                                    stDelete.setInt(1, ingredientID);
+                                    stDelete.setString(2, user);
+                                    stDelete.setDate(3, thisPurchaseDate);
+                                    int rsDelete = stDelete.executeUpdate();
+                                }
+                            }
+                            else{
+                                // don't delete everything because you never had enough
+                                return -1;
+                            }
+
+
+//                            if(rs2.next()){
+//                                if(rs2.getInt("quantitycurr") < rs1.getInt("quantity")){
+//                                    i--;
+//                                    notenough = true;
+//                                    PreparedStatement st3 = (PreparedStatement)  conn
+//                                            .prepareStatement("UPDATE in_pantry SET quantitycurr=0 WHERE ingredientid=?; " +
+//                                                    "DELETE FROM in_pantry WHERE quantitycurr=0");
+//                                    st3.setInt(1, rs2.getInt("ingredientid"));
+//                                    int rs3 = st3.executeUpdate();
+//                                    quantityInPantry = quantityInPantry - rs2.getInt("quantitycurr");
+//                                }
+//                                else{
+//                                    quantityInPantry = rs2.getInt("quantitycurr") - rs1.getInt("quantity");
+//                                    PreparedStatement st4 = (PreparedStatement)  conn
+//                                            .prepareStatement("UPDATE in_pantry SET quantitycurr=? WHERE ingredientid=?");
+//                                    st4.setInt(1, quantityInPantry);
+//                                    st4.setInt(2, rs2.getInt("ingredientid"));
+//                                    int rs4 = st4.executeUpdate();
+//                                }
+//                            }
+                        }
+
                         }
                     }
-                }
-
             }
-
-
-
             return 0;
         } catch (SQLException e) {
 
@@ -698,6 +836,123 @@ public static int deleteFromPantry(String username, String item) throws IOExcept
             return -1;
         }
         return -1;
+    }
+
+    public static int leaveReview(String user, int quant, int stars, String revtext, int recipeID){
+        Connection conn = getCon();
+        try{
+                if(DataBase.cookRecipe(recipeID, quant) != -1){
+                        PreparedStatement st = (PreparedStatement) conn
+                .prepareStatement("INSERT INTO netizen_creates values (?,?, now(), ?,?,? );");
+                st.setString(1, user);
+                st.setInt(2, recipeID);
+                st.setInt(3, stars);
+                st.setString(4, revtext);
+                st.setInt(5, quant);
+                }
+                else return -1;
+        } 
+        
+
+
+
+         catch (SQLException throwables) {
+             throwables.printStackTrace();
+             return -1;
+         }
+         return -1;
+    }
+//     public static int leaveReview(String user, int quant, int stars, String revtext, int recipeID){
+//         Connection conn = getCon();
+//         try{
+//                 ArrayList<Integer> list = new ArrayList<>();
+//                 ArrayList<Integer> list2 = new ArrayList<>();
+//                 ArrayList<String> list3 = new ArrayList<>();
+//                 PreparedStatement st0 = (PreparedStatement) conn
+//                 .prepareStatement("SELECT ingredientid, quantity, unit from recipe_req where recipeid = ? ");
+//         st0.setInt(1, recipeID);
+//         ResultSet rs0 = st0.executeQuery();
+//         while (rs0.next()) {
+//             list.add(rs0.getInt("ingredientID"));
+//             list2.add(rs0.getInt("quantity"));
+//             list3.add(rs0.getString("unit"));
+//         }
+//         for (int i =0 ; i< list.size() ;i++){
+//                 PreparedStatement st1 = (PreparedStatement) conn
+//                 .prepareStatement("SELECT ingredientid, quantitycurr, unit from in_pantry where user = ? ");
+//                 st1.setString(1, user);
+//                 ResultSet rs1 = st1.executeQuery();
+//                 while (rs1.next()) {
+//         } 
+        
+
+
+
+//         }
+//         catch (SQLException throwables) {
+//             throwables.printStackTrace();
+//             return -1;
+//         }
+//         return -1;
+//     }
+
+
+public static ResultSet getUserRecipes (String user){
+        Connection conn = DataBase.getConnect();
+        try{
+            PreparedStatement ps = (PreparedStatement) conn .prepareStatement("SELECT name, recipeid from recipe where author = ?");
+            ps.setString(1, user);
+            ResultSet rs = ps.executeQuery();
+            return rs;
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Select max failed");
+        return null;
+    }
+
+
+
+
+    public static ResultSet getIngredients(int recipeID){
+        Connection conn = getCon();
+        try{
+            PreparedStatement st = (PreparedStatement) conn
+                    .prepareStatement("SELECT i.name, r.quantity, r.unit "
+                            + "FROM recipe_requires AS r, ingredient AS i "
+                            + "WHERE i.ingredientid IN ( "
+                            + "SELECT r.ingredientid "
+                            + "WHERE r.recipeid = ? "
+                            + ") "
+                            + "AND i.ingredientid = r.ingredientid;");
+            st.setInt(1, recipeID);
+            ResultSet rs = st.executeQuery();
+            return rs;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return null;
+    }
+
+
+    public static ResultSet getCategories(int recipeID){
+        Connection conn = getCon();
+        try{
+            PreparedStatement st = (PreparedStatement) conn
+                    .prepareStatement("SELECT c.categoryname "
+                            + "FROM category AS c, recipe_category as r "
+                            + "WHERE c.categoryid = r.categoryid "
+                            + "AND c.categoryid IN ( "
+                            + "SELECT r.categoryid "
+                            + "WHERE r.recipeid = ?);");
+            st.setInt(1, recipeID);
+            ResultSet rs = st.executeQuery();
+            return rs;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return null;
     }
 
 }
