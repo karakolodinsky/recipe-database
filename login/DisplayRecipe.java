@@ -34,17 +34,17 @@ public class DisplayRecipe extends JFrame {
     private JPanel buttonsContainer;
 
     /** standardized variables for containers/text-boxes: */
-    private int CONTAINER_HEIGHT = 500;
-    private int CONTAINER_WIDTH = 600;
-    private int HALF_CONTAINER_HEIGHT = 250;
-    private int BUTTON_CONTAINER_WIDTH = 150;
-    private int DESCRIPTION_WIDTH = 150;
+    private static final int CONTAINER_HEIGHT = 500;
+    private static final int CONTAINER_WIDTH = 600;
+    private static final int HALF_CONTAINER_HEIGHT = 250;
+    private static final int BUTTON_CONTAINER_WIDTH = 150;
+    private static final int DESCRIPTION_WIDTH = 150;
 
     public static final int WIDTH_FRAME = 1200;
     public static final int HEIGHT_FRAME = 600;
 
-    private int TEXT_BOX_WIDTH = 210;
-    private int TEXT_BOX_HEIGHT = 30;
+    private static final int TEXT_BOX_WIDTH = 210;
+    private static final int TEXT_BOX_HEIGHT = 30;
     //private int SMALL_CONTAINER_HEIGHT = ;
 
 
