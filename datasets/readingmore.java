@@ -20,7 +20,7 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.swing.JOptionPane;
 
-import org.postgresql.util.OSUtil;
+//import org.postgresql.util.OSUtil;
 
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
