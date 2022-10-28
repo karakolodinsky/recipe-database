@@ -34,6 +34,9 @@ public class EditRecipe extends JFrame {
     private ResultSet rs;
     private int newDiff;
     private JTextField add;
+    private JTextField delete;
+    private JTextField deleteCat;
+    private JTextField addCat;
 
 
     public EditRecipe (String user, int recipeId, String btnText) throws Exception {
@@ -62,8 +65,6 @@ public class EditRecipe extends JFrame {
 
         panel.add(Box.createVerticalGlue());
         formatRecipe();
-        JButton home = returnHome();
-        panel.add(home);
         this.getContentPane().add(scrollPane);
         setContentPane(scrollPane);
     }
@@ -113,14 +114,29 @@ public class EditRecipe extends JFrame {
         labelLabel = new JLabel("Ingredients [ Name | Quantity | Units ]");
         panel.add(labelLabel);
         displayIngred();
+        addIngBtn();
+        deleteIngBtn();
+
+        displayCategories();
+        addCategoryBtn();
+
+
+
+        validate();
+    }
+
+    private void addIngBtn () {
         JButton addIng = new JButton("Add Ingredient:");
         addIng.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    int ingredientId = addIngredient(add.getText().strip());
-                    new addIngredientPopup(ingredientId, recipeId);
+                    String text = add.getText().strip();
+                    if (text != null || !text.equals("")) {
+                        int ingredientId = addIngredient(text);
+                        new addIngredientPopup(ingredientId, recipeId);
+                    }
                 } catch (IOException e1) {
                     // TODO Auto-generated catch block
                     e1.printStackTrace();
@@ -131,13 +147,78 @@ public class EditRecipe extends JFrame {
         });
         panel.add(addIng);
         add = textField();
-
-        displayCategories();
-
-
-
-        validate();
     }
+
+    private void deleteIngBtn () {
+        JButton deleteIng = new JButton("Delete Ingredient:");
+        deleteIng.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                
+                deleteIngredient(delete.getText().strip());
+                
+            }
+
+        });
+        panel.add(deleteIng);
+        delete = textField();
+    }
+
+    private void deleteIngredient (String name) {
+        Connection con = DataBase.getCon();
+        try {
+            PreparedStatement st = (PreparedStatement) con
+                    .prepareStatement("SELECT ingredientid, name FROM ingredient where name = ?");
+            st.setString(1, name);
+            st.execute();
+            ResultSet rs = st.getResultSet();
+            if (rs.isBeforeFirst()) {
+                rs.next();
+                int ingredientId = rs.getInt("ingredientid");
+                PreparedStatement ps = con.prepareStatement(
+                "DELETE FROM recipe_requires WHERE recipeid=? AND ingredientid=?;");
+                ps.setInt(1, recipeId);
+                ps.setInt(2, ingredientId);
+                ps.executeUpdate();
+            }
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    private void deleteCategory (String name) {
+        Connection con = DataBase.getCon();
+        try {
+            PreparedStatement st = (PreparedStatement) con
+                    .prepareStatement("SELECT categoryid FROM category where categoryname = ?");
+            st.setString(1, name);
+            st.execute();
+            ResultSet rs = st.getResultSet();
+            rs.next();
+            int categoryid = rs.getInt("categoryid");
+            st = (PreparedStatement) con
+                    .prepareStatement("SELECT categoryid FROM recipe_category where categoryid = ?");
+            st.setInt(1, categoryid);
+            st.execute();
+            rs = st.getResultSet();
+            if (rs.isBeforeFirst()) {
+                rs.next();
+                int categoryId = rs.getInt("categoryid");
+                PreparedStatement ps = con.prepareStatement(
+                "DELETE FROM recipe_category WHERE recipeid=? AND categoryid=?;");
+                ps.setInt(1, recipeId);
+                ps.setInt(2, categoryId);
+                ps.executeUpdate();
+            }
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    
 
     private void labelMaker (String text) {
         JTextField label = new JTextField(text);
@@ -164,22 +245,6 @@ public class EditRecipe extends JFrame {
         textArea.setAlignmentX(LEFT_ALIGNMENT);
         panel.add(textArea);
         return textArea;
-    }
-
-    private JButton returnHome () {
-        JButton home = new JButton("Home");
-        home.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                EventQueue.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        EditRecipe.this.dispose();
-                        new UserHome();
-                    }
-                });
-            }
-        });
-        return home;
     }
 
     private void diffMenu (int diff) {
@@ -307,7 +372,7 @@ public class EditRecipe extends JFrame {
     
 
     public static int addIngredient(String ingredient) throws IOException {
-        Connection conn = DataBase.getConnect();
+        Connection conn = DataBase.getCon();
 
         try {
             PreparedStatement st = (PreparedStatement) conn
@@ -354,28 +419,106 @@ public class EditRecipe extends JFrame {
             ps = DataBase.getCon().prepareStatement("SELECT c.categoryname FROM recipe_category rc, category c " +
                                             "WHERE rc.categoryid=c.categoryid AND rc.recipeid=?;");
             ps.setInt(1, recipeId);
-            ResultSet rs = ps.executeQuery();
-            SearchTbl.setModel(DbUtils.resultSetToTableModel(rs));
-            if (rs.next()) {
+            ps.execute();
+            ResultSet rs = ps.getResultSet();
+            if (rs.isBeforeFirst()) {
                 JLabel labelLabel = new JLabel("Categories:");
                 panel.add(labelLabel);
+                panel.add(SearchTbl);
+                JButton btn = new JButton("Delete Category:");
+                panel.add(btn);
+                btn.addActionListener(new ActionListener() {
+
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        String text = deleteCat.getText().strip();
+                        if (text != null && !text.equals("")) {
+                            deleteCategory(text);
+                        }
+                        
+                    }});
+                deleteCat = textField();
+                
             }
         } catch (SQLException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-            
-        SearchTbl.setVisible(true);
-        SearchTbl.setRowSelectionAllowed(true);
-        SearchTbl.addMouseListener(new java.awt.event.MouseAdapter() {
-                @Override
-                public void mouseClicked(java.awt.event.MouseEvent evt) {
-                    int row = SearchTbl.rowAtPoint(evt.getPoint());
-                    String ing = (String) SearchTbl.getValueAt(row, 0);
+        try {
+            ps = DataBase.getCon().prepareStatement("SELECT c.categoryname FROM recipe_category rc, category c " +
+                                                "WHERE rc.categoryid=c.categoryid AND rc.recipeid=?;");
+            ps.setInt(1, recipeId);
+            ps.execute();
+            ResultSet rs = ps.getResultSet();
+                
+            SearchTbl.setVisible(true);
+            //panel.add(SearchTbl);
+            SearchTbl.setModel(DbUtils.resultSetToTableModel(rs));
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    private void addCategoryBtn () {
+        JButton btn = new JButton("Add Category:");
+        panel.add(btn);
+        btn.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String text =addCat.getText().strip();
+                if (text != null && !text.equals("")) {
+                    try {
+                        addCategory(text);
+                    } catch (IOException e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
+                    }
                 }
-            });
-        //helper.add(SearchTbl);
-        panel.add(SearchTbl);
+                
+            }});
+        addCat = textField();
+    }
+
+    private int addCategory(String text) throws IOException {
+        Connection conn = DataBase.getCon();
+
+        try {
+            PreparedStatement st = (PreparedStatement) conn
+                    .prepareStatement("SELECT categoryid FROM category where categoryname = ?;");
+                    st.setString(1, text);
+            System.out.println(st);
+            st.execute();
+            ResultSet rs = st.getResultSet();
+            int categoryid = 0;
+            if (rs.isBeforeFirst()) {
+                if (rs.next()){
+                    categoryid = rs.getInt("categoryid");
+                }
+            }
+
+            else {
+                st = conn.prepareStatement("SELECT MAX(categoryid) as max FROM category;");
+                rs = st.executeQuery();
+                rs.next();
+                categoryid = rs.getInt(1) + 1;
+                st = conn.prepareStatement("INSERT INTO category VALUES(?, ?);");
+                st.setInt(1, categoryid);
+                st.setString(2, text);
+                st.executeUpdate();
+                
+            }
+            st = conn.prepareStatement("INSERT INTO recipe_category VALUES (?, ?);");
+            st.setInt(1, recipeId);
+            st.setInt(2, categoryid);
+            st.executeUpdate();
+            
+            
+        } catch (SQLException e) {
+            }
+        return 0;
+
     }
 
     public static void main(String[] args) {
