@@ -226,7 +226,7 @@ public class DataBase {
                 int qOLD = 0;
                 int bqOLD = 0;
                 PreparedStatement st0 = (PreparedStatement) conn
-                    .prepareStatement("SELECT ingredientid from ingredient where name = ? ");
+                    .prepareStatement("SELECT ingredientid from ingredient where name = ?;");
                 st0.setString(1, item);
                 ResultSet rs0 = st0.executeQuery();
                 while (rs0.next()) {
@@ -255,17 +255,23 @@ public class DataBase {
                                         qOLD = rs3.getInt(1);
                                         bqOLD = rs3.getInt(2);
                                 }
-                        PreparedStatement st2 = (PreparedStatement) conn
-                        .prepareStatement("UPDATE in_pantry SET quantitycurr = ?, quantitybought = ?, purchasedate = ? , expirationdate = ?, unit = ? WHERE username = ? and ingredientid = ?;  ");
-                        st2.setDate(3, (java.sql.Date) purch);
-                        st2.setInt(1, quantity + qOLD);
-                        st2.setInt(2, qbought+ bqOLD);
-                        st2.setDate(4, (java.sql.Date) exp);
+                        PreparedStatement st2;
                         if (unit != "item name"){
+                            st2 = (PreparedStatement) conn
+                            .prepareStatement("UPDATE in_pantry SET quantitycurr = ?, quantitybought = ?, purchasedate = ? , expirationdate = ?, unit = ? WHERE username = ? and ingredientid = ?;  ");
+                            st2.setDate(3, (java.sql.Date) purch);
+                            st2.setInt(1, quantity + qOLD);
+                            st2.setInt(2, qbought+ bqOLD);
+                            st2.setDate(4, (java.sql.Date) exp);
                                 st2.setString(5, unit);   
                         }
                         else {
-                                st2.setString(5, item);
+                            st2 = (PreparedStatement) conn
+                            .prepareStatement("UPDATE in_pantry SET quantitycurr = ?, quantitybought = ?, purchasedate = ? , expirationdate = ? WHERE username = ? and ingredientid = ?;  ");
+                            st2.setDate(3, (java.sql.Date) purch);
+                            st2.setInt(1, quantity + qOLD);
+                            st2.setInt(2, qbought+ bqOLD);
+                            st2.setDate(4, (java.sql.Date) exp);
                         }
                         st2.setString(6, user);
                         st2.setInt(7, Integer.parseInt(ingID));
