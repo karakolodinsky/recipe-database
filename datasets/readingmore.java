@@ -85,11 +85,33 @@ public class readingmore {
 
 
             // store recipeId, author, steps, description, cooktime, servings, difficulty, name in the recipe
-            PreparedStatement st1 = con.prepareStatement("insert into in_pantry values (?, ?, now(), ?, ?, now(), ?);");
+
+            String d1 = "now()";
+            String d2 = "now()";
+            int i = r.nextInt(11)+1;
+            int l = r.nextInt(27)+1;
+            int j = r.nextInt(3)+2020;
+            if (i<10){
+                d1 = j + "-0" + i + "-" + l;
+            }
+            else{
+                d1 = j + "-" + i + "-" + l;
+            }
+            j= j+1;
+            if (i<10){
+                d2 = j + "-0" + i + "-" + l;
+            }
+            else{
+                d2 = j + "-" + i +  "-" + l;
+            }
+            System.out.println("insert into in_pantry values (?, ? ,'" + d1 + "', ?, ?,'"+ d2 +"' , ?);");
+            PreparedStatement st1 = con.prepareStatement("insert into in_pantry values (?, ? ,'" + d1 + "', ?, ?,'"+ d2 +"', ?);");
             st1.setString(1, name);
             //st1.setString(2, "Teagan");
             st1.setInt(2, ingredientId);
             //st1.setString(8, "Mush");
+            String beagle = "";
+        
             //st1.setString(4, "Mushy");
             st1.setInt(3, quantitybought);
             //st1.setInt(7, 3);
