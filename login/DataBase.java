@@ -265,7 +265,7 @@ public class DataBase {
                                         bqOLD = rs3.getInt(2);
                                 }
                         PreparedStatement st2;
-                        if (unit != "item name"){
+                        if (unit != "other"){
                             st2 = (PreparedStatement) conn
                             .prepareStatement("UPDATE in_pantry SET quantitycurr = ?, quantitybought = ?, purchasedate = ? , expirationdate = ?, unit = ? WHERE username = ? and ingredientid = ?;  ");
                             st2.setDate(3, (java.sql.Date) purch);
@@ -276,7 +276,7 @@ public class DataBase {
                         }
                         else {
                             st2 = (PreparedStatement) conn
-                            .prepareStatement("UPDATE in_pantry SET quantitycurr = ?, quantitybought = ?, purchasedate = ? , expirationdate = ? WHERE username = ? and ingredientid = ?;  ");
+                            .prepareStatement("UPDATE in_pantry SET quantitycurr = ?, quantitybought = ?, purchasedate = ? , expirationdate = ?, unit = '' WHERE username = ? and ingredientid = ?;  ");
                             st2.setDate(3, (java.sql.Date) purch);
                             st2.setInt(1, quantity + qOLD);
                             st2.setInt(2, qbought+ bqOLD);
@@ -302,11 +302,12 @@ public class DataBase {
             st.setInt(4, qbought);
             st.setInt(5, quantity);
             st.setDate(6, (java.sql.Date) exp);
-            if (unit != "item name"){
+            if (unit != "other"){
                 st.setString(7, unit);   
         }
                 else {
-                st.setString(7, item);
+                        String emp = "";
+                st.setString(7, emp);
         }
             int rs = st.executeUpdate();
             if(rs == 1){
