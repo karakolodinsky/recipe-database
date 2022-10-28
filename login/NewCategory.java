@@ -40,7 +40,7 @@ public class NewCategory extends JFrame {
     String author;
     private static JPanel contentPane;
     static String currCategoryStr;
-    String user;
+    private static String user;
 
     /**
      * Launch the application.
@@ -91,7 +91,7 @@ public class NewCategory extends JFrame {
         init();
     }
 
-    private static void init(){
+    private void init(){
         //contentPane = new JPanel();
 
         /** Enter Category Name Label & Text-box **/
@@ -131,7 +131,18 @@ public class NewCategory extends JFrame {
             }
         });
 
+        JButton homeButton = new JButton("Back to home");
+        homeButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                NewCategory.this.dispose();
+                UserHome newR = new UserHome();
+            }
+        });
+
+
         contentPane.add(nb);
+        contentPane.add(homeButton);
+        resultLable.setMinimumSize(new Dimension(900, 50));
         contentPane.add(resultLable);
     }
 }
