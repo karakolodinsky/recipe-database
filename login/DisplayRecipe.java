@@ -37,7 +37,7 @@ public class DisplayRecipe extends JFrame {
 
     /** standardized variables for containers: */
     private int CONTAINER_HEIGHT = 500;
-    private int CONTAINER_WIDTH = 450;
+    private int CONTAINER_WIDTH = 400;
     private int HALF_CONTAINER_HEIGHT = 250;
     //private int SMALL_CONTAINER_HEIGHT = ;
 
@@ -87,6 +87,7 @@ public class DisplayRecipe extends JFrame {
         descriptionContainer.setMaximumSize(new Dimension(CONTAINER_WIDTH, CONTAINER_HEIGHT));
 
         panel.add(descriptionContainer);
+        panel.add(categoriesContainer);
         panel.add(ingredientContainer);
 
         //panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -160,8 +161,23 @@ public class DisplayRecipe extends JFrame {
      * Adds recipe's "tags": categories
      */
     private void RecipeTags(){
-        //GetCategories(String category)
+        String categorysList = "<html>Categories:<br/><br/>";
 
+        try{
+            ResultSet categoryList = DataBase.getCategories(recipeId);
+            if (categoryList != null){
+                while (categoryList.next()) {
+                    categorysList += categoryList.getString(1);
+                    categorysList += ", <br/>";
+                }
+                categorysList += "<html/>";
+                JLabel comp = new JLabel(categorysList);
+                System.out.println(categorysList);
+                categoriesContainer.add(comp);
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
     }
 
     /**
