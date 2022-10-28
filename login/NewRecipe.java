@@ -1,12 +1,20 @@
 package login;
 
+import net.proteanit.sql.DbUtils;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.*;
 import java.awt.*;
+import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import javax.swing.*;
 
 import javax.swing.*;
@@ -36,6 +44,9 @@ public class NewRecipe extends JFrame{
     private int COMBO_BOX_WIDTH = 100;
     private int COMBO_BOX_HEIGHT = 50;
 
+    private int SMALL_TEXT_BOX_WIDTH = 30;
+    //private int SMALL_BOX_HEIGHT =20;
+
     /** Current user: */
     static private String currUser;
 
@@ -47,6 +58,12 @@ public class NewRecipe extends JFrame{
     Integer cooktime;
     Integer servings;
     Integer difficulty;
+
+    /** Ingredient  */
+    ArrayList<Ingredient> ingredients = new ArrayList<>();
+    static String currIngredientStr;
+    //private JScrollPane IngredientScroll;
+
 
 
     /**
@@ -140,7 +157,6 @@ public class NewRecipe extends JFrame{
 
         /** Enter-Button calls DataBase.createRecipe() **/
         JButton enter = new JButton("Enter");
-        contentPane.add(enter);
         enter.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -205,7 +221,97 @@ public class NewRecipe extends JFrame{
                 }
             }
         });
+
+        JPanel ingredientContainer = new JPanel();
+        ingredientContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
+        ingredientContainer.setPreferredSize(new Dimension(1014, 100));
+        ingredientContainer.setMaximumSize(new Dimension(1014, 100));
+
+        /** Enter Recipe Steps Label & Textbox **/
+        JLabel ingSelectLabel = new JLabel("Search for Ingredient:");
+        JTextField ingNameTxt = new JTextField(20);
+        //contentPane.add(ingSelectLabel);
+        //contentPane.add(ingNameTxt);
+        ingredientContainer.add(ingSelectLabel);
+        ingredientContainer.add(ingNameTxt);
+
+        JTable IngredientButtons = new JTable();
+        //IngredientButtons.setVisible(false);
+        JScrollPane IngredientScroll = new JScrollPane(IngredientButtons);
+        JButton ingSearch = new JButton("Search");
+        //contentPane.add(ingSearch);
+        ingredientContainer.add(ingSearch);
+        ingSearch.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try{
+                    if (ingNameTxt.getText() != null) {
+                        ResultSet ingredientsList = DataBase.GetIngredients(ingNameTxt.getText());
+                        while (ingredientsList.next()){
+                            IngredientButtons.setModel(DbUtils.resultSetToTableModel(ingredientsList));
+                        }
+                    }
+                    else{
+                        ResultSet ingredientsList =DataBase.GetIngredients("");
+                        while (ingredientsList.next()){
+                            IngredientButtons.setModel(DbUtils.resultSetToTableModel(ingredientsList));
+                        }
+                    }
+                } catch (IOException | SQLException ioException) { ioException.printStackTrace(); }
+            }
+        });
+
+        Dimension ingDim = new Dimension(400, 200 );
+        IngredientScroll.setPreferredSize( ingDim );
+        //JScrollPane IngredientScroll = new JScrollPane(IngredientButtons);
+        IngredientScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        //IngredientScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        //IngredientScroll.setPreferredSize(new Dimension(SMALL_TEXT_BOX_WIDTH, COMBO_BOX_HEIGHT));
+        //IngredientScroll.setSize(new Dimension(SMALL_TEXT_BOX_WIDTH, COMBO_BOX_HEIGHT));
+        //contentPane.add(IngredientScroll);
+        //ingredientContainer.add(IngredientScroll);
+
+        JList<Ingredient> curIngredients = new JList<Ingredient>();
+        curIngredients.setPreferredSize( ingDim );
+
+        JLabel ingUnitLabel = new JLabel("Units (optional):");
+        JTextField ingUnitTxt = new JTextField(10);
+        //contentPane.add(ingUnitLabel);
+        //contentPane.add(ingUnitTxt);
+        ingredientContainer.add(ingUnitLabel);
+        ingredientContainer.add(ingUnitTxt);
+
+        JLabel ingQuantityLabel = new JLabel("Quantity:");
+        JFormattedTextField ingQuantityTxt = new JFormattedTextField(formatter);
+        ingQuantityTxt.setColumns(10);
+        //contentPane.add(ingQuantityLabel);
+        //contentPane.add(ingQuantityTxt);
+        ingredientContainer.add(ingQuantityLabel);
+        ingredientContainer.add(ingQuantityTxt);
+
+
+        contentPane.add(ingredientContainer);
+        contentPane.add(IngredientScroll);
+        contentPane.add(curIngredients);
+        contentPane.add(enter);
         contentPane.setVisible(true);
+    }
+
+
+    /**
+     * Adds an ingredient button to save the current ingredient
+     * @param txt
+     * @return
+     */
+    private static JButton newIngredientButton (String txt){
+        JButton nb = new JButton(txt);
+        nb.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                currIngredientStr = txt;
+            }
+    });
+        return nb;
     }
 
 }
