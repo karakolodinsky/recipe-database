@@ -226,6 +226,7 @@ public class NewRecipe extends JFrame{
             }
         });
 
+        /** Container for ingredient buttons, labels, textboxes */
         JPanel ingredientContainer = new JPanel();
         ingredientContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
         ingredientContainer.setPreferredSize(new Dimension(1014, 100));
@@ -239,6 +240,7 @@ public class NewRecipe extends JFrame{
         ingredientContainer.add(ingSelectLabel);
         ingredientContainer.add(ingNameTxt);
 
+        /** stores ingredient buttons in table */
         JTable IngredientButtons = new JTable();
         IngredientButtons.addMouseListener(new java.awt.event.MouseAdapter(){
             @Override
@@ -248,10 +250,10 @@ public class NewRecipe extends JFrame{
                 currIngredientStr = ing;
             }
         });
-        //IngredientButtons.setVisible(false);
+
+        /** Scroll-wheel view of ingredients */
         JScrollPane IngredientScroll = new JScrollPane(IngredientButtons);
         JButton ingSearch = new JButton("Search");
-        //contentPane.add(ingSearch);
         ingredientContainer.add(ingSearch);
         ingSearch.addActionListener(new ActionListener() {
             @Override
@@ -273,22 +275,23 @@ public class NewRecipe extends JFrame{
             }
         });
 
+        /** Ingredient scroll attributes */
         Dimension ingDim = new Dimension(400, 200 );
         IngredientScroll.setPreferredSize( ingDim );
         IngredientScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
-        String[] ings;
+        /** List of ingredients added to recipe */
         JList<String> curIngredients = new JList<String>();
         curIngredients.setListData(ingredientsStrings.toArray(new String[ingredientsStrings.size()]));
         curIngredients.setPreferredSize( ingDim );
 
+        /** Enter Ingredient Units Label & Text-box **/
         JLabel ingUnitLabel = new JLabel("Units (optional):");
         JTextField ingUnitTxt = new JTextField(10);
-        //contentPane.add(ingUnitLabel);
-        //contentPane.add(ingUnitTxt);
         ingredientContainer.add(ingUnitLabel);
         ingredientContainer.add(ingUnitTxt);
 
+        /** Enter Ingredient Quantity Label & Text-box **/
         JLabel ingQuantityLabel = new JLabel("Quantity:");
         JFormattedTextField ingQuantityTxt = new JFormattedTextField(formatter);
         ingQuantityTxt.setColumns(10);
@@ -297,6 +300,7 @@ public class NewRecipe extends JFrame{
         ingredientContainer.add(ingQuantityLabel);
         ingredientContainer.add(ingQuantityTxt);
 
+        /** Add-Ingredient button **/
         JButton addIngredient = new JButton("Add Ingredient");
         addIngredient.addActionListener(new ActionListener() {
             @Override
@@ -318,6 +322,7 @@ public class NewRecipe extends JFrame{
                 }
             }});
 
+        /** Add components in correct order: **/
         contentPane.add(ingredientContainer);
         contentPane.add(addIngredient);
         contentPane.add(IngredientScroll);
