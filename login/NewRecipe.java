@@ -47,6 +47,10 @@ public class NewRecipe extends JFrame{
     private int SMALL_TEXT_BOX_WIDTH = 30;
     //private int SMALL_BOX_HEIGHT =20;
 
+    /** standardized variables for containers: */
+    private int CONTAINER_HEIGHT = 50;
+    private int CONTAINER_WIDTH = 1014;
+
     /** Current user: */
     static private String currUser;
 
@@ -64,6 +68,10 @@ public class NewRecipe extends JFrame{
     ArrayList<String> ingredientsStrings = new ArrayList<>();
     static String currIngredientStr;
     //private JScrollPane IngredientScroll;
+
+    /** Category */
+    ArrayList<String> categoriesString = new ArrayList<>();
+    static String currCategoryStr;
 
 
 
@@ -195,6 +203,7 @@ public class NewRecipe extends JFrame{
                         }
                         else{
                             DataBase.recipeRequires(newId, ingredients);
+                            //Database
                             NewRecipe.this.dispose();
                         }
                     }
@@ -229,8 +238,8 @@ public class NewRecipe extends JFrame{
         /** Container for ingredient buttons, labels, textboxes */
         JPanel ingredientContainer = new JPanel();
         ingredientContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
-        ingredientContainer.setPreferredSize(new Dimension(1014, 100));
-        ingredientContainer.setMaximumSize(new Dimension(1014, 100));
+        ingredientContainer.setPreferredSize(new Dimension(CONTAINER_WIDTH, CONTAINER_HEIGHT));
+        ingredientContainer.setMaximumSize(new Dimension(CONTAINER_WIDTH, CONTAINER_HEIGHT));
 
         /** Enter Recipe Steps Label & Textbox **/
         JLabel ingSelectLabel = new JLabel("Search for Ingredient:");
@@ -253,6 +262,8 @@ public class NewRecipe extends JFrame{
 
         /** Scroll-wheel view of ingredients */
         JScrollPane IngredientScroll = new JScrollPane(IngredientButtons);
+
+        /** Ingredient JTable buttons: */
         JButton ingSearch = new JButton("Search");
         ingredientContainer.add(ingSearch);
         ingSearch.addActionListener(new ActionListener() {
@@ -321,6 +332,46 @@ public class NewRecipe extends JFrame{
                     System.out.println("New Ingredient: " + newIngredient.toStr());
                 }
             }});
+
+        /** Container for category buttons, labels, textboxes */
+        JPanel categoryContainer = new JPanel();
+        categoryContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
+        categoryContainer.setPreferredSize(new Dimension(CONTAINER_WIDTH, CONTAINER_HEIGHT));
+        categoryContainer.setMaximumSize(new Dimension(CONTAINER_WIDTH, CONTAINER_HEIGHT));
+
+        /** Category JTable buttons: */
+        JTable CategoryButtons = new JTable();
+        CategoryButtons.addMouseListener(new java.awt.event.MouseAdapter(){
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt){
+                int row = CategoryButtons.rowAtPoint(evt.getPoint());
+                String ing = (String) CategoryButtons.getValueAt(row, 0);
+                currCategoryStr = ing;
+            }
+        });
+
+        /** List of categories added to recipe */
+        JList<String> curCategories = new JList<String>();
+        curCategories.setListData(ingredientsStrings.toArray(new String[categoriesString.size()]));
+        curCategories.setPreferredSize( ingDim );
+
+        JButton addCategory = new JButton("Add Category");
+        addCategory.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (currCategoryStr != null){
+                    categoriesString.add(currCategoryStr);
+                    curCategories.setListData(categoriesString.toArray(new String[categoriesString.size()]));
+                    System.out.println("New Category: " + currCategoryStr);
+                }
+            }});
+
+
+        /** Scroll-wheel view of ingredients */
+        JScrollPane CategoryScroll = new JScrollPane(CategoryButtons);
+        JButton catSearch = new JButton("Search");
+        categoryContainer.add(catSearch);
+
 
         /** Add components in correct order: **/
         contentPane.add(ingredientContainer);
