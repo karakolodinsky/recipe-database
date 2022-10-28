@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,6 +13,7 @@ import java.sql.SQLException;
  * UI-Interface for the display recipe
  *
  * @author Teagan Nester
+ * @author Serene Wood
  * @author ?
  */
 
@@ -54,6 +56,8 @@ public class DisplayRecipe extends JFrame {
 
         panel.add(Box.createVerticalGlue());
         formatRecipe();
+        RecipeTags();
+        RecipeIngredients();
         this.getContentPane().add(scrollPane);
         setContentPane(scrollPane);
     }
@@ -104,6 +108,41 @@ public class DisplayRecipe extends JFrame {
 
 
         validate();
+    }
+
+
+    /**
+     * Adds recipe's "tags": categories
+     */
+    private void RecipeTags(){
+        //GetCategories(String category)
+
+    }
+
+    /**
+     * Pulls all ingredients for the current recipe and displays them
+     */
+    private void RecipeIngredients(){
+        String ingredientsList = "<html>";
+        try{
+            ResultSet categoryList = DataBase.getIngredients(recipeId);
+            if (categoryList != null){
+                while (categoryList.next()){
+                    //return idEx.getInt(1)
+                    ingredientsList += (categoryList.getString(3) + "- ");
+                    ingredientsList += categoryList.getInt(1) + " ";
+                    ingredientsList += categoryList.getString(2);
+                    ingredientsList += ", <br/>";
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        ingredientsList += "<html/>";
+        JLabel comp = new JLabel(ingredientsList);
+        System.out.println(ingredientsList);
+        panel.add(comp);
+        //textArea(ingredientsList);
     }
 
     private void labelMaker (String text) {

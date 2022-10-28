@@ -700,5 +700,25 @@ public static int deleteFromPantry(String username, String item) throws IOExcept
         return -1;
     }
 
+
+    public static ResultSet getIngredients(int recipeID){
+        Connection conn = getCon();
+        try{
+            PreparedStatement st = (PreparedStatement) conn
+                    .prepareStatement("SELECT r.quantity, r.unit, i.name "
+                            + "FROM recipe_requires AS r, ingredient AS i "
+                            + "WHERE i.ingredientid IN ( "
+                            + "SELECT DISTINCT(r.ingredientid) FROM recipe_requires AS r "
+                            + "WHERE r.recipeid = ? "
+                            + ");");
+            st.setInt(1, recipeID);
+            ResultSet rs = st.executeQuery();
+            return rs;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return null;
+    }
+
 }
 
