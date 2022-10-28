@@ -777,5 +777,46 @@ public static ResultSet getUserRecipes (String user){
 
 
 
+
+    public static ResultSet getIngredients(int recipeID){
+        Connection conn = getCon();
+        try{
+            PreparedStatement st = (PreparedStatement) conn
+                    .prepareStatement("SELECT i.name, r.quantity, r.unit "
+                            + "FROM recipe_requires AS r, ingredient AS i "
+                            + "WHERE i.ingredientid IN ( "
+                            + "SELECT r.ingredientid "
+                            + "WHERE r.recipeid = ? "
+                            + ") "
+                            + "AND i.ingredientid = r.ingredientid;");
+            st.setInt(1, recipeID);
+            ResultSet rs = st.executeQuery();
+            return rs;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return null;
+    }
+
+
+    public static ResultSet getCategories(int recipeID){
+        Connection conn = getCon();
+        try{
+            PreparedStatement st = (PreparedStatement) conn
+                    .prepareStatement("SELECT c.categoryname "
+                            + "FROM category AS c, recipe_category as r "
+                            + "WHERE c.categoryid = r.categoryid "
+                            + "AND c.categoryid IN ( "
+                            + "SELECT r.categoryid "
+                            + "WHERE r.recipeid = ?);");
+            st.setInt(1, recipeID);
+            ResultSet rs = st.executeQuery();
+            return rs;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return null;
+    }
+
 }
 
