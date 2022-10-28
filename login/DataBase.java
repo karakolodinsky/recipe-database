@@ -368,6 +368,25 @@ public class DataBase {
 
     }
 
+    public static Integer GetCategoryByName(String name) throws IOException {
+        Connection conn = DataBase.getConnect(); 
+
+        try{
+            PreparedStatement st = (PreparedStatement) conn
+                .prepareStatement("SELECT categoryId FROM category WHERE name LIKE '%" + name + "%'");
+            System.out.println(st);
+            boolean exists = st.execute();
+            if(exists){
+                ResultSet rs = st.getResultSet();
+                return rs.getInt(1);
+            }
+        }
+        catch(SQLException e){
+            printSQLException(e);
+        }
+        return -1;
+    }
+
     public static ResultSet GetPantry (String user) throws IOException {
         Connection conn = DataBase.getConnect();
 
