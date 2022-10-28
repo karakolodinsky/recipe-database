@@ -20,6 +20,7 @@ public class DisplayRecipe extends JFrame {
     private JPanel panel;
     private ResultSet rs;
     private JButton cookButton;
+    private JLabel db_label_errorText;
 
 
     public DisplayRecipe (String user, int recipeId, String btnText) throws SQLException {
@@ -67,6 +68,10 @@ public class DisplayRecipe extends JFrame {
                 //functionality for make-bake-cook
                 // will need to pass in recipeid to to Database.cookRecipe(int recipeid)
                 int x = DataBase.cookRecipe(recipeId);
+                if(x == -1){
+                    JOptionPane.showMessageDialog(new JFrame(), "out of ingredients!",
+                            "yo", JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
         JLabel label = new JLabel(info[0]);
