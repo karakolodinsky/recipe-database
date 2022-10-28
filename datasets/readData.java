@@ -10,12 +10,14 @@ import java.security.spec.InvalidKeySpecException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
 import java.util.Random;
 //import java.util.random.*;
 
+import javax.annotation.processing.Filer;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.swing.JOptionPane;
@@ -32,7 +34,61 @@ public class readData {
         
     }
 
-    public void readRecipes (Connection con) throws IOException, SQLException {
+    private void readReviews (Connection con) throws IOException, SQLException {
+        FileReader fr = new FileReader("datasets/RAW_interactions.csv");
+        BufferedReader br = new BufferedReader(fr);
+        String line = br.readLine();
+        while ((line = br.readLine()) != null) {
+            String[] reviewParts = line.split(",");
+            String dateForm = formatDate(reviewParts[2]);
+            Date date = Date.valueOf(dateForm);
+            int rating = Integer.parseInt(reviewParts[3]);
+            String review = reviewParts[4];
+            if (review.length() >= 500) {
+                review = review.substring(0, 499);
+            }
+            if (rating < 6 && rating > 0) {
+                // get random user from database
+                PreparedStatement ps = con.prepareStatement("SELECT * FROM netizen ORDER BY RANDOM() LIMIT 1;");
+                ResultSet rs = ps.executeQuery();
+                rs.next();
+                String user = rs.getString("username");
+                // get random recipe from database
+                ps = con.prepareStatement("SELECT * FROM recipe ORDER BY RANDOM() LIMIT 1;");
+                rs = ps.executeQuery();
+                rs.next();
+                int recipeId = rs.getInt("recipeId");
+                Date uploaded = rs.getDate("date");
+                boolean timingGood = date.after(uploaded);
+                if (!timingGood) {
+                    date = uploaded;
+                }
+                //fix user account creation date
+                ps = con.prepareStatement("UPDATE netizen SET creationdate=? where username=?;");
+                Timestamp creationDate = new Timestamp(date.getTime());
+                ps.setTimestamp(1, creationDate);
+                ps.setString(2, user);
+                ps.executeUpdate();
+
+                // make their review
+                ps = con.prepareStatement("INSERT into netizen_creates VALUES (?, ?, ?, ?, ?, ?);");
+                ps.setString(1, user);
+                ps.setInt(2, recipeId);
+                ps.setDate(3, date);
+                ps.setInt(4, rating);
+                ps.setString(5, review);
+                Random rand = new Random();
+                int serv = rand.nextInt(10);
+                ps.setInt(6, serv);
+                ps.executeUpdate();
+            }
+        }
+
+        br.close();
+        fr.close();
+    }
+
+    private void readRecipes (Connection con) throws IOException, SQLException {
         //Connection con = DataBase.getCon();
         FileReader fr = new FileReader("datasets/RAW_recipes.csv"); // I'm running from recipe-database
         BufferedReader br = new BufferedReader(fr);
@@ -171,7 +227,7 @@ public class readData {
 
                 String currIngred = ingredients[i];
 
-                //check that element of categories is not "" or ", " or " "
+                //check that element of ingredients is not "" or ", " or " "
                 if(!(currIngred.equals("") || currIngred.equals(", ") || currIngred.equals(" "))){
 
                     try {
@@ -219,6 +275,21 @@ public class readData {
         fr.close();
     }
 
+    private String formatDate (String text) {
+        String[] d = text.split("/");
+        String year = d[2];
+        String month = d[0];
+        String day = d[1];
+        if (day.length() == 1) {
+            day = "0" + day;
+        }
+        if (month.length() == 1) {
+            month = "0" + month;
+        }
+        String dateForm = year + "-" + month + "-" + day;
+        return dateForm;
+    }
+
     private void getDates (Connection con) throws IOException {
         FileReader fr = new FileReader("datasets/RAW_recipes.csv"); // I'm running from recipe-database
         BufferedReader br = new BufferedReader(fr);
@@ -227,17 +298,8 @@ public class readData {
             String[] recipeParts = line.split("[\\[\\]]");
             String[] recipe = recipeParts[0].split(",");
             int recipeId = Integer.parseInt(recipe[1]);
-            String[] d = recipe[4].split("/");
-            String year = d[2];
-            String month = d[0];
-            String day = d[1];
-            if (day.length() == 1) {
-                day = "0" + day;
-            }
-            if (month.length() == 1) {
-                month = "0" + month;
-            }
-            String dateForm = year + "-" + month + "-" + day;
+            String dateForm = formatDate(recipe[4]);
+            
             Date date = Date.valueOf(dateForm);
 
             ResultSet rs = null;
@@ -303,10 +365,20 @@ public class readData {
         System.out.println("Password: ");
         String password = reader.readLine().trim();
         
+        // Uncomment the below to read in recipe data
+        // readData rd = new readData();
+        // Connection con = rd.dbLogin(username, password);
+        // //rd.readRecipes(con);
+        // rd.getDates(con);
+        // System.exit(1);
+
+
+        // Uncomment the below to read in the recipe review data
         readData rd = new readData();
         Connection con = rd.dbLogin(username, password);
         //rd.readRecipes(con);
-        rd.getDates(con);
+        //rd.getDates(con);
+        rd.readReviews(con);
         System.exit(1);
     }
     

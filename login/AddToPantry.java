@@ -21,6 +21,13 @@ import javax.swing.text.DateFormatter;
 import javax.swing.text.AbstractDocument.Content;
 import java.util.Date;
 
+/**
+ * UI-Interface for adding new ingredient to pantry
+ *
+ * @author Kara Kolodinsky
+ * @author ?
+ */
+
 public class AddToPantry extends JFrame {
 
     private static final long serialVersionUID = 1L;
@@ -210,9 +217,11 @@ public class AddToPantry extends JFrame {
         label_errorText.setBounds(20, 320, 170, 30);
         label_errorText.setFont(new Font("Tahoma", Font.PLAIN + Font.BOLD, 11));
         contentPane.add(label_errorText);
+
+
         JTable SearchTbl = new JTable();
         SearchTbl.setVisible(false);
-        SearchTbl.setBounds(20, 150, 200, 175);
+        SearchTbl.setBounds(20, 135, 200, 195);
         SearchTbl.setFocusable(false);
         SearchTbl.setRowSelectionAllowed(true);
         SearchTbl.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -238,15 +247,23 @@ public class AddToPantry extends JFrame {
             });
 
         contentPane.add(SearchTbl);
+
+        SearchTbl.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+
+        // JScrollPane pane = new JScrollPane(SearchTbl);
+        // contentPane.add(pane);
         
 
-        // JScrollPane js=new JScrollPane(SearchTbl);
-        // js.setVisible(true);
-        // add(js);
+        // JScrollPane js = new JScrollPane(SearchTbl);
+        // Dimension ingDim = new Dimension(200, 175 );
+        // js.setPreferredSize( ingDim );
+        // js.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        // contentPane.add(js);
 
         JButton SearchButton = new JButton("Search");
         SearchButton.setFont(new Font("80er Teenie Demo", Font.BOLD, 26));
         SearchButton.setBounds(20, 350, 162, 50);
+        
         contentPane.add(SearchButton);
         SearchButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {

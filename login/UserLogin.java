@@ -7,7 +7,12 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.AbstractDocument.Content;
-
+/**
+ * UI-Interface for the netizen login
+ *
+ * @author Kara Kolodinsky
+ * @author ?
+ */
 
 public class UserLogin extends JFrame {
 

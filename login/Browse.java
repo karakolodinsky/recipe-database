@@ -4,6 +4,10 @@ import java.awt.*;
 import java.awt.event.*;
 import java.sql.*;  
 
+/*
+ * author: Teagan
+ */
+
 public class Browse extends JFrame {
 
     static private String netizenUsername;
@@ -206,39 +210,30 @@ public class Browse extends JFrame {
                 //sort on name
                 if (sort.equals("Name")) {
                     if (asc) {
-                        ps = con.prepareStatement("SELECT r.name, r.recipeId, avg(n.rating) as avgrating " +
-                                                "FROM recipe r LEFT JOIN netizen_creates n on r.recipeId=n.recipeId " +
-                                                "group by r.recipeId, r.name ORDER BY r.name;");
+                        // ps = con.prepareStatement("SELECT r.name, r.recipeId, avg(n.rating) as avgrating " +
+                        //                         "FROM recipe r LEFT JOIN netizen_creates n on r.recipeId=n.recipeId " +
+                        //                         "group by r.recipeId, r.name ORDER BY r.name;");
+                        ps = con.prepareStatement("SELECT * FROM recipepublic ORDER BY name;");
                     }
                     else {
-                        ps = con.prepareStatement("SELECT r.name, r.recipeId, avg(n.rating) as avgrating " +
-                                                "FROM recipe r LEFT JOIN netizen_creates n on r.recipeId=n.recipeId " +
-                                                "group by r.recipeId, r.name ORDER BY r.name DESC;");
+                        ps = con.prepareStatement("SELECT * FROM recipepublic ORDER BY name DESC;");
                     }
                 }
                 //sort on date
                 else if (sort.equals("Date")) {
                     if (asc) {
-                        ps = con.prepareStatement("SELECT r.name, r.recipeId, avg(n.rating) as avgrating " +
-                                                "FROM recipe r LEFT JOIN netizen_creates n on r.recipeId=n.recipeId " +
-                                                "group by r.recipeId, r.name ORDER BY r.date;");
+                        ps = con.prepareStatement("SELECT * FROM recipepublic ORDER BY date;");
                     }
                     else {
-                        ps = con.prepareStatement("SELECT r.name, r.recipeId, avg(n.rating) as avgrating " +
-                                                "FROM recipe r LEFT JOIN netizen_creates n on r.recipeId=n.recipeId " +
-                                                "group by r.recipeId, r.name ORDER BY r.date DESC;");
+                        ps = con.prepareStatement("SELECT * FROM recipepublic ORDER BY date DESC;");
                     }
                 }
                 else { //sort on rating
                     if (asc) {
-                        ps = con.prepareStatement("SELECT r.name, r.recipeId, avg(n.rating) as avgrating " +
-                                                "FROM recipe r LEFT JOIN netizen_creates n on r.recipeId=n.recipeId " +
-                                                "group by r.recipeId, r.name ORDER BY avgrating;");
+                        ps = con.prepareStatement("SELECT * FROM recipepublic ORDER BY avgrating;");
                     }
                     else {
-                        ps = con.prepareStatement("SELECT r.name, r.recipeId, avg(n.rating) as avgrating " +
-                                                    "FROM recipe r LEFT JOIN netizen_creates n on r.recipeId=n.recipeId " +
-                                                    "group by r.recipeId, r.name ORDER BY avgrating DESC;");
+                        ps = con.prepareStatement("SELECT * FROM recipepublic ORDER BY avgrating DESC;");
                     }
                 }
             }
@@ -247,39 +242,33 @@ public class Browse extends JFrame {
                 // sort by name
                 if (sort.equals("Name")) {
                     if (asc) {
-                        ps = con.prepareStatement("SELECT r.name, r.recipeId, avg(n.rating) as avgrating " +
-                                                "FROM recipe r LEFT JOIN netizen_creates n on r.recipeId=n.recipeId " +
-                                                "WHERE name like ? GROUP BY r.recipeId, r.name ORDER BY r.name;");
+                        // ps = con.prepareStatement("SELECT r.name, r.recipeId, avg(n.rating) as avgrating " +
+                        //                         "FROM recipe r LEFT JOIN netizen_creates n on r.recipeId=n.recipeId " +
+                        //                         "WHERE name like ? GROUP BY r.recipeId, r.name ORDER BY r.name;");
+                        ps = con.prepareStatement("SELECT * FROM recipepublic WHERE name LIKE ? ORDER BY name;");
                     }
                     else {
-                        ps = con.prepareStatement("SELECT r.name, r.recipeId, avg(n.rating) as avgrating " +
-                                                "FROM recipe r LEFT JOIN netizen_creates n on r.recipeId=n.recipeId " +
-                                                "WHERE name like ? GROUP BY r.recipeId, r.name ORDER BY r.name DESC;");
+                        ps = con.prepareStatement("SELECT * FROM recipepublic WHERE name LIKE ? ORDER BY name DESC;");
                     }
                 }
                 //sort by date
                 else if (sort.equals("Date")) {
                     if (asc) {
-                        ps = con.prepareStatement("SELECT r.name, r.recipeId, avg(n.rating) as avgrating " +
-                                                "FROM recipe r LEFT JOIN netizen_creates n on r.recipeId=n.recipeId " +
-                                                "WHERE name like ? GROUP BY r.recipeId, r.name ORDER BY r.date;");
+                        // ps = con.prepareStatement("SELECT r.name, r.recipeId, avg(n.rating) as avgrating " +
+                        //                         "FROM recipe r LEFT JOIN netizen_creates n on r.recipeId=n.recipeId " +
+                        //                         "WHERE name like ? GROUP BY r.recipeId, r.name ORDER BY r.date;");
+                        ps = con.prepareStatement("SELECT * FROM recipepublic WHERE name LIKE ? ORDER BY date;");
                     }
                     else {
-                        ps = con.prepareStatement("SELECT r.name, r.recipeId, avg(n.rating) as avgrating " +
-                                                "FROM recipe r LEFT JOIN netizen_creates n on r.recipeId=n.recipeId " +
-                                                "WHERE name like ? GROUP BY r.recipeId, r.name ORDER BY r.date DESC;");
+                        ps = con.prepareStatement("SELECT * FROM recipepublic WHERE name LIKE ? ORDER BY date DESC;");
                     }
                 }
                 else { //sort on rating
                     if (asc) {
-                        ps = con.prepareStatement("SELECT r.name, r.recipeId, avg(n.rating) as avgrating " +
-                                                "FROM recipe r LEFT JOIN netizen_creates n on r.recipeId=n.recipeId " +
-                                                "WHERE name like ? GROUP BY r.recipeId, r.name ORDER BY avgrating;");
+                        ps = con.prepareStatement("SELECT * FROM recipepublic WHERE name LIKE ? ORDER BY avgrating;");
                     }
                     else {
-                        ps = con.prepareStatement("SELECT r.name, r.recipeId, avg(n.rating) as avgrating " +
-                                                "FROM recipe r LEFT JOIN netizen_creates n on r.recipeId=n.recipeId " +
-                                                "WHERE name like ? GROUP BY r.recipeId, r.name ORDER BY avgrating DESC;");
+                        ps = con.prepareStatement("SELECT * FROM recipepublic WHERE name LIKE ? ORDER BY avgrating;");
                     }
                 }
                 ps.setString(1, "%" + searchVal + "%");
@@ -291,45 +280,93 @@ public class Browse extends JFrame {
                 // sort by name
                 if (sort.equals("Name")) {
                     if (asc) {
-                        ps = con.prepareStatement("SELECT r.name, r.recipeId, avg(n.rating) as avgrating " +
-                                                "FROM recipe r LEFT JOIN netizen_creates n on r.recipeId=n.recipeId " +
-                                                "WHERE name like ? GROUP BY r.recipeId, r.name ORDER BY r.name;");
+                        ps = con.prepareStatement("select * from recipepublic where recipeid in " + 
+                                                "(select distinct recipeId from recipe_requires where ingredientid in " +
+                                                    "(select ingredientid from ingredient where name like ?))" +
+                                                "order by name;");
                     }
                     else {
-                        ps = con.prepareStatement("SELECT r.name, r.recipeId, avg(n.rating) as avgrating " +
-                                                "FROM recipe r LEFT JOIN netizen_creates n on r.recipeId=n.recipeId " +
-                                                "WHERE name like ? GROUP BY r.recipeId, r.name ORDER BY r.name DESC;");
+                        ps = con.prepareStatement("select * from recipepublic where recipeid in " + 
+                                                "(select distinct recipeId from recipe_requires where ingredientid in " +
+                                                "(select ingredientid from ingredient where name like ?))" +
+                                                "order by name DESC;");
                     }
                 }
                 //sort by date
                 else if (sort.equals("Date")) {
                     if (asc) {
-                        ps = con.prepareStatement("SELECT r.name, r.recipeId, avg(n.rating) as avgrating " +
-                                                "FROM recipe r LEFT JOIN netizen_creates n on r.recipeId=n.recipeId " +
-                                                "WHERE name like ? GROUP BY r.recipeId, r.name ORDER BY r.date;");
+                        ps = con.prepareStatement("select * from recipepublic where recipeid in " + 
+                                                "(select distinct recipeId from recipe_requires where ingredientid in " +
+                                                "(select ingredientid from ingredient where name like ?))" +
+                                                "order by date;");
                     }
                     else {
-                        ps = con.prepareStatement("SELECT r.name, r.recipeId, avg(n.rating) as avgrating " +
-                                                "FROM recipe r LEFT JOIN netizen_creates n on r.recipeId=n.recipeId " +
-                                                "WHERE name like ? GROUP BY r.recipeId, r.name ORDER BY r.date DESC;");
+                        ps = con.prepareStatement("select * from recipepublic where recipeid in " + 
+                                                "(select distinct recipeId from recipe_requires where ingredientid in " +
+                                                "(select ingredientid from ingredient where name like ?))" +
+                                                "order by date DESC;");
                     }
                 }
                 else { //sort on rating
                     if (asc) {
-                        ps = con.prepareStatement("SELECT r.name, r.recipeId, avg(n.rating) as avgrating " +
-                                                "FROM recipe r LEFT JOIN netizen_creates n on r.recipeId=n.recipeId " +
-                                                "WHERE name like ? GROUP BY r.recipeId, r.name ORDER BY avgrating;");
+                        ps = con.prepareStatement("select * from recipepublic where recipeid in " + 
+                                                "(select distinct recipeId from recipe_requires where ingredientid in " +
+                                                "(select ingredientid from ingredient where name like ?))" +
+                                                "order by avgrating;");
                     }
                     else {
-                        ps = con.prepareStatement("SELECT r.name, r.recipeId, avg(n.rating) as avgrating " +
-                                                "FROM recipe r LEFT JOIN netizen_creates n on r.recipeId=n.recipeId " +
-                                                "WHERE name like ? GROUP BY r.recipeId, r.name ORDER BY avgrating DESC;");
+                        ps = con.prepareStatement("select * from recipepublic where recipeid in " + 
+                                                "(select distinct recipeId from recipe_requires where ingredientid in " +
+                                                "(select ingredientid from ingredient where name like ?))" +
+                                                "order by avgrating DESC;");
                     }
                 }
                 ps.setString(1, "%" + searchVal + "%");
             }
-            else { // change this it's stubbed out
-                ps = con.prepareStatement("SELECT recipeId, name FROM recipe WHERE name like %?% ORDER BY ?;");
+            else { // category
+                if (sort.equals("Name")) {
+                    if (asc) {
+                        ps = con.prepareStatement("select * from recipepublic where recipeid in " + 
+                                            "(select distinct recipeId from recipe_category where categoryid in " +
+                                            "(select categoryid from category where categoryname like ?))" +
+                                            "order by name;");
+                    }
+                    else {
+                        ps = con.prepareStatement("select * from recipepublic where recipeid in " + 
+                                            "(select distinct recipeId from recipe_category where categoryid in " +
+                                            "(select categoryid from category where categoryname like ?))" +
+                                            "order by name DESC;");
+                    }
+                }
+                else if (sort.equals("Date")) {
+                    if (asc) {
+                        ps = con.prepareStatement("select * from recipepublic where recipeid in " + 
+                                            "(select distinct recipeId from recipe_category where categoryid in " +
+                                            "(select categoryid from category where categoryname like ?))" +
+                                            "order by date;");
+                    }
+                    else {
+                        ps = con.prepareStatement("select * from recipepublic where recipeid in " + 
+                                            "(select distinct recipeId from recipe_category where categoryid in " +
+                                            "(select categoryid from category where categoryname like ?))" +
+                                            "order by date DESC;");
+                    }
+                }
+                else {
+                    if (asc) {
+                        ps = con.prepareStatement("select * from recipepublic where recipeid in " + 
+                                            "(select distinct recipeId from recipe_category where categoryid in " +
+                                            "(select categoryid from category where categoryname like ?))" +
+                                            "order by avgrating;");
+                    }
+                    else {
+                        ps = con.prepareStatement("select * from recipepublic where recipeid in " + 
+                                            "(select distinct recipeId from recipe_category where categoryid in " +
+                                            "(select categoryid from category where categoryname like ?))" +
+                                            "order by avgrating DESC;");
+                    }
+                }
+                ps.setString(1, "%" + searchVal + "%");
             }
 
             exec = ps.execute();

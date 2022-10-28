@@ -235,9 +235,10 @@ public class DataBase {
                         System.out.println(ingID + "\n");
                       }
                       PreparedStatement st1 = (PreparedStatement) conn
-                            .prepareStatement("SELECT ingredientid from in_pantry where ingredientid = ? and username = ? ");
+                      .prepareStatement("SELECT ingredientid from in_pantry where ingredientid = ? and username = ? and purchasedate = ?");
                       st1.setInt(1,Integer.parseInt(ingID));
                       st1.setString(2, user);
+                      st1.setDate(3, (java.sql.Date) purch);
                       ResultSet rs1 = st1.executeQuery();
                       boolean in_pantry = true;
                       if (!rs1.isBeforeFirst() ) {    
@@ -336,7 +337,7 @@ public class DataBase {
 
         try {
             PreparedStatement st = (PreparedStatement) conn
-                    .prepareStatement("SELECT name FROM ingredient WHERE name LIKE '%" + ingredient + "%'");
+                    .prepareStatement("SELECT name FROM ingredient WHERE name LIKE '" + ingredient + "%' order by name");
                 //     st.setString(1, ingredient);
             System.out.println(st);
             ResultSet rs = st.executeQuery();
@@ -351,12 +352,51 @@ public class DataBase {
 
     }
 
+    public static ResultSet GetCategories (String category) throws IOException {
+        Connection conn = DataBase.getConnect();
+
+        try {
+            PreparedStatement st = (PreparedStatement) conn
+                    .prepareStatement("SELECT categoryname FROM category WHERE categoryname LIKE '%" + category + "%'");
+                //     st.setString(1, ingredient);
+            System.out.println(st);
+            ResultSet rs = st.executeQuery();
+            return rs;
+        } catch (SQLException e) {
+
+                // print SQL exception information
+                printSQLException(e);
+            }
+
+        return null;
+
+    }
+
+    public static Integer GetCategoryByName(String name) throws IOException {
+        Connection conn = DataBase.getConnect(); 
+
+        try{
+            PreparedStatement st = (PreparedStatement) conn
+                .prepareStatement("SELECT categoryId FROM category WHERE categoryname LIKE '%" + name + "%'");
+            System.out.println(st);
+            boolean exists = st.execute();
+            if(exists){
+                ResultSet rs = st.getResultSet();
+                return rs.getInt(1);
+            }
+        }
+        catch(SQLException e){
+            printSQLException(e);
+        }
+        return -1;
+    }
+
     public static ResultSet GetPantry (String user) throws IOException {
         Connection conn = DataBase.getConnect();
 
         try {
             PreparedStatement st = (PreparedStatement) conn
-                    .prepareStatement("SELECT i.name, p.purchasedate, p.expirationdate, p.quantitycurr, p.quantitybought, p.unit from ingredient i, in_pantry p where i.ingredientid = p.ingredientid and p.username = ?");
+                    .prepareStatement("SELECT i.name, p.purchasedate, p.expirationdate, p.quantitycurr, p.quantitybought, p.unit from ingredient i, in_pantry p where i.ingredientid = p.ingredientid and p.username = ? order by name");
                 st.setString(1, user);
             System.out.println(st);
             ResultSet rs = st.executeQuery();
@@ -373,7 +413,7 @@ public class DataBase {
 
     // STUB
     // todo on make-bake-cook branch
-    public static int cookRecipe (int recipeID) {
+    public static int cookRecipe (int recipeID, int quant) {
         Connection conn = DataBase.getCon();
         try{
             PreparedStatement st = (PreparedStatement)  conn
@@ -601,7 +641,7 @@ public class DataBase {
      * @param servings          Integer 1-12
      * @param difficulty        Integer 1-5
      * @param name              String <= 50 chars long
-     * @return                  1 on success, -1 on failure
+     * @return                  New recipe's ID
      */
     public static int createRecipe(String steps, String description, Integer cooktime,
                                     Integer servings, Integer difficulty, String name){
@@ -627,13 +667,69 @@ public class DataBase {
             int rs = st.executeUpdate();
             if(rs == 1){
                 //display(rs);      // nvm lol
-                return 1;
+                return newid;
             }
         }
         catch (SQLException e) {
             printSQLException(e);
         }
         return -1;                  // try failed
+    }
+
+    /**
+     * Categorize a recipe with the given categories
+     * @param categoryString the string of categories
+     * @param recipeId the recipe to add these tags to
+     */
+    public static void categorizeRecipe(String categoryString, Integer recipeId){
+
+        // make the categories a list of strings
+        String[] categories = categoryString.split(",");
+
+        int size = categories.length;
+        for(int i = 0; i < size; i++){
+
+            String currTag = categories[i];
+
+            //check that element of categories is not "" or ", " or " "
+            if(!(currTag.equals("") || currTag.equals(", ") || currTag.equals(" "))){
+            
+                try {
+                    ResultSet rs = null;
+                    PreparedStatement st = con.prepareStatement("SELECT categoryId FROM category WHERE categoryname=?;");
+                    st.setString(1, currTag.strip());
+                    boolean exists = st.execute();
+                    int categoryId = -1;
+                    if (exists) {
+                        // if category does not already exist, create it, else grab existing category's Id
+                        rs = st.getResultSet();
+                        if (!rs.isBeforeFirst()) {
+                            st = con.prepareStatement("Select max(categoryId) from category;");
+                            rs = st.executeQuery();
+                            rs.next();
+                            categoryId = rs.getInt(1) + 1;
+                            st = con.prepareStatement("Insert into category values(?, ?);");
+                            st.setInt(1, categoryId);
+                            st.setString(2, currTag);
+                            st.executeUpdate();
+                        }
+                        else{
+                            rs.next();
+                            categoryId = rs.getInt(1);
+                        }
+                    }
+
+                    // add category to recipeCategory
+                    st = con.prepareStatement("insert into recipe_category values(?, ?);");
+                    st.setInt(1, recipeId);
+                    st.setInt(2, categoryId);
+                    st.executeUpdate();
+
+                } catch (SQLException e) {
+                    System.exit(0);
+                } 
+            }       
+        }
     }
 
 
@@ -646,7 +742,7 @@ public class DataBase {
         int newId;
         try{
             PreparedStatement id = (PreparedStatement) conn .prepareStatement("SELECT MAX(R.RECIPEID) " +
-                                                                                "FROM RECIPE AS R");
+                                                                                "FROM RECIPE AS R;");
             ResultSet idEx = id.executeQuery();
             //empnum = rs.getString(1);
             while (idEx.next()){
@@ -656,6 +752,7 @@ public class DataBase {
         catch (SQLException e) {
             e.printStackTrace();
         }
+        System.out.println("Select max failed");
         return 0;
     }
 
@@ -688,6 +785,168 @@ public static int deleteFromPantry(String username, String item) throws IOExcept
 
         return -1;
 
+    }
+
+    /**
+     * Adds all the arraylist's ingredients to the SQL recipe_requires table
+     * @param recipeID      ID number for recipe in database (Foreign Key)
+     * @param ingredients   Array of all ingredients for the recipe
+     * @return          1 on success, -1 on fail
+     */
+    public static int recipeRequires(int recipeID, ArrayList<Ingredient> ingredients){
+        Connection conn = getCon();
+        Integer ingID = null;
+        try{
+            for (Ingredient i : ingredients){
+                /** get the ID for the current ingredient */
+                PreparedStatement st0 = (PreparedStatement) conn
+                        .prepareStatement("SELECT ingredientid from ingredient where name = ? ");
+                st0.setString(1, i.getName());
+                ResultSet rs0 = st0.executeQuery();
+                while (rs0.next()) {
+                    ingID = rs0.getInt("ingredientID");
+                }
+
+                if (ingID != null) {
+                    PreparedStatement st = (PreparedStatement) conn
+                            .prepareStatement("INSERT INTO recipe_requires (RECIPEID, INGREDIENTID, QUANTITY, UNIT) "
+                                    + "VALUES (?, ?, ?, ?)" );
+                    st.setInt(1, recipeID);
+                    st.setInt(2, ingID);
+                    st.setInt(3, i.getQuantity());
+                    if (i.getUnit() != null){
+                        st.setString(4, i.getUnit());
+                    }
+
+                    int rs = st.executeUpdate();
+                    if (rs == 1) {
+                        return 1;
+                    }
+                }
+            }
+        }
+        catch (SQLException throwables) {
+            throwables.printStackTrace();
+            return -1;
+        }
+        return -1;
+    }
+
+    public static int leaveReview(String user, int quant, int stars, String revtext, int recipeID){
+        Connection conn = getCon();
+        try{
+                if(DataBase.cookRecipe(recipeID, quant) != -1){
+                        PreparedStatement st = (PreparedStatement) conn
+                .prepareStatement("INSERT INTO netizen_creates values (?,?, now(), ?,?,? );");
+                st.setString(1, user);
+                st.setInt(2, recipeID);
+                st.setInt(3, stars);
+                st.setString(4, revtext);
+                st.setInt(5, quant);
+                }
+                else return -1;
+        } 
+        
+
+
+
+         catch (SQLException throwables) {
+             throwables.printStackTrace();
+             return -1;
+         }
+         return -1;
+    }
+//     public static int leaveReview(String user, int quant, int stars, String revtext, int recipeID){
+//         Connection conn = getCon();
+//         try{
+//                 ArrayList<Integer> list = new ArrayList<>();
+//                 ArrayList<Integer> list2 = new ArrayList<>();
+//                 ArrayList<String> list3 = new ArrayList<>();
+//                 PreparedStatement st0 = (PreparedStatement) conn
+//                 .prepareStatement("SELECT ingredientid, quantity, unit from recipe_req where recipeid = ? ");
+//         st0.setInt(1, recipeID);
+//         ResultSet rs0 = st0.executeQuery();
+//         while (rs0.next()) {
+//             list.add(rs0.getInt("ingredientID"));
+//             list2.add(rs0.getInt("quantity"));
+//             list3.add(rs0.getString("unit"));
+//         }
+//         for (int i =0 ; i< list.size() ;i++){
+//                 PreparedStatement st1 = (PreparedStatement) conn
+//                 .prepareStatement("SELECT ingredientid, quantitycurr, unit from in_pantry where user = ? ");
+//                 st1.setString(1, user);
+//                 ResultSet rs1 = st1.executeQuery();
+//                 while (rs1.next()) {
+//         } 
+        
+
+
+
+//         }
+//         catch (SQLException throwables) {
+//             throwables.printStackTrace();
+//             return -1;
+//         }
+//         return -1;
+//     }
+
+
+public static ResultSet getUserRecipes (String user){
+        Connection conn = DataBase.getConnect();
+        try{
+            PreparedStatement ps = (PreparedStatement) conn .prepareStatement("SELECT name, recipeid from recipe where author = ?");
+            ps.setString(1, user);
+            ResultSet rs = ps.executeQuery();
+            return rs;
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Select max failed");
+        return null;
+    }
+
+
+
+
+    public static ResultSet getIngredients(int recipeID){
+        Connection conn = getCon();
+        try{
+            PreparedStatement st = (PreparedStatement) conn
+                    .prepareStatement("SELECT i.name, r.quantity, r.unit "
+                            + "FROM recipe_requires AS r, ingredient AS i "
+                            + "WHERE i.ingredientid IN ( "
+                            + "SELECT r.ingredientid "
+                            + "WHERE r.recipeid = ? "
+                            + ") "
+                            + "AND i.ingredientid = r.ingredientid;");
+            st.setInt(1, recipeID);
+            ResultSet rs = st.executeQuery();
+            return rs;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return null;
+    }
+
+
+    public static ResultSet getCategories(int recipeID){
+        Connection conn = getCon();
+        try{
+            PreparedStatement st = (PreparedStatement) conn
+                    .prepareStatement("SELECT c.categoryname "
+                            + "FROM category AS c, recipe_category as r "
+                            + "WHERE c.categoryid = r.categoryid "
+                            + "AND c.categoryid IN ( "
+                            + "SELECT r.categoryid "
+                            + "WHERE r.recipeid = ?);");
+            st.setInt(1, recipeID);
+            ResultSet rs = st.executeQuery();
+            return rs;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return null;
     }
 
 }
