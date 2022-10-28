@@ -348,6 +348,26 @@ public class DataBase {
 
     }
 
+    public static ResultSet GetCategories (String category) throws IOException {
+        Connection conn = DataBase.getConnect();
+
+        try {
+            PreparedStatement st = (PreparedStatement) conn
+                    .prepareStatement("SELECT name FROM category WHERE name LIKE '%" + category + "%'");
+                //     st.setString(1, ingredient);
+            System.out.println(st);
+            ResultSet rs = st.executeQuery();
+            return rs;
+        } catch (SQLException e) {
+
+                // print SQL exception information
+                printSQLException(e);
+            }
+
+        return null;
+
+    }
+
     public static ResultSet GetPantry (String user) throws IOException {
         Connection conn = DataBase.getConnect();
 
