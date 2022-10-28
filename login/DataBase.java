@@ -30,9 +30,18 @@ public class DataBase {
     public static final int ITERATIONS = 1000;
     // PBEWith<digest>And<encryption> Parameters for use with the PBEWith<digest>And<encryption> algorithm.
     // HmacSHA512 Key generator for use with the HmacSHA512 algorithm
-    private static final String ALGORITHM = "PBKDF2WithHmacSHA512"; 
+    private static final String ALGORITHM = "PBKDF2WithHmacSHA512";
 
+
+    /**
+     * Returns the current database connection; if none exists, a new connection is made
+     * @return      RIT CS Database connection
+     */
     public static Connection getCon() {
+        if (con == null){
+            Connection conn = getConnect();
+            con = conn;
+        }
         return con;
     }
 
@@ -159,7 +168,7 @@ public class DataBase {
      * @return if the user exists, it returns the user id.
      */
     public static int verifyLogin(String username, String password) {
-        Connection conn = DataBase.getConnect();
+        Connection conn = DataBase.getCon();
 
         try {
             PreparedStatement st = (PreparedStatement) conn
@@ -194,7 +203,7 @@ public class DataBase {
     }
 
     public static int createUser(String username, String password) throws IOException {
-        Connection conn = DataBase.getConnect();
+        Connection conn = DataBase.getCon();
 
         try {
             PreparedStatement st = (PreparedStatement) conn
@@ -220,14 +229,14 @@ public class DataBase {
     }
 
     public static int addtoPantry(String item, String user, int quantity, Date exp, Date purch, int qbought, String unit) throws IOException {
-        Connection conn = DataBase.getConnect();
+        Connection conn = DataBase.getCon();
 
         try {
                 String ingID = "";
                 int qOLD = 0;
                 int bqOLD = 0;
                 PreparedStatement st0 = (PreparedStatement) conn
-                    .prepareStatement("SELECT ingredientid from ingredient where name = ? ");
+                    .prepareStatement("SELECT ingredientid from ingredient where name = ?;");
                 st0.setString(1, item);
                 ResultSet rs0 = st0.executeQuery();
                 while (rs0.next()) {
@@ -256,17 +265,23 @@ public class DataBase {
                                         qOLD = rs3.getInt(1);
                                         bqOLD = rs3.getInt(2);
                                 }
-                        PreparedStatement st2 = (PreparedStatement) conn
-                        .prepareStatement("UPDATE in_pantry SET quantitycurr = ?, quantitybought = ?, purchasedate = ? , expirationdate = ?, unit = ? WHERE username = ? and ingredientid = ?;  ");
-                        st2.setDate(3, (java.sql.Date) purch);
-                        st2.setInt(1, quantity + qOLD);
-                        st2.setInt(2, qbought+ bqOLD);
-                        st2.setDate(4, (java.sql.Date) exp);
-                        if (unit != "item name"){
+                        PreparedStatement st2;
+                        if (unit != "other"){
+                            st2 = (PreparedStatement) conn
+                            .prepareStatement("UPDATE in_pantry SET quantitycurr = ?, quantitybought = ?, purchasedate = ? , expirationdate = ?, unit = ? WHERE username = ? and ingredientid = ?;  ");
+                            st2.setDate(3, (java.sql.Date) purch);
+                            st2.setInt(1, quantity + qOLD);
+                            st2.setInt(2, qbought+ bqOLD);
+                            st2.setDate(4, (java.sql.Date) exp);
                                 st2.setString(5, unit);   
                         }
                         else {
-                                st2.setString(5, item);
+                            st2 = (PreparedStatement) conn
+                            .prepareStatement("UPDATE in_pantry SET quantitycurr = ?, quantitybought = ?, purchasedate = ? , expirationdate = ?, unit = '' WHERE username = ? and ingredientid = ?;  ");
+                            st2.setDate(3, (java.sql.Date) purch);
+                            st2.setInt(1, quantity + qOLD);
+                            st2.setInt(2, qbought+ bqOLD);
+                            st2.setDate(4, (java.sql.Date) exp);
                         }
                         st2.setString(6, user);
                         st2.setInt(7, Integer.parseInt(ingID));
@@ -288,11 +303,12 @@ public class DataBase {
             st.setInt(4, qbought);
             st.setInt(5, quantity);
             st.setDate(6, (java.sql.Date) exp);
-            if (unit != "item name"){
+            if (unit != "other"){
                 st.setString(7, unit);   
         }
                 else {
-                st.setString(7, item);
+                        String emp = "";
+                st.setString(7, emp);
         }
             int rs = st.executeUpdate();
             if(rs == 1){
@@ -311,7 +327,7 @@ public class DataBase {
     }
 
     public static int SearchIngredient(String ingredient) throws IOException {
-        Connection conn = DataBase.getConnect();
+        Connection conn = DataBase.getCon();
 
         try {
             PreparedStatement st = (PreparedStatement) conn
@@ -334,7 +350,7 @@ public class DataBase {
     }
 
     public static ResultSet GetIngredients (String ingredient) throws IOException {
-        Connection conn = DataBase.getConnect();
+        Connection conn = DataBase.getCon();
 
         try {
             PreparedStatement st = (PreparedStatement) conn
@@ -354,7 +370,7 @@ public class DataBase {
     }
 
     public static ResultSet GetCategories (String category) throws IOException {
-        Connection conn = DataBase.getConnect();
+        Connection conn = DataBase.getCon();
 
         try {
             PreparedStatement st = (PreparedStatement) conn
@@ -374,7 +390,7 @@ public class DataBase {
     }
 
     public static Integer GetCategoryByName(String name) throws IOException {
-        Connection conn = DataBase.getConnect(); 
+        Connection conn = DataBase.getCon();
 
         try{
             PreparedStatement st = (PreparedStatement) conn
@@ -393,7 +409,7 @@ public class DataBase {
     }
 
     public static ResultSet GetPantry (String user) throws IOException {
-        Connection conn = DataBase.getConnect();
+        Connection conn = DataBase.getCon();
 
         try {
             PreparedStatement st = (PreparedStatement) conn
@@ -682,8 +698,7 @@ public class DataBase {
     public static int createRecipe(String steps, String description, Integer cooktime,
                                     Integer servings, Integer difficulty, String name){
         String username = UserLogin.getUsername();
-        Connection conn = DataBase.getConnect();
-        //Q; does insert auto-assign recipeIDs?
+        Connection conn = DataBase.getCon();
         try{
             int newid = (getMaxRecipeId() + 1);
             //recipe: (recipeid, author, steps, description, cooktime, servings, difficulty, name, date)
@@ -702,7 +717,6 @@ public class DataBase {
 
             int rs = st.executeUpdate();
             if(rs == 1){
-                //display(rs);      // nvm lol
                 return newid;
             }
         }
@@ -771,16 +785,15 @@ public class DataBase {
 
     /**
      * Gets the current maximum recipeid value from the recipe table
-     * @return int
+     * @return              RecipeID on success, -1 on fail
      */
     public static int getMaxRecipeId (){
-        Connection conn = DataBase.getConnect();
+        Connection conn = DataBase.getCon();
         int newId;
         try{
             PreparedStatement id = (PreparedStatement) conn .prepareStatement("SELECT MAX(R.RECIPEID) " +
                                                                                 "FROM RECIPE AS R;");
             ResultSet idEx = id.executeQuery();
-            //empnum = rs.getString(1);
             while (idEx.next()){
                 return idEx.getInt(1);
             }
@@ -789,12 +802,12 @@ public class DataBase {
             e.printStackTrace();
         }
         System.out.println("Select max failed");
-        return 0;
+        return -1;
     }
 
 
 public static int deleteFromPantry(String username, String item) throws IOException {
-        Connection conn = DataBase.getConnect();
+        Connection conn = DataBase.getCon();
 
         try {
                 int ingID = 0;
@@ -820,14 +833,14 @@ public static int deleteFromPantry(String username, String item) throws IOExcept
             }
 
         return -1;
-
     }
+
 
     /**
      * Adds all the arraylist's ingredients to the SQL recipe_requires table
      * @param recipeID      ID number for recipe in database (Foreign Key)
      * @param ingredients   Array of all ingredients for the recipe
-     * @return          1 on success, -1 on fail
+     * @return              1 on success, -1 on fail
      */
     public static int recipeRequires(int recipeID, ArrayList<Ingredient> ingredients){
         Connection conn = getCon();
@@ -868,7 +881,9 @@ public static int deleteFromPantry(String username, String item) throws IOExcept
         return -1;
     }
 
+
     public static int leaveReview(int stars, String revtext, int recipeID, double scaleQuant){
+
         Connection conn = getCon();
         try{
             PreparedStatement st = (PreparedStatement) conn
@@ -929,7 +944,7 @@ public static int deleteFromPantry(String username, String item) throws IOExcept
 
 
 public static ResultSet getUserRecipes (String user){
-        Connection conn = DataBase.getConnect();
+        Connection conn = DataBase.getCon();
         try{
             PreparedStatement ps = (PreparedStatement) conn .prepareStatement("SELECT name, recipeid from recipe where author = ?");
             ps.setString(1, user);
@@ -944,8 +959,11 @@ public static ResultSet getUserRecipes (String user){
     }
 
 
-
-
+    /**
+     * Gets all ingredients belonging to a selected recipe
+     * @param recipeID      the recipes ID number / foreign key to recipe in recipe_requires
+     * @return              ResultSet of ingredients' recipe-specific name, quantity, unit
+     */
     public static ResultSet getIngredients(int recipeID){
         Connection conn = getCon();
         try{
@@ -967,6 +985,11 @@ public static ResultSet getUserRecipes (String user){
     }
 
 
+    /**
+     * Gets all categories belonging to a selected recipe
+     * @param recipeID      the recipes ID number / foreign key to recipe in recipe_requires
+     * @return              ResultSet of categories' name
+     */
     public static ResultSet getCategories(int recipeID){
         Connection conn = getCon();
         try{

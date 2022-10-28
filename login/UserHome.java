@@ -3,9 +3,13 @@ package login;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
@@ -28,11 +32,18 @@ public class UserHome extends JFrame {
      */
     private static String netizenUsername;
 
-    //private JPanel contentPane;
-    private int strdButtonWidth = 150;
-    private int strdButtonHeight = 40;
-    private int strdFontSize = 10;
-    private int borderSize = 20;
+    /** private JPanel contentPane; */
+    private static final int BUTTON_WIDTH = 175;
+    private static final int BUTTON_HEIGHT = 50;
+    private static final int FONT_SIZE = 10;
+    private static final int BORDER = 20;
+
+    private static final int LOGOUT_BUTTON_WIDTH = 80;
+    private static final int LOGOUT_BUTTON_HEIGHT = 30;
+
+    /** */
+    private static final int LOWER_BUTTON = 150;
+
 
     // netizen primary key, and recipe foreign key (pointing to recipe creator)
     static private String user;
@@ -85,9 +96,9 @@ public class UserHome extends JFrame {
         btnNewButton.setForeground(new Color(0, 0, 0));
         btnNewButton.setBackground(UIManager.getColor("Button.disabledForeground"));
 
-        btnNewButton.setFont(new Font("Tahoma", Font.PLAIN, strdFontSize));
+        btnNewButton.setFont(new Font("Tahoma", Font.PLAIN, FONT_SIZE));
 
-        btnNewButton.setFont(new Font("Tahoma", Font.PLAIN, 15));
+        btnNewButton.setFont(new Font("Tahoma", Font.PLAIN, FONT_SIZE));
 
         btnNewButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -105,15 +116,14 @@ public class UserHome extends JFrame {
         });
 
         //btnNewButton.setBounds(247, 118, 491, 114);
-        btnNewButton.setBounds(20, 10, strdButtonWidth, strdButtonHeight);
 
-        btnNewButton.setBounds(20, 20, 200, 30);
+        //btnNewButton.setBounds(20, 20, 200, 30);
 
         contentPane.add(btnNewButton);
         JButton browseButton = new JButton("Browse Recipes");
         browseButton.setForeground(new Color(0, 0, 0));
         browseButton.setBackground(UIManager.getColor("Button.disabledForeground"));
-        browseButton.setFont(new Font("Tahoma", Font.PLAIN, 15));
+        browseButton.setFont(new Font("Tahoma", Font.PLAIN, FONT_SIZE));
         browseButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 UserHome.this.dispose();
@@ -122,13 +132,12 @@ public class UserHome extends JFrame {
                 //browse.setVisible(true);
             }
         });
-        browseButton.setBounds(20, 120, 200, 30);
         contentPane.add(browseButton);
 
         JButton pantryButton = new JButton("My Pantry");
         pantryButton.setForeground(new Color(0, 0, 0));
         pantryButton.setBackground(UIManager.getColor("Button.disabledForeground"));
-        pantryButton.setFont(new Font("Tahoma", Font.PLAIN, 15));
+        pantryButton.setFont(new Font("Tahoma", Font.PLAIN, FONT_SIZE));
         pantryButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                     dispose();
@@ -138,7 +147,6 @@ public class UserHome extends JFrame {
                 }
             
         });
-        pantryButton.setBounds(20, 160, 200, 30);
         contentPane.add(pantryButton);
         // JButton button = new JButton("Change-password\r\n");
         // button.setBackground(UIManager.getColor("Button.disabledForeground"));
@@ -156,9 +164,8 @@ public class UserHome extends JFrame {
 
         JButton newRecipeButton = new JButton("Create new Recipe");
         newRecipeButton.setBackground(UIManager.getColor("Button.disabledForeground"));
-        newRecipeButton.setFont(new Font("Tahoma", Font.PLAIN, strdFontSize));
+        newRecipeButton.setFont(new Font("Tahoma", Font.PLAIN, FONT_SIZE));
         //newRecipeButton.setBounds(247, 320, 491, 114);
-        newRecipeButton.setBounds(20, 320, strdButtonWidth, strdButtonHeight);
         newRecipeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //UserHome ah = new UserHome(userName);
@@ -174,9 +181,8 @@ public class UserHome extends JFrame {
 
         JButton editRecipeButton = new JButton("View My Recipes");
         editRecipeButton.setBackground(UIManager.getColor("Button.disabledForeground"));
-        editRecipeButton.setFont(new Font("Tahoma", Font.PLAIN, strdFontSize));
+        editRecipeButton.setFont(new Font("Tahoma", Font.PLAIN, FONT_SIZE));
         //editRecipeButton.setBounds(247, 320, 491, 114);
-        editRecipeButton.setBounds((20 + strdButtonWidth + borderSize), 320, strdButtonWidth, strdButtonHeight);
         editRecipeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //functionality
@@ -220,6 +226,32 @@ public class UserHome extends JFrame {
             }
         });
         contentPane.add(makeRecipeButton);*/
+
+        /** Welcome message */
+        String welcomeText = "<html>Welcome, " + UserLogin.getUsername() + "<br/>Select an action:<html/>";
+        System.out.println(welcomeText);
+        JLabel welcomeLabel = new JLabel(welcomeText);
+        //welcome.setMinimumSize(new Dimension(500, 50));
+        welcomeLabel.setFont(new Font("80er Teenie Demo", Font.ITALIC, 20));
+        /* To center a component: (int) Math.floor(WIDTH_FRAME/2.5)*/
+        welcomeLabel.setBounds((2 * BORDER), (2 * -BORDER), 500, 200);
+        contentPane.add(welcomeLabel);
+
+        /** Cooking mama */
+        try{
+            BufferedImage myPicture = ImageIO.read(new File("./login/mama.jpg"));
+            JLabel picLabel = new JLabel(new ImageIcon(myPicture));
+            picLabel.setBounds((int) Math.floor(WIDTH_FRAME/3), 200, 310, 359);
+            add(picLabel);
+        } catch (IOException e) { e.printStackTrace(); }
+
+        /** Set button locations */
+        btnNewButton.setBounds((WIDTH_FRAME - (6 * BORDER)), (2 * BORDER), LOGOUT_BUTTON_WIDTH, LOGOUT_BUTTON_HEIGHT);  //logout
+        browseButton.setBounds(BORDER, LOWER_BUTTON, BUTTON_WIDTH, BUTTON_HEIGHT);
+        editRecipeButton.setBounds((BORDER + BUTTON_WIDTH + BORDER), LOWER_BUTTON, BUTTON_WIDTH, BUTTON_HEIGHT);
+        newRecipeButton.setBounds((BORDER + (2 * (BUTTON_WIDTH + BORDER))), LOWER_BUTTON, BUTTON_WIDTH, BUTTON_HEIGHT);
+        pantryButton.setBounds((BORDER + (3 * (BUTTON_WIDTH + BORDER))), LOWER_BUTTON, BUTTON_WIDTH, BUTTON_HEIGHT);
+
 
 
 

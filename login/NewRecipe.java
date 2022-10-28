@@ -34,26 +34,26 @@ public class NewRecipe extends JFrame{
     private JPanel contentPane;
 
     /** standardized variables for buttons: */
-    private int strdButtonWidth = 150;
-    private int strdButtonHeight = 40;
-    private int strdFontSize = 10;
-    private int borderSize = 20;
+    private static final int strdButtonWidth = 150;
+    private static final int strdButtonHeight = 40;
+    private static final int strdFontSize = 10;
+    private static final int borderSize = 20;
 
     /** standardized variables for text-boxes: */
-    private int TEXT_BOX_WIDTH = 100;
-    private int COMBO_BOX_WIDTH = 100;
-    private int COMBO_BOX_HEIGHT = 50;
+    private static final int TEXT_BOX_WIDTH = 100;
+    private static final int COMBO_BOX_WIDTH = 100;
+    private static final int COMBO_BOX_HEIGHT = 50;
 
-    private int SMALL_TEXT_BOX_WIDTH = 30;
+    private static final int SMALL_TEXT_BOX_WIDTH = 30;
     //private int SMALL_BOX_HEIGHT =20;
 
     /** standardized variables for containers: */
-    private int CONTAINER_HEIGHT = 60;
-    private int CONTAINER_WIDTH = 1014;
+    private static final int CONTAINER_HEIGHT = 60;
+    private static final int CONTAINER_WIDTH = 1014;
 
     /** standardized variables for JScroll */
-    private int SCROLL_HEIGHT = 100;
-    private int SCROLL_WIDTH = 400;
+    private static final int SCROLL_HEIGHT = 100;
+    private static final int SCROLL_WIDTH = 400;
 
     /** Current user: */
     static private String currUser;
