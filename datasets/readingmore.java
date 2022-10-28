@@ -42,14 +42,15 @@ public class readingmore {
         BufferedReader br = new BufferedReader(fr);
         String name = "";
         String line = br.readLine();
+        Random r = new Random();
         while ((line = br.readLine()) != null) {
             String unit;
             String[] recipeParts = line.split("[\\[\\]]");
             String[] recipe = recipeParts[0].split(",");
             int name1 = Integer.parseInt(recipe[0]);
             int ingredientId = Integer.parseInt(recipe[1]);
-            int quantitybought = Integer.parseInt(recipe[3]);
-            int currentquantity = Integer.parseInt(recipe[4]);
+            int quantitybought = r.nextInt(300)+1;
+            int currentquantity = r.nextInt(300)+1;
             int unit1 = Integer.parseInt(recipe[6]);
             if (unit1 == 0){
                  unit = "fl oz";
@@ -65,10 +66,6 @@ public class readingmore {
                 currentquantity = quantitybought;
             }
 
-            if (currentquantity == 0 || quantitybought == 0){
-                currentquantity = 33;
-                quantitybought = 33;
-            }
             PreparedStatement st8 = con.prepareStatement("SELECT username FROM netizen ORDER BY RANDOM() LIMIT 1");
             ResultSet rs = st8.executeQuery();
             if (rs.next()){
