@@ -284,13 +284,13 @@ public class EditRecipe extends JFrame {
                     .prepareStatement("SELECT ingredientid, name FROM ingredient where name = ?");
                     st.setString(1, ingredient);
             System.out.println(st);
-            boolean exec = st.execute();
+            st.execute();
             ResultSet rs = st.getResultSet();
             int ingredientid = 0;
             if (rs.isBeforeFirst()) {
                 while(rs.next()){
                     ingredientid = rs.getInt("ingredientid");
-                    // add to display
+                    
                 }
             }
 
@@ -299,13 +299,13 @@ public class EditRecipe extends JFrame {
                 rs = st.executeQuery();
                 rs.next();
                 ingredientid = rs.getInt(1) + 1;
-
-                //add to display
+                st = conn.prepareStatement("INSERT INTO ingredient VALUES(?, ?);");
+                st.setInt(1, ingredientid);
+                st.setString(2, ingredient);
+                st.executeUpdate();
+                
             }
-            st = conn.prepareStatement("INSERT INTO ingredient VALUES(?, ?);");
-            st.setInt(1, ingredientid);
-            st.setString(2, ingredient);
-            st.executeUpdate();
+            
             
         } catch (SQLException e) {
             }
