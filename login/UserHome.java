@@ -139,6 +139,7 @@ public class UserHome extends JFrame {
         });
         pantryButton.setBounds(20, 160, 200, 30);
         contentPane.add(pantryButton);
+
         // JButton button = new JButton("Change-password\r\n");
         // button.setBackground(UIManager.getColor("Button.disabledForeground"));
         // button.addActionListener(new ActionListener() {
@@ -182,18 +183,6 @@ public class UserHome extends JFrame {
             }
         });
         contentPane.add(editRecipeButton);
-
-        JButton searchRecipeButton = new JButton("Search for Recipe");
-        searchRecipeButton.setBackground(UIManager.getColor("Button.disabledForeground"));
-        searchRecipeButton.setFont(new Font("Tahoma", Font.PLAIN, strdFontSize));
-        //editRecipeButton.setBounds(247, 320, 491, 114);
-        searchRecipeButton.setBounds((20 + (2 * (strdButtonWidth + borderSize))), 320, strdButtonWidth, strdButtonHeight);
-        searchRecipeButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                //functionality
-            }
-        });
-        contentPane.add(searchRecipeButton);
 
         /* JButton makeRecipeButton = new JButton("Bake/Cook Recipe");
         makeRecipeButton.setBackground(UIManager.getColor("Button.disabledForeground"));
