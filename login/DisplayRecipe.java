@@ -66,6 +66,11 @@ public class DisplayRecipe extends JFrame {
         panel.setBorder(new EmptyBorder(5, 5, 5, 5));
         JScrollPane scrollPane = new JScrollPane(panel);
 
+        //headerContainer = new JPanel();
+        //categoriesContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
+        //categoriesContainer.setPreferredSize(new Dimension(CONTAINER_WIDTH, HALF_CONTAINER_HEIGHT));
+        //categoriesContainer.setMaximumSize(new Dimension(CONTAINER_WIDTH, HALF_CONTAINER_HEIGHT));
+
         ingredientContainer = new JPanel();
         ingredientContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
         ingredientContainer.setPreferredSize(new Dimension(CONTAINER_WIDTH, HALF_CONTAINER_HEIGHT));
@@ -136,6 +141,11 @@ public class DisplayRecipe extends JFrame {
         labelMaker("Cook Time: " + time);
         int serv = rs.getInt("servings");
         labelMaker("Servings: " + serv);
+
+        JPanel div = new JPanel();
+        div.setSize(new Dimension(900, 50));
+        panel.add(div);
+
         String desc = rs.getString("description");
         textArea("Description:\n" + desc);
         String steps = rs.getString("steps");
@@ -158,7 +168,7 @@ public class DisplayRecipe extends JFrame {
      * Pulls all ingredients for the current recipe and displays them
      */
     private void RecipeIngredients(){
-        String ingredientsList = "<html>Ingredients:";
+        String ingredientsList = "<html>Ingredients:<br/><br/>";
         try{
             ResultSet categoryList = DataBase.getIngredients(recipeId);
             //SELECT r.ingredientid, r.quantity, r.unit
@@ -167,7 +177,7 @@ public class DisplayRecipe extends JFrame {
                     ingredientsList += categoryList.getString(1);
                     ingredientsList += (categoryList.getString(3));
                     ingredientsList += categoryList.getInt(2);
-                    ingredientsList += ", <br/>"; ingredientsList += ", <br/>";             // newlines
+                    ingredientsList += ", <br/>"; //ingredientsList += ", <br/>";             // newlines
                 }
                 ingredientsList += "<html/>";
                 JLabel comp = new JLabel(ingredientsList);
@@ -192,7 +202,11 @@ public class DisplayRecipe extends JFrame {
 
     private void textArea (String text) {
         JTextArea textArea = new JTextArea(text);
-        textArea.setColumns(TEXT_BOX_WIDTH = 100);
+        //textArea.setColumns(300);
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+
+
         textArea.setEditable(false);  
         textArea.setCursor(null);  
         textArea.setOpaque(false);  
