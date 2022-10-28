@@ -232,9 +232,10 @@ public class DataBase {
                         System.out.println(ingID + "\n");
                       }
                       PreparedStatement st1 = (PreparedStatement) conn
-                      .prepareStatement("SELECT ingredientid from in_pantry where ingredientid = ? and username = ? ");
+                      .prepareStatement("SELECT ingredientid from in_pantry where ingredientid = ? and username = ? and purchasedate = ?");
                       st1.setInt(1,Integer.parseInt(ingID));
                       st1.setString(2, user);
+                      st1.setDate(3, (java.sql.Date) purch);
                       ResultSet rs1 = st1.executeQuery();
                       boolean in_pantry = true;
                       if (!rs1.isBeforeFirst() ) {    
@@ -699,6 +700,41 @@ public static int deleteFromPantry(String username, String item) throws IOExcept
         }
         return -1;
     }
+//     public static int leaveReview(String user, int quant, int stars, String revtext, int recipeID){
+//         Connection conn = getCon();
+//         try{
+//                 ArrayList<Integer> list = new ArrayList<>();
+//                 ArrayList<Integer> list2 = new ArrayList<>();
+//                 ArrayList<String> list3 = new ArrayList<>();
+//                 PreparedStatement st0 = (PreparedStatement) conn
+//                 .prepareStatement("SELECT ingredientid, quantity, unit from recipe_req where recipeid = ? ");
+//         st0.setInt(1, recipeID);
+//         ResultSet rs0 = st0.executeQuery();
+//         while (rs0.next()) {
+//             list.add(rs0.getInt("ingredientID"));
+//             list2.add(rs0.getInt("quantity"));
+//             list3.add(rs0.getString("unit"));
+//         }
+//         for (int i =0 ; i< list.size() ;i++){
+//                 PreparedStatement st1 = (PreparedStatement) conn
+//                 .prepareStatement("SELECT ingredientid, quantitycurr, unit from in_pantry where user = ? ");
+//                 st1.setString(1, user);
+//                 ResultSet rs1 = st1.executeQuery();
+//                 while (rs1.next()) {
+//         } 
+        
+
+
+
+//         }
+//         catch (SQLException throwables) {
+//             throwables.printStackTrace();
+//             return -1;
+//         }
+//         return -1;
+//     }
+
+
 
 
     public static ResultSet getIngredients(int recipeID){
