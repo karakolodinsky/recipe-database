@@ -134,7 +134,7 @@ public class AddToPantry extends JFrame {
         uJLabel.setBounds(320, 250, 200, 40);
         contentPane.add(uJLabel);
 
-        String[] unit = { "grams","ounces", "fl oz", "item name"};
+        String[] unit = { "grams","ounces", "fl oz", "other"};
         JComboBox<String> units = new JComboBox<String>(unit);
         units.setBounds(500, 250, 200, 30);
         units.setVisible(false);

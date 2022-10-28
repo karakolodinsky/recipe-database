@@ -33,7 +33,7 @@ public class UserHome extends JFrame {
     private static String netizenUsername;
 
     /** private JPanel contentPane; */
-    private static final int BUTTON_WIDTH = 175;
+    private static final int BUTTON_WIDTH = 150;
     private static final int BUTTON_HEIGHT = 50;
     private static final int FONT_SIZE = 10;
     private static final int BORDER = 20;
@@ -42,7 +42,7 @@ public class UserHome extends JFrame {
     private static final int LOGOUT_BUTTON_HEIGHT = 30;
 
     /** */
-    private static final int LOWER_BUTTON = 150;
+    private static final int LOWER_BUTTON = 125;
 
 
     // netizen primary key, and recipe foreign key (pointing to recipe creator)
@@ -201,6 +201,19 @@ public class UserHome extends JFrame {
         });
         contentPane.add(editRecipeButton);
 
+        /** Create a new category */
+        JButton newCategoryButton = new JButton("Create a Category");
+        newCategoryButton.setForeground(new Color(0, 0, 0));
+        newCategoryButton.setBackground(UIManager.getColor("Button.disabledForeground"));
+        newCategoryButton.setFont(new Font("Tahoma", Font.PLAIN, FONT_SIZE));
+        newCategoryButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                UserHome.this.dispose();
+                NewCategory newR = new NewCategory(user);
+            }
+        });
+        contentPane.add(newCategoryButton);
+
         // JButton searchRecipeButton = new JButton("Search for Recipe");
         // searchRecipeButton.setBackground(UIManager.getColor("Button.disabledForeground"));
         // searchRecipeButton.setFont(new Font("Tahoma", Font.PLAIN, strdFontSize));
@@ -252,6 +265,7 @@ public class UserHome extends JFrame {
         editRecipeButton.setBounds((BORDER + BUTTON_WIDTH + BORDER), LOWER_BUTTON, BUTTON_WIDTH, BUTTON_HEIGHT);
         newRecipeButton.setBounds((BORDER + (2 * (BUTTON_WIDTH + BORDER))), LOWER_BUTTON, BUTTON_WIDTH, BUTTON_HEIGHT);
         pantryButton.setBounds((BORDER + (3 * (BUTTON_WIDTH + BORDER))), LOWER_BUTTON, BUTTON_WIDTH, BUTTON_HEIGHT);
+        newCategoryButton.setBounds((BORDER + (4 * (BUTTON_WIDTH + BORDER))), LOWER_BUTTON, BUTTON_WIDTH, BUTTON_HEIGHT);
 
 
 
