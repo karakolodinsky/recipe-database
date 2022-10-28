@@ -203,8 +203,14 @@ public class NewRecipe extends JFrame{
                         }
                         else{
                             DataBase.recipeRequires(newId, ingredients);
-                            //Database
-                            NewRecipe.this.dispose();
+                            if (categoriesString.size() > 0){
+                                String catStr = "";
+                                for (String categ : categoriesString){
+                                    catStr += (", " + categ);
+                                }
+                                DataBase.categorizeRecipe(catStr, newId);
+                                NewRecipe.this.dispose();
+                            }
                         }
                     }
 
