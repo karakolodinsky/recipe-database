@@ -9,13 +9,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 /**
- * UI-Interface for the display recipe
+ * UI-Interface for the edit recipe
  *
  * @author Teagan Nester
  * @author ?
  */
 
-public class DisplayRecipe extends JFrame {
+public class EditRecipe extends JFrame {
 
     private String user;
     private int recipeId;
@@ -25,11 +25,10 @@ public class DisplayRecipe extends JFrame {
     public static final int HEIGHT_FRAME = 600;
     private JPanel panel;
     private ResultSet rs;
-    private JButton cookButton;
 
 
-    public DisplayRecipe (String user, int recipeId, String btnText) throws SQLException {
-        super("Recipe Information");
+    public EditRecipe (String user, int recipeId, String btnText) throws SQLException {
+        super("Edit Recipe");
         this.user = user;
         this.recipeId = recipeId;
         this.btnText = btnText;
@@ -38,7 +37,7 @@ public class DisplayRecipe extends JFrame {
         setSize(WIDTH_FRAME, HEIGHT_FRAME);
         setLocationRelativeTo(null);
         setLocation(getX() - 80, getY() - 80);
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
         setVisible(true);
 
         init ();
@@ -54,6 +53,8 @@ public class DisplayRecipe extends JFrame {
 
         panel.add(Box.createVerticalGlue());
         formatRecipe();
+        JButton home = returnHome();
+        panel.add(home);
         this.getContentPane().add(scrollPane);
         setContentPane(scrollPane);
     }
@@ -65,22 +66,13 @@ public class DisplayRecipe extends JFrame {
         if (info.length > 1) {
             avg = info[1];
         }
-        cookButton = new JButton("cook/make/bake");
-        cookButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        panel.add(cookButton);
-        cookButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                //functionality for make-bake-cook
-                // will need to pass in recipeid to to Database.cookRecipe(int recipeid)
-                int x = DataBase.cookRecipe(recipeId);
-            }
-        });
-        JLabel label = new JLabel(info[0]);
+        JTextField label = new JTextField(info[0]);
+        label.setEditable(true);
         label.setAlignmentX(Component.CENTER_ALIGNMENT);
         panel.add(label);
         if (!(avg.equals(""))) {
-            label = new JLabel("Average Rating: " + avg);
-            label.setAlignmentX(Component.CENTER_ALIGNMENT);
+            JLabel labelLabel = new JLabel("Average Rating: " + avg);
+            labelLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             panel.add(label);
         }
         PreparedStatement ps = con.prepareStatement("SELECT cooktime, steps, description, servings, difficulty, date " +
@@ -89,32 +81,44 @@ public class DisplayRecipe extends JFrame {
         ResultSet rs = ps.executeQuery();
         rs.next();
         String date = rs.getDate("date").toString();
-        labelMaker("Uploaded On: " + date);
+        JLabel labelLabel = new JLabel("Uploaded On: " + date);
+        panel.add(labelLabel);
         int diff = rs.getInt("difficulty");
+        labelLabel = new JLabel("Difficulty:");
+        panel.add(labelLabel);
         String diffString = difficulty(diff);
-        labelMaker("Difficulty: " + diffString);
+        labelMaker(diffString);
         int time = rs.getInt("cooktime");
-        labelMaker("Cook Time: " + time);
+        labelLabel = new JLabel("Cook Time (Minutes):");
+        panel.add(labelLabel);
+        labelMaker(String.valueOf(time));
         int serv = rs.getInt("servings");
-        labelMaker("Servings: " + serv);
+        labelLabel = new JLabel("Servings:");
+        panel.add(labelLabel);
+        labelMaker(String.valueOf(serv));
         String desc = rs.getString("description");
-        textArea("Description:\n" + desc);
+        labelLabel = new JLabel("Description:");
+        panel.add(labelLabel);
+        textArea(desc);
         String steps = rs.getString("steps");
-        textArea("Steps:\n " + steps);
+        labelLabel = new JLabel("Steps:");
+        panel.add(labelLabel);
+        textArea(steps);
 
 
         validate();
     }
 
     private void labelMaker (String text) {
-        JLabel label = new JLabel(text);
+        JTextField label = new JTextField(text);
         label.setAlignmentX(Component.CENTER_ALIGNMENT);
+        label.setEditable(true);
         panel.add(label);
     }
 
     private void textArea (String text) {
         JTextArea textArea = new JTextArea(text);
-        textArea.setEditable(false);  
+        textArea.setEditable(true);  
         textArea.setCursor(null);  
         textArea.setOpaque(false);  
         textArea.setFocusable(false);
@@ -122,6 +126,22 @@ public class DisplayRecipe extends JFrame {
         textArea.setWrapStyleWord(true);
         textArea.setAlignmentX(CENTER_ALIGNMENT);
         panel.add(textArea);
+    }
+
+    private JButton returnHome () {
+        JButton home = new JButton("Home");
+        home.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                EventQueue.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        EditRecipe.this.dispose();
+                        new UserHome();
+                    }
+                });
+            }
+        });
+        return home;
     }
 
     private String difficulty (int diff) {
@@ -149,7 +169,7 @@ public class DisplayRecipe extends JFrame {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    new BrowseResult("test", null);
+                    new EditRecipe("test", 1, "str");
                 } catch (SQLException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
