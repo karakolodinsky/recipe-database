@@ -109,14 +109,17 @@ public class DisplayRecipe extends JFrame {
         if (info.length > 1) {
             avg = info[1];
         }
+        final JTextField quantText = new JTextField(6);
+        descriptionContainer.add(quantText);
         cookButton = new JButton("cook/make/bake");
         cookButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         descriptionContainer.add(cookButton);
         cookButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                //functionality for make-bake-cook
-                // will need to pass in recipeid to to Database.cookRecipe(int recipeid)
-                int x = DataBase.cookRecipe(recipeId, 1);
+                // check if we have enough ingredients then be able to cook/leave review
+                String data = quantText.getText();
+                double scaleQuant = Double.parseDouble(data);
+                int x = DataBase.checkIngrQty(recipeId, scaleQuant);
                 if(x == -1){
                     JOptionPane.showMessageDialog(new JFrame(), "out of ingredients!",
                             "yo", JOptionPane.ERROR_MESSAGE);
@@ -126,6 +129,7 @@ public class DisplayRecipe extends JFrame {
                                 @Override
                                 public void run() {
                                     new Review();
+                                    int y = DataBase.cookRecipe(recipeId, scaleQuant);
                                 }
                             });
                 }
