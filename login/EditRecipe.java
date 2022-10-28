@@ -45,7 +45,7 @@ public class EditRecipe extends JFrame {
         setSize(WIDTH_FRAME, HEIGHT_FRAME);
         setLocationRelativeTo(null);
         setLocation(getX() - 80, getY() - 80);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setVisible(true);
 
         init ();
@@ -112,6 +112,8 @@ public class EditRecipe extends JFrame {
         labelLabel = new JLabel("Ingredients [ Name | Quantity | Units ]");
         panel.add(labelLabel);
         displayIngred();
+        displayCategories();
+
 
 
         validate();
@@ -243,9 +245,6 @@ public class EditRecipe extends JFrame {
     }
 
     private void displayIngred () {
-        JPanel helper = new JPanel();
-        //helper.setSize(500, 500);
-        //helper.setAlignmentX(LEFT_ALIGNMENT);
         JTable SearchTbl = new JTable();
         //SearchTbl.setBounds(0, 0, 100, 100);
         SearchTbl.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -311,6 +310,40 @@ public class EditRecipe extends JFrame {
         } catch (SQLException e) {
             }
 
+    }
+
+    private void displayCategories () {
+        JTable SearchTbl = new JTable();
+        SearchTbl.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        SearchTbl.setDefaultEditor(Object.class, null);
+        SearchTbl.setAlignmentX(LEFT_ALIGNMENT);
+        PreparedStatement ps;
+        try {
+            ps = DataBase.getCon().prepareStatement("SELECT c.categoryname FROM recipe_category rc, category c " +
+                                            "WHERE rc.categoryid=c.categoryid AND rc.recipeid=?;");
+            ps.setInt(1, recipeId);
+            ResultSet rs = ps.executeQuery();
+            SearchTbl.setModel(DbUtils.resultSetToTableModel(rs));
+            if (rs.next()) {
+                JLabel labelLabel = new JLabel("Categories:");
+                panel.add(labelLabel);
+            }
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+            
+        SearchTbl.setVisible(true);
+        SearchTbl.setRowSelectionAllowed(true);
+        SearchTbl.addMouseListener(new java.awt.event.MouseAdapter() {
+                @Override
+                public void mouseClicked(java.awt.event.MouseEvent evt) {
+                    int row = SearchTbl.rowAtPoint(evt.getPoint());
+                    String ing = (String) SearchTbl.getValueAt(row, 0);
+                }
+            });
+        //helper.add(SearchTbl);
+        panel.add(SearchTbl);
     }
 
     public static void main(String[] args) {
