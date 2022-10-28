@@ -109,7 +109,8 @@ public class EditRecipe extends JFrame {
         labelLabel = new JLabel("Steps:");
         panel.add(labelLabel);
         textArea(steps);
-        labelLabel = new JLabel("Ingredients:");
+        labelLabel = new JLabel("Ingredients [ Name | Quantity | Units ]");
+        panel.add(labelLabel);
         displayIngred();
 
 
@@ -125,10 +126,8 @@ public class EditRecipe extends JFrame {
 
     private void textArea (String text) {
         JTextArea textArea = new JTextArea(text);
-        textArea.setEditable(true);  
-        textArea.setCursor(null);  
-        textArea.setOpaque(false);  
-        textArea.setFocusable(false);
+        textArea.setEditable(true);   
+        textArea.setOpaque(true);  
         textArea.setLineWrap(true);
         textArea.setWrapStyleWord(true);
         textArea.setAlignmentX(LEFT_ALIGNMENT);
