@@ -37,6 +37,7 @@ public class EditRecipe extends JFrame {
     private JTextField delete;
     private JTextField deleteCat;
     private JTextField addCat;
+    private String recipeName;
 
 
     public EditRecipe (String user, int recipeId, String btnText) throws Exception {
@@ -65,8 +66,23 @@ public class EditRecipe extends JFrame {
 
         panel.add(Box.createVerticalGlue());
         formatRecipe();
+        submit();
         this.getContentPane().add(scrollPane);
         setContentPane(scrollPane);
+    }
+
+    private void submit() {
+        JButton submit = new JButton ("Submit");
+        panel.add(submit);
+        submit.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // TODO Auto-generated method stub
+                
+            }
+            
+        });
     }
 
     private void formatRecipe () throws Exception {
