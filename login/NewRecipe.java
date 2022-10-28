@@ -61,6 +61,7 @@ public class NewRecipe extends JFrame{
 
     /** Ingredient  */
     ArrayList<Ingredient> ingredients = new ArrayList<>();
+    ArrayList<String> ingredientsStrings = new ArrayList<>();
     static String currIngredientStr;
     //private JScrollPane IngredientScroll;
 
@@ -236,6 +237,14 @@ public class NewRecipe extends JFrame{
         ingredientContainer.add(ingNameTxt);
 
         JTable IngredientButtons = new JTable();
+        IngredientButtons.addMouseListener(new java.awt.event.MouseAdapter(){
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt){
+                int row = IngredientButtons.rowAtPoint(evt.getPoint());
+                String ing = (String) IngredientButtons.getValueAt(row, 0);
+                currIngredientStr = ing;
+            }
+        });
         //IngredientButtons.setVisible(false);
         JScrollPane IngredientScroll = new JScrollPane(IngredientButtons);
         JButton ingSearch = new JButton("Search");
@@ -263,15 +272,11 @@ public class NewRecipe extends JFrame{
 
         Dimension ingDim = new Dimension(400, 200 );
         IngredientScroll.setPreferredSize( ingDim );
-        //JScrollPane IngredientScroll = new JScrollPane(IngredientButtons);
         IngredientScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        //IngredientScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        //IngredientScroll.setPreferredSize(new Dimension(SMALL_TEXT_BOX_WIDTH, COMBO_BOX_HEIGHT));
-        //IngredientScroll.setSize(new Dimension(SMALL_TEXT_BOX_WIDTH, COMBO_BOX_HEIGHT));
-        //contentPane.add(IngredientScroll);
-        //ingredientContainer.add(IngredientScroll);
 
-        JList<Ingredient> curIngredients = new JList<Ingredient>();
+        String[] ings;
+        JList<String> curIngredients = new JList<String>();
+        curIngredients.setListData(ingredientsStrings.toArray(new String[ingredientsStrings.size()]));
         curIngredients.setPreferredSize( ingDim );
 
         JLabel ingUnitLabel = new JLabel("Units (optional):");
@@ -289,8 +294,29 @@ public class NewRecipe extends JFrame{
         ingredientContainer.add(ingQuantityLabel);
         ingredientContainer.add(ingQuantityTxt);
 
+        JButton addIngredient = new JButton("Add Ingredient");
+        addIngredient.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (ingQuantityTxt.getValue() != null && currIngredientStr != null){
+                    Ingredient newIngredient;
+                    if (ingUnitTxt.getText() != null){
+                        newIngredient = new Ingredient (currIngredientStr,
+                                (Integer) ingQuantityTxt.getValue(), ingUnitTxt.getText());
+                    }
+                    else {
+                        newIngredient = new Ingredient(currIngredientStr,
+                                (Integer) ingQuantityTxt.getValue(), null);
+                    }
+                    ingredients.add(newIngredient);
+                    ingredientsStrings.add(currIngredientStr);
+                    curIngredients.setListData(ingredientsStrings.toArray(new String[ingredientsStrings.size()]));
+                    System.out.println("New Ingredient: " + newIngredient.toStr());
+                }
+            }});
 
         contentPane.add(ingredientContainer);
+        contentPane.add(addIngredient);
         contentPane.add(IngredientScroll);
         contentPane.add(curIngredients);
         contentPane.add(enter);

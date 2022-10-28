@@ -14,4 +14,9 @@ public class Ingredient {
     public Integer getQuantity(){ return this.quantity; }
 
     public String getUnit(){ return this.unit; }
+
+
+    public String toStr(){
+        return this.name + "  " + this.quantity.toString() + "  " + this.unit;
+    }
 }

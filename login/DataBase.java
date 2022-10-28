@@ -37,8 +37,13 @@ public class DataBase {
     // HmacSHA512 Key generator for use with the HmacSHA512 algorithm
     private static final String ALGORITHM = "PBKDF2WithHmacSHA512";
 
+    /**
+     * Gets the current connection to the database - if it exists - or creates a new one
+     * @return Connection to SQL recipes database
+     */
     public static Connection getCon() {
-        return con;
+        if (con != null){ return con; }
+        else { con = getConnect(); return con; }
     }
 
     /**
