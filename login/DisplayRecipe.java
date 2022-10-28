@@ -126,22 +126,25 @@ public class DisplayRecipe extends JFrame {
         String ingredientsList = "<html>";
         try{
             ResultSet categoryList = DataBase.getIngredients(recipeId);
+            //SELECT r.ingredientid, r.quantity, r.unit
             if (categoryList != null){
                 while (categoryList.next()){
-                    //return idEx.getInt(1)
-                    ingredientsList += (categoryList.getString(3) + "- ");
-                    ingredientsList += categoryList.getInt(1) + " ";
-                    ingredientsList += categoryList.getString(2);
+                    ingredientsList += categoryList.getString(1);
+                    ingredientsList += (categoryList.getString(3));
+                    ingredientsList += categoryList.getInt(2);
                     ingredientsList += ", <br/>";
                 }
+                ingredientsList += "<html/>";
+                JLabel comp = new JLabel(ingredientsList);
+                System.out.println(ingredientsList);
+                panel.add(comp);
+            }
+            else{
+                System.out.println("No ingredients");
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        ingredientsList += "<html/>";
-        JLabel comp = new JLabel(ingredientsList);
-        System.out.println(ingredientsList);
-        panel.add(comp);
         //textArea(ingredientsList);
     }
 

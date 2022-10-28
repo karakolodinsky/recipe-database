@@ -705,12 +705,13 @@ public static int deleteFromPantry(String username, String item) throws IOExcept
         Connection conn = getCon();
         try{
             PreparedStatement st = (PreparedStatement) conn
-                    .prepareStatement("SELECT r.quantity, r.unit, i.name "
+                    .prepareStatement("SELECT i.name, r.quantity, r.unit "
                             + "FROM recipe_requires AS r, ingredient AS i "
                             + "WHERE i.ingredientid IN ( "
-                            + "SELECT DISTINCT(r.ingredientid) FROM recipe_requires AS r "
+                            + "SELECT r.ingredientid "
                             + "WHERE r.recipeid = ? "
-                            + ");");
+                            + ") "
+                            + "AND i.ingredientid = r.ingredientid;");
             st.setInt(1, recipeID);
             ResultSet rs = st.executeQuery();
             return rs;
