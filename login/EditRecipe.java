@@ -109,6 +109,7 @@ public class EditRecipe extends JFrame {
         labelLabel = new JLabel("Steps:");
         panel.add(labelLabel);
         textArea(steps);
+        labelLabel = new JLabel("Ingredients:");
         displayIngred();
 
 
@@ -253,7 +254,7 @@ public class EditRecipe extends JFrame {
         SearchTbl.setAlignmentX(LEFT_ALIGNMENT);
         PreparedStatement ps;
         try {
-            ps = DataBase.getCon().prepareStatement("SELECT i.name FROM recipe_requires rr, ingredient i " +
+            ps = DataBase.getCon().prepareStatement("SELECT i.name, rr.quantity, rr.unit FROM recipe_requires rr, ingredient i " +
                                             "WHERE rr.ingredientid=i.ingredientid AND rr.recipeid=?;");
             ps.setInt(1, recipeId);
             ResultSet rs = ps.executeQuery();
