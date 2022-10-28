@@ -36,10 +36,12 @@ public class Review extends JFrame {
     private JLabel label_errorText;
     private JButton btnNewButton;
     private JButton btnNewButton2;
+    private static int recipeId;
+    private static double scaleQuant;
 
 
 
-    public Review(){
+    public Review(int recipeId, double scaleQuant){
         super("Review");
         setResizable(false);
         setLayout(null);
@@ -48,6 +50,8 @@ public class Review extends JFrame {
         setLocation(getX() - 80, getY() - 80);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setVisible(true);
+        Review.recipeId = recipeId;
+        Review.scaleQuant = scaleQuant;
 
         init();
     }
@@ -77,22 +81,10 @@ public class Review extends JFrame {
         starss.setFont(new Font("Calibri", Font.BOLD, 26));
         contentPane.add(starss);
 
-        String[] stars = { "1","2", "3", "4", "5"};
-        JComboBox<String> units = new JComboBox<String>(stars);
+        Integer[] stars = { 1, 2, 3, 4, 5};
+        JComboBox<Integer> units = new JComboBox<Integer>(stars);
         units.setBounds(475, 325, 50, 30);
         contentPane.add(units);
-
-
-        JLabel quantL = new JLabel("Quantity");
-        quantL.setBounds(350,400,100,30);
-        quantL.setFont(new Font("Calibri", Font.BOLD, 26));
-        contentPane.add(quantL);
-
-
-        JFormattedTextField quant = new JFormattedTextField(createFormatter("###"));
-        quant.setBounds(475,400,60,30);
-        quant.setFont(new Font("Calibri", Font.BOLD, 26));
-        contentPane.add(quant);
 
 
         JButton revbtn = new JButton("Leave Review");
@@ -101,6 +93,11 @@ public class Review extends JFrame {
         revbtn.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
+                    // todo
+                    String reviewText = reviewtxt.getText();
+                    int starRating = units.getItemAt(units.getSelectedIndex());
+                    int returnValue = DataBase.leaveReview(starRating, reviewText, recipeId, scaleQuant);
+                    Review.this.dispose();
            }
        });
        contentPane.add(revbtn);
@@ -119,7 +116,7 @@ public class Review extends JFrame {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    Review frame = new Review();
+                    Review frame = new Review(recipeId, scaleQuant);
                     frame.setVisible(true);
                 } catch (Exception e) {
                     e.printStackTrace();

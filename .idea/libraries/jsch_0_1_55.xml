@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="jsch-0.1.55">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../libraries/jsch-0.1.55.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../libraries/oclc-dbutils-1.0.20080317.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../libraries/postgresql-42.2.24.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

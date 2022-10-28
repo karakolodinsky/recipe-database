@@ -15,10 +15,11 @@ import java.util.Base64;
 import java.util.Calendar;
 // import java.util.Date;
 import java.sql.Date;
+import java.lang.Math;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
-import javax.swing.JOptionPane;
+import javax.swing.*;
 
 public class DataBase {
 
@@ -428,9 +429,7 @@ public class DataBase {
 
     }
 
-    // STUB
-    // todo on make-bake-cook branch
-    public static int cookRecipe (int recipeID, int quant) {
+    public static int checkIngrQty (int recipeID, double scaleQuant){
         Connection conn = DataBase.getCon();
         try{
             PreparedStatement st = (PreparedStatement)  conn
@@ -467,7 +466,81 @@ public class DataBase {
                             return -1;
                         } else {
                             rs2.next();
-                            int quantityLeft = rsFirstCheck.getInt("quantity");
+                            int recipeQuantity = rsFirstCheck.getInt("quantity");
+                            int quantityLeft = (int) (Math.ceil(scaleQuant * recipeQuantity));
+                            rs2.previous();
+                            boolean seen = false;
+                            while (rs2.next() && quantityLeft > 0) {
+                                // loop through all of one ingredient in pantry
+                                seen = false;
+                                int currentQuantity = rs2.getInt("quantitycurr");
+
+                                if (currentQuantity <= quantityLeft) {
+                                    //calculate qtyLeft
+                                    quantityLeft = quantityLeft - currentQuantity;
+                                    seen = true;
+
+                                }
+                                if (currentQuantity > quantityLeft && !seen) {
+                                    // you have enough break while
+                                    quantityLeft = 0;
+                                }
+                            }
+                            if (quantityLeft > 0){
+                                // never enough of one of the ingredients so return -1
+                                return -1;
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (SQLException e) {
+
+            // print SQL exception information
+            printSQLException(e);
+        }
+        return 0;
+    }
+
+    public static int cookRecipe (int recipeID, double scaleQuant) {
+        Connection conn = DataBase.getCon();
+        try{
+            PreparedStatement st = (PreparedStatement)  conn
+                    .prepareStatement("SELECT COUNT(*) AS ingredientCount FROM recipe_requires WHERE recipeid=?");
+            st.setInt(1, recipeID);
+            System.out.println(st);
+            ResultSet rs = st.executeQuery();
+            rs.next();
+
+
+            // first loop to see if we have enough of all ingredients
+            // if we don't have enough of even 1 then exit
+            PreparedStatement stFirstCheck = (PreparedStatement)  conn
+                    .prepareStatement("SELECT ingredientid, quantity FROM recipe_requires WHERE recipeid=?",
+                            ResultSet.TYPE_SCROLL_SENSITIVE,
+                            ResultSet.CONCUR_UPDATABLE);
+            stFirstCheck.setInt(1, recipeID);
+            System.out.println(stFirstCheck);
+            ResultSet rsFirstCheck = stFirstCheck.executeQuery();
+
+            int ingredientCount = rs.getInt("ingredientCount");
+            for(int i = 0; i < ingredientCount; i++) {
+                if (rsFirstCheck.next()) {
+                    PreparedStatement st2 = (PreparedStatement) conn
+                            .prepareStatement("SELECT purchasedate, ingredientid, quantitycurr, unit FROM in_pantry WHERE ingredientid=? AND username=? " +
+                                            "group by purchasedate, ingredientid, quantitycurr, unit, expirationdate ORDER BY expirationdate ASC;", ResultSet.TYPE_SCROLL_SENSITIVE,
+                                    ResultSet.CONCUR_UPDATABLE);
+                    st2.setInt(1, rsFirstCheck.getInt("ingredientid"));
+                    st2.setString(2, user);
+                    boolean rscheck = st2.execute();
+                    if (rscheck) {
+                        ResultSet rs2 = st2.getResultSet();
+                        if (!rs2.isBeforeFirst()) {
+                            return -1;
+                        } else {
+                            rs2.next();
+                            int recipeQuantity = rsFirstCheck.getInt("quantity");
+                            int quantityLeft = (int) (Math.ceil(scaleQuant * recipeQuantity));
                             rs2.previous();
                             boolean seen = false;
                             while (rs2.next() && quantityLeft > 0) {
@@ -496,13 +569,6 @@ public class DataBase {
             }
 
 
-
-
-
-
-
-
-
             PreparedStatement st1 = (PreparedStatement)  conn
                     .prepareStatement("SELECT ingredientid, quantity FROM recipe_requires WHERE recipeid=?",
                             ResultSet.TYPE_SCROLL_SENSITIVE,
@@ -511,16 +577,8 @@ public class DataBase {
             System.out.println(st1);
             ResultSet rs1 = st1.executeQuery();
 
-            // boolean notenough = false;
-            // int quantityInPantry = 0;
             for(int i = 0; i < ingredientCount; i++){
                 if(rs1.next()){
-//                    if(notenough){
-//                        rs1.previous();
-//                    }
-//                    if(!notenough){
-//                        quantityInPantry = rs1.getInt("quantity");
-//                    }
                     PreparedStatement st2 = (PreparedStatement)  conn
                             .prepareStatement("SELECT purchasedate, ingredientid, quantitycurr, unit FROM in_pantry WHERE ingredientid=? AND username=? " +
                                     "group by purchasedate, ingredientid, quantitycurr, unit, expirationdate ORDER BY expirationdate ASC;", ResultSet.TYPE_SCROLL_SENSITIVE,
@@ -594,28 +652,6 @@ public class DataBase {
                                 // don't delete everything because you never had enough
                                 return -1;
                             }
-
-
-//                            if(rs2.next()){
-//                                if(rs2.getInt("quantitycurr") < rs1.getInt("quantity")){
-//                                    i--;
-//                                    notenough = true;
-//                                    PreparedStatement st3 = (PreparedStatement)  conn
-//                                            .prepareStatement("UPDATE in_pantry SET quantitycurr=0 WHERE ingredientid=?; " +
-//                                                    "DELETE FROM in_pantry WHERE quantitycurr=0");
-//                                    st3.setInt(1, rs2.getInt("ingredientid"));
-//                                    int rs3 = st3.executeUpdate();
-//                                    quantityInPantry = quantityInPantry - rs2.getInt("quantitycurr");
-//                                }
-//                                else{
-//                                    quantityInPantry = rs2.getInt("quantitycurr") - rs1.getInt("quantity");
-//                                    PreparedStatement st4 = (PreparedStatement)  conn
-//                                            .prepareStatement("UPDATE in_pantry SET quantitycurr=? WHERE ingredientid=?");
-//                                    st4.setInt(1, quantityInPantry);
-//                                    st4.setInt(2, rs2.getInt("ingredientid"));
-//                                    int rs4 = st4.executeUpdate();
-//                                }
-//                            }
                         }
 
                         }
@@ -880,29 +916,31 @@ public static int deleteFromPantry(String username, String item) throws IOExcept
     }
 
 
-    public static int leaveReview(String user, int quant, int stars, String revtext, int recipeID){
+    public static int leaveReview(int stars, String revtext, int recipeID, double scaleQuant){
+
         Connection conn = getCon();
         try{
-                if(DataBase.cookRecipe(recipeID, quant) != -1){
-                        PreparedStatement st = (PreparedStatement) conn
+            PreparedStatement st = (PreparedStatement) conn
                 .prepareStatement("INSERT INTO netizen_creates values (?,?, now(), ?,?,? );");
-                st.setString(1, user);
-                st.setInt(2, recipeID);
-                st.setInt(3, stars);
-                st.setString(4, revtext);
-                st.setInt(5, quant);
-                }
-                else return -1;
-        } 
-        
-
-
-
+            st.setString(1, user);
+            st.setInt(2, recipeID);
+            st.setInt(3, stars);
+            st.setString(4, revtext);
+            st.setDouble(5, scaleQuant);
+            int rs = st.executeUpdate();
+            if(rs != -1){
+                JOptionPane.showMessageDialog(new JFrame(), "Success on writing a review",
+                        "review_status", JOptionPane.INFORMATION_MESSAGE);
+            }
+            else{
+                return -1;
+            }
+        }
          catch (SQLException throwables) {
              throwables.printStackTrace();
              return -1;
          }
-         return -1;
+         return 0;
     }
 //     public static int leaveReview(String user, int quant, int stars, String revtext, int recipeID){
 //         Connection conn = getCon();

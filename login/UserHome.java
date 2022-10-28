@@ -33,6 +33,7 @@ public class UserHome extends JFrame {
     private static String netizenUsername;
 
     /** private JPanel contentPane; */
+
     private static final int BUTTON_WIDTH = 150;
     private static final int BUTTON_HEIGHT = 50;
     private static final int FONT_SIZE = 10;

@@ -9,7 +9,9 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException; 
+import java.sql.SQLException;
+import java.util.Objects;
+
 /**
  * UI-Interface for the display recipe
  *
@@ -83,8 +85,10 @@ public class DisplayRecipe extends JFrame {
         /** contains navigation buttons */
         buttonsContainer = new JPanel();
         buttonsContainer.setAlignmentX(Component.CENTER_ALIGNMENT);
-        buttonsContainer.setPreferredSize(new Dimension(    BUTTON_CONTAINER_WIDTH, 75));
-        buttonsContainer.setMaximumSize(new Dimension(BUTTON_CONTAINER_WIDTH, 75));
+
+        buttonsContainer.setPreferredSize(new Dimension(    BUTTON_CONTAINER_WIDTH, 100));
+        buttonsContainer.setMaximumSize(new Dimension(BUTTON_CONTAINER_WIDTH, 100));
+
 
         /** contains description and recipe info */
         descriptionContainer = new JPanel();
@@ -128,15 +132,22 @@ public class DisplayRecipe extends JFrame {
         if (info.length > 1) {
             avg = info[1];
         }
+        final JTextField quantText = new JTextField(6);
+        quantText.setAlignmentX(Component.LEFT_ALIGNMENT);
+        buttonsContainer.add(quantText);
         cookButton = new JButton("cook/make/bake");
         cookButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         buttonsContainer.add(cookButton);
-        //descriptionContainer.add(cookButton);
+
         cookButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                //functionality for make-bake-cook
-                // will need to pass in recipeid to to Database.cookRecipe(int recipeid)
-                int x = DataBase.cookRecipe(recipeId, 1);
+                // check if we have enough ingredients then be able to cook/leave review
+                String data = quantText.getText();
+                if(Objects.equals(quantText.getText(), "")){
+                    data = "1";
+                }
+                double scaleQuant = Double.parseDouble(data);
+                int x = DataBase.checkIngrQty(recipeId, scaleQuant);
                 if(x == -1){
                     JOptionPane.showMessageDialog(new JFrame(), "out of ingredients!",
                             "yo", JOptionPane.ERROR_MESSAGE);
@@ -145,7 +156,8 @@ public class DisplayRecipe extends JFrame {
                         EventQueue.invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
-                                    new Review();
+                                    new Review(recipeId, scaleQuant);
+                                    int y = DataBase.cookRecipe(recipeId, scaleQuant);
                                 }
                             });
                 }
