@@ -18,7 +18,7 @@ import java.sql.SQLException;
 public class DisplayRecipe extends JFrame {
 
     private String user;
-    private int recipeId;
+    private static int recipeId;
     private String btnText;
     private JScrollPane contentPane;
     public static final int WIDTH_FRAME = 1200;
@@ -72,7 +72,9 @@ public class DisplayRecipe extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 //functionality for make-bake-cook
                 // will need to pass in recipeid to to Database.cookRecipe(int recipeid)
-                int x = DataBase.cookRecipe(recipeId);
+                new Review();
+
+                // int x = DataBase.cookRecipe(recipeId);
             }
         });
         JLabel label = new JLabel(info[0]);
@@ -159,6 +161,8 @@ public class DisplayRecipe extends JFrame {
         });
     }
 
-
+    public static int getRecipeId() {
+            return recipeId;
+    }
         
 }
