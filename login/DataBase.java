@@ -470,7 +470,7 @@ public class DataBase {
      * @param servings          Integer 1-12
      * @param difficulty        Integer 1-5
      * @param name              String <= 50 chars long
-     * @return                  1 on success, -1 on failure
+     * @return                  New recipe's ID
      */
     public static int createRecipe(String steps, String description, Integer cooktime,
                                     Integer servings, Integer difficulty, String name){
@@ -496,7 +496,7 @@ public class DataBase {
             int rs = st.executeUpdate();
             if(rs == 1){
                 //display(rs);      // nvm lol
-                return 1;
+                return newid;
             }
         }
         catch (SQLException e) {
@@ -571,7 +571,7 @@ public class DataBase {
         int newId;
         try{
             PreparedStatement id = (PreparedStatement) conn .prepareStatement("SELECT MAX(R.RECIPEID) " +
-                                                                                "FROM RECIPE AS R");
+                                                                                "FROM RECIPE AS R;");
             ResultSet idEx = id.executeQuery();
             //empnum = rs.getString(1);
             while (idEx.next()){
@@ -581,6 +581,7 @@ public class DataBase {
         catch (SQLException e) {
             e.printStackTrace();
         }
+        System.out.println("Select max failed");
         return 0;
     }
 

@@ -188,6 +188,8 @@ public class NewRecipe extends JFrame{
 
                         /** Create recipe in SQL database; do not run until RecipeId is auto-generated **/
                         int newId = DataBase.createRecipe(steps, description, cooktime, servings, difficulty, name);
+                        //System.out.println(newId);
+                        //System.exit(-1);
                         if (newId == -1){
                             System.out.println("ERROR: FAILED TO ADD NEW RECIPE TO DATABASE");
                         }
