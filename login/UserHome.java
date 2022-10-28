@@ -3,9 +3,13 @@ package login;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
@@ -223,6 +227,7 @@ public class UserHome extends JFrame {
         });
         contentPane.add(makeRecipeButton);*/
 
+        /** Welcome message */
         String welcomeText = "<html>Welcome, " + UserLogin.getUsername() + "<br/>Select an action:<html/>";
         System.out.println(welcomeText);
         JLabel welcomeLabel = new JLabel(welcomeText);
@@ -231,6 +236,14 @@ public class UserHome extends JFrame {
         /* To center a component: (int) Math.floor(WIDTH_FRAME/2.5)*/
         welcomeLabel.setBounds((2 * BORDER), (2 * -BORDER), 500, 200);
         contentPane.add(welcomeLabel);
+
+        /** Cooking mama */
+        try{
+            BufferedImage myPicture = ImageIO.read(new File("./login/mama.jpg"));
+            JLabel picLabel = new JLabel(new ImageIcon(myPicture));
+            picLabel.setBounds((int) Math.floor(WIDTH_FRAME/3), 200, 310, 359);
+            add(picLabel);
+        } catch (IOException e) { e.printStackTrace(); }
 
         /** Set button locations */
         btnNewButton.setBounds((WIDTH_FRAME - (6 * BORDER)), (2 * BORDER), LOGOUT_BUTTON_WIDTH, LOGOUT_BUTTON_HEIGHT);  //logout
