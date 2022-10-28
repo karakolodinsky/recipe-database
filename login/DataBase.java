@@ -10,6 +10,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
@@ -612,6 +613,51 @@ public static int deleteFromPantry(String username, String item) throws IOExcept
 
         return -1;
 
+    }
+
+    /**
+     * Adds all the arraylist's ingredients to the SQL recipe_requires table
+     * @param recipeID      ID number for recipe in database (Foreign Key)
+     * @param ingredients   Array of all ingredients for the recipe
+     * @return          1 on success, -1 on fail
+     */
+    public static int recipeRequires(int recipeID, ArrayList<Ingredient> ingredients){
+        Connection conn = getCon();
+        Integer ingID = null;
+        try{
+            for (Ingredient i : ingredients){
+                /** get the ID for the current ingredient */
+                PreparedStatement st0 = (PreparedStatement) conn
+                        .prepareStatement("SELECT ingredientid from ingredient where name = ? ");
+                st0.setString(1, i.getName());
+                ResultSet rs0 = st0.executeQuery();
+                while (rs0.next()) {
+                    ingID = rs0.getInt("ingredientID");
+                }
+
+                if (ingID != null) {
+                    PreparedStatement st = (PreparedStatement) conn
+                            .prepareStatement("INSERT INTO recipe_requires (RECIPEID, INGREDIENTID, QUANTITY, UNIT) "
+                                    + "VALUES (?, ?, ?, ?)" );
+                    st.setInt(1, recipeID);
+                    st.setInt(2, ingID);
+                    st.setInt(3, i.getQuantity());
+                    if (i.getUnit() != null){
+                        st.setString(4, i.getUnit());
+                    }
+
+                    int rs = st.executeUpdate();
+                    if (rs == 1) {
+                        return 1;
+                    }
+                }
+            }
+        }
+        catch (SQLException throwables) {
+            throwables.printStackTrace();
+            return -1;
+        }
+        return -1;
     }
 
 }
