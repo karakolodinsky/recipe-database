@@ -15,6 +15,11 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.NumberFormatter;
 
+/**
+ * UI-Interface for the New-Category functionality
+ *
+ * @author Serene Wood
+ */
 
 public class NewCategory extends JFrame {
 
@@ -58,6 +63,10 @@ public class NewCategory extends JFrame {
         });
     }
 
+
+    /**
+     * Dead constructor
+     */
     public NewCategory(){
 
     }
@@ -91,6 +100,9 @@ public class NewCategory extends JFrame {
         init();
     }
 
+    /**
+     * New Category's UI init()
+     */
     private void init(){
         //contentPane = new JPanel();
 
@@ -138,8 +150,6 @@ public class NewCategory extends JFrame {
                 UserHome newR = new UserHome();
             }
         });
-
-
         contentPane.add(nb);
         contentPane.add(homeButton);
         resultLable.setMinimumSize(new Dimension(900, 50));
