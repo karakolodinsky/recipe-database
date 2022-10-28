@@ -265,7 +265,7 @@ public class DataBase {
                                         bqOLD = rs3.getInt(2);
                                 }
                         PreparedStatement st2;
-                        if (unit != "item name"){
+                        if (unit != "other"){
                             st2 = (PreparedStatement) conn
                             .prepareStatement("UPDATE in_pantry SET quantitycurr = ?, quantitybought = ?, purchasedate = ? , expirationdate = ?, unit = ? WHERE username = ? and ingredientid = ?;  ");
                             st2.setDate(3, (java.sql.Date) purch);
@@ -276,7 +276,7 @@ public class DataBase {
                         }
                         else {
                             st2 = (PreparedStatement) conn
-                            .prepareStatement("UPDATE in_pantry SET quantitycurr = ?, quantitybought = ?, purchasedate = ? , expirationdate = ? WHERE username = ? and ingredientid = ?;  ");
+                            .prepareStatement("UPDATE in_pantry SET quantitycurr = ?, quantitybought = ?, purchasedate = ? , expirationdate = ?, unit = '' WHERE username = ? and ingredientid = ?;  ");
                             st2.setDate(3, (java.sql.Date) purch);
                             st2.setInt(1, quantity + qOLD);
                             st2.setInt(2, qbought+ bqOLD);
@@ -302,11 +302,12 @@ public class DataBase {
             st.setInt(4, qbought);
             st.setInt(5, quantity);
             st.setDate(6, (java.sql.Date) exp);
-            if (unit != "item name"){
+            if (unit != "other"){
                 st.setString(7, unit);   
         }
                 else {
-                st.setString(7, item);
+                        String emp = "";
+                st.setString(7, emp);
         }
             int rs = st.executeUpdate();
             if(rs == 1){
@@ -390,20 +391,21 @@ public class DataBase {
     public static Integer GetCategoryByName(String name) throws IOException {
         Connection conn = DataBase.getCon();
 
+        int ret = -1;
         try{
             PreparedStatement st = (PreparedStatement) conn
                 .prepareStatement("SELECT categoryId FROM category WHERE categoryname LIKE '%" + name + "%'");
             System.out.println(st);
-            boolean exists = st.execute();
-            if(exists){
-                ResultSet rs = st.getResultSet();
-                return rs.getInt(1);
+            ResultSet exists = st.executeQuery();
+            while (exists.next()){
+                ret = exists.getInt(1);
+                return ret;
             }
         }
         catch(SQLException e){
             printSQLException(e);
         }
-        return -1;
+        return ret;
     }
 
     public static ResultSet GetPantry (String user) throws IOException {
@@ -1001,6 +1003,43 @@ public static ResultSet getUserRecipes (String user){
             throwables.printStackTrace();
         }
         return null;
+    }
+
+
+    /**
+     *
+     * @param name
+     */
+    public static boolean newCategory(String name) {
+        Connection conn = getCon();
+        try {
+            int catID = - 1;
+            /** get the ID for the current category */
+            PreparedStatement st0 = (PreparedStatement) conn
+                    .prepareStatement("SELECT MAX(categoryid) from category");
+            ResultSet rs0 = st0.executeQuery();
+            while (rs0.next()) {
+                catID = rs0.getInt(1);
+            }
+
+            if (catID > 0){
+                if (-1 != GetCategoryByName(name)) {
+                    return false;
+                }
+                int newCatID = catID += 1;
+                PreparedStatement st = (PreparedStatement) conn
+                        .prepareStatement("INSERT INTO category (categoryid, categoryname) VALUES (?, ?);");
+                st.setInt(1, newCatID);
+                st.setString(2, name);
+                st.execute();
+                return true;
+            }
+
+        }
+        catch (SQLException | IOException throwables) {
+            throwables.printStackTrace();
+        }
+        return false;
     }
 
 }
