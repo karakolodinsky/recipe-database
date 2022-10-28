@@ -353,7 +353,7 @@ public class DataBase {
 
         try {
             PreparedStatement st = (PreparedStatement) conn
-                    .prepareStatement("SELECT name FROM category WHERE name LIKE '%" + category + "%'");
+                    .prepareStatement("SELECT categoryname FROM category WHERE categoryname LIKE '%" + category + "%'");
                 //     st.setString(1, ingredient);
             System.out.println(st);
             ResultSet rs = st.executeQuery();
@@ -373,7 +373,7 @@ public class DataBase {
 
         try{
             PreparedStatement st = (PreparedStatement) conn
-                .prepareStatement("SELECT categoryId FROM category WHERE name LIKE '%" + name + "%'");
+                .prepareStatement("SELECT categoryId FROM category WHERE categoryname LIKE '%" + name + "%'");
             System.out.println(st);
             boolean exists = st.execute();
             if(exists){

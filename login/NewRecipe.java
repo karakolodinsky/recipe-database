@@ -48,8 +48,12 @@ public class NewRecipe extends JFrame{
     //private int SMALL_BOX_HEIGHT =20;
 
     /** standardized variables for containers: */
-    private int CONTAINER_HEIGHT = 50;
+    private int CONTAINER_HEIGHT = 60;
     private int CONTAINER_WIDTH = 1014;
+
+    /** standardized variables for JScroll */
+    private int SCROLL_HEIGHT = 100;
+    private int SCROLL_WIDTH = 400;
 
     /** Current user: */
     static private String currUser;
@@ -108,7 +112,7 @@ public class NewRecipe extends JFrame{
 
         /** yoinked code: **/
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(450, 190, 1014, 597);
+        setBounds(450, 190, 1014, 650);
         setResizable(false);
         contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -247,7 +251,7 @@ public class NewRecipe extends JFrame{
         ingredientContainer.setPreferredSize(new Dimension(CONTAINER_WIDTH, CONTAINER_HEIGHT));
         ingredientContainer.setMaximumSize(new Dimension(CONTAINER_WIDTH, CONTAINER_HEIGHT));
 
-        /** Enter Recipe Steps Label & Textbox **/
+        /** Enter Ingredient name Label & Textbox **/
         JLabel ingSelectLabel = new JLabel("Search for Ingredient:");
         JTextField ingNameTxt = new JTextField(20);
         //contentPane.add(ingSelectLabel);
@@ -268,6 +272,8 @@ public class NewRecipe extends JFrame{
 
         /** Scroll-wheel view of ingredients */
         JScrollPane IngredientScroll = new JScrollPane(IngredientButtons);
+
+
 
         /** Ingredient JTable buttons: */
         JButton ingSearch = new JButton("Search");
@@ -293,7 +299,7 @@ public class NewRecipe extends JFrame{
         });
 
         /** Ingredient scroll attributes */
-        Dimension ingDim = new Dimension(400, 200 );
+        Dimension ingDim = new Dimension(   SCROLL_WIDTH, SCROLL_HEIGHT);
         IngredientScroll.setPreferredSize( ingDim );
         IngredientScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
@@ -345,20 +351,57 @@ public class NewRecipe extends JFrame{
         categoryContainer.setPreferredSize(new Dimension(CONTAINER_WIDTH, CONTAINER_HEIGHT));
         categoryContainer.setMaximumSize(new Dimension(CONTAINER_WIDTH, CONTAINER_HEIGHT));
 
-        /** Category JTable buttons: */
+        /** Enter Category Name Label & Textbox **/
+        JLabel catSelectLabel = new JLabel("Search for Category:");
+        JTextField catNameTxt = new JTextField(20);
+        categoryContainer.add(catSelectLabel);
+        categoryContainer.add(catNameTxt);
+
+        /** Stores Category JTable buttons: */
         JTable CategoryButtons = new JTable();
         CategoryButtons.addMouseListener(new java.awt.event.MouseAdapter(){
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt){
                 int row = CategoryButtons.rowAtPoint(evt.getPoint());
-                String ing = (String) CategoryButtons.getValueAt(row, 0);
-                currCategoryStr = ing;
+                String cat = (String) CategoryButtons.getValueAt(row, 0);
+                currCategoryStr = cat;
             }
         });
 
+        /** Scroll-wheel view of Category */
+        JScrollPane CategoryScroll = new JScrollPane(CategoryButtons);
+
+        /** Category JTable buttons: */
+        JButton catSearch = new JButton("Search");
+        categoryContainer.add(catSearch);
+        catSearch.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try{
+                    if (catNameTxt.getText() != null) {
+                        ResultSet categoryList = DataBase.GetCategories(catNameTxt.getText());
+                        while (categoryList.next()){
+                            CategoryButtons.setModel(DbUtils.resultSetToTableModel(categoryList));
+                        }
+                    }
+                    else{
+                        ResultSet categoryList = DataBase.GetCategories("");
+                        while (categoryList.next()){
+                            CategoryButtons.setModel(DbUtils.resultSetToTableModel(categoryList));
+                        }
+                    }
+                } catch (IOException | SQLException ioException) { ioException.printStackTrace(); }
+            }
+        });
+
+        /** Category scroll attributes */
+        CategoryScroll.setPreferredSize( ingDim );
+        CategoryScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+
+
         /** List of categories added to recipe */
         JList<String> curCategories = new JList<String>();
-        curCategories.setListData(ingredientsStrings.toArray(new String[categoriesString.size()]));
+        curCategories.setListData(categoriesString.toArray(new String[categoriesString.size()]));
         curCategories.setPreferredSize( ingDim );
 
         JButton addCategory = new JButton("Add Category");
@@ -373,10 +416,10 @@ public class NewRecipe extends JFrame{
             }});
 
 
-        /** Scroll-wheel view of ingredients */
-        JScrollPane CategoryScroll = new JScrollPane(CategoryButtons);
-        JButton catSearch = new JButton("Search");
+
+        //categoryContainer.add(CategoryScroll);
         categoryContainer.add(catSearch);
+        categoryContainer.add(addCategory);
 
 
         /** Add components in correct order: **/
@@ -384,6 +427,10 @@ public class NewRecipe extends JFrame{
         contentPane.add(addIngredient);
         contentPane.add(IngredientScroll);
         contentPane.add(curIngredients);
+        contentPane.add(categoryContainer);
+        contentPane.add(addCategory);
+        contentPane.add(CategoryScroll);
+        contentPane.add(curCategories);
         contentPane.add(enter);
         contentPane.setVisible(true);
     }
