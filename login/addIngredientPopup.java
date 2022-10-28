@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -24,12 +25,14 @@ public class addIngredientPopup extends JFrame{
     JPanel panel;
     JTextArea quantity;
     String unit = "";
-    String user;
+    int recipeId;
+    //String user;
 
-    public addIngredientPopup (int ingredientId, String user) {
+    public addIngredientPopup (int ingredientId, int recipeId) {
         super("Edit Ingredients");
         this.ingredientId = ingredientId;
-        this.user = user;
+        this.recipeId = recipeId;
+        //this.user = user;
         setResizable(false);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setVisible(true);
@@ -44,6 +47,15 @@ public class addIngredientPopup extends JFrame{
         panel.setAlignmentX(CENTER_ALIGNMENT);
         panel.add(Box.createVerticalGlue());
         add();
+        JButton btn = new JButton("Submit");
+        btn.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                submit();
+                addIngredientPopup.this.dispose();
+                
+            }});
 
         this.getContentPane().add(scrollPane);
         setContentPane(scrollPane);
@@ -72,6 +84,17 @@ public class addIngredientPopup extends JFrame{
         String qty = quantity.getText();
         if (!qty.equals("")) {
             int qtyInt = Integer.parseInt(qty);
+            try {
+                PreparedStatement ps = DataBase.getCon().prepareStatement(
+                "INSERT INTO recipe_requires VALUES(?, ?, ?, ?);");
+                ps.setInt(1, recipeId);
+                ps.setInt(2, ingredientId);
+                ps.setInt(3, qtyInt);
+                ps.setString(4, unit);
+                ps.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
 
         }
     }
