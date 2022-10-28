@@ -27,22 +27,25 @@ public class DisplayRecipe extends JFrame {
     private JPanel panel;
     private ResultSet rs;
     private JButton cookButton;
+    private JButton homeButton;
     private JPanel ingredientContainer;
     private JPanel descriptionContainer;
     private JPanel categoriesContainer;
+    private JPanel buttonsContainer;
 
     /** standardized variables for containers/text-boxes: */
     private int CONTAINER_HEIGHT = 500;
-    private int CONTAINER_WIDTH = 400;
+    private int CONTAINER_WIDTH = 600;
     private int HALF_CONTAINER_HEIGHT = 250;
+    private int BUTTON_CONTAINER_WIDTH = 150;
+    private int DESCRIPTION_WIDTH = 150;
 
     public static final int WIDTH_FRAME = 1200;
     public static final int HEIGHT_FRAME = 600;
 
-    private int TEXT_BOX_WIDTH = 150;
+    private int TEXT_BOX_WIDTH = 210;
     private int TEXT_BOX_HEIGHT = 30;
     //private int SMALL_CONTAINER_HEIGHT = ;
-    private JLabel db_label_errorText;
 
 
     public DisplayRecipe (String user, int recipeId, String btnText) throws SQLException {
@@ -68,33 +71,43 @@ public class DisplayRecipe extends JFrame {
         panel.setLayout(new FlowLayout());
         panel.setBorder(new EmptyBorder(5, 5, 5, 5));
         JScrollPane scrollPane = new JScrollPane(panel);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        setResizable(false);
 
         //headerContainer = new JPanel();
         //categoriesContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
         //categoriesContainer.setPreferredSize(new Dimension(CONTAINER_WIDTH, HALF_CONTAINER_HEIGHT));
         //categoriesContainer.setMaximumSize(new Dimension(CONTAINER_WIDTH, HALF_CONTAINER_HEIGHT));
 
-        /** contains ingredient-list */
-        ingredientContainer = new JPanel();
-        ingredientContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
-        ingredientContainer.setPreferredSize(new Dimension(CONTAINER_WIDTH, HALF_CONTAINER_HEIGHT));
-        ingredientContainer.setMaximumSize(new Dimension(CONTAINER_WIDTH, HALF_CONTAINER_HEIGHT));
-
-        /** contains category-list */
-        categoriesContainer = new JPanel();
-        categoriesContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
-        categoriesContainer.setPreferredSize(new Dimension(CONTAINER_WIDTH, HALF_CONTAINER_HEIGHT));
-        categoriesContainer.setMaximumSize(new Dimension(CONTAINER_WIDTH, HALF_CONTAINER_HEIGHT));
+        /** contains navigation buttons */
+        buttonsContainer = new JPanel();
+        buttonsContainer.setAlignmentX(Component.CENTER_ALIGNMENT);
+        buttonsContainer.setPreferredSize(new Dimension(    BUTTON_CONTAINER_WIDTH, 75));
+        buttonsContainer.setMaximumSize(new Dimension(BUTTON_CONTAINER_WIDTH, 75));
 
         /** contains description and recipe info */
         descriptionContainer = new JPanel();
-        descriptionContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
+        //descriptionContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
         descriptionContainer.setPreferredSize(new Dimension(CONTAINER_WIDTH, CONTAINER_HEIGHT));
         descriptionContainer.setMaximumSize(new Dimension(CONTAINER_WIDTH, CONTAINER_HEIGHT));
+
+        /** contains category-list */
+        categoriesContainer = new JPanel();
+        //categoriesContainer.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        categoriesContainer.setPreferredSize(new Dimension(DESCRIPTION_WIDTH, HALF_CONTAINER_HEIGHT));
+        categoriesContainer.setMaximumSize(new Dimension(DESCRIPTION_WIDTH, HALF_CONTAINER_HEIGHT));
+
+        /** contains ingredient-list */
+        ingredientContainer = new JPanel();
+        //ingredientContainer.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        ingredientContainer.setPreferredSize(new Dimension(DESCRIPTION_WIDTH, HALF_CONTAINER_HEIGHT));
+        ingredientContainer.setMaximumSize(new Dimension(DESCRIPTION_WIDTH, HALF_CONTAINER_HEIGHT));
 
         panel.add(descriptionContainer);
         panel.add(categoriesContainer);
         panel.add(ingredientContainer);
+        panel.add(buttonsContainer);
 
         //panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setAlignmentY(TOP_ALIGNMENT);
@@ -117,7 +130,8 @@ public class DisplayRecipe extends JFrame {
         }
         cookButton = new JButton("cook/make/bake");
         cookButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        descriptionContainer.add(cookButton);
+        buttonsContainer.add(cookButton);
+        //descriptionContainer.add(cookButton);
         cookButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //functionality for make-bake-cook
@@ -137,9 +151,28 @@ public class DisplayRecipe extends JFrame {
                 }
             }
         });
+
+        /** Navigates back to UserHome */
+        homeButton = new JButton("Return to Home");
+        homeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                DisplayRecipe.this.dispose();
+                new UserHome();
+            }
+        });
+        buttonsContainer.add(homeButton);
+
+        /** Recipe Title */
+        //String tabstr = "\t\t\t\t\t";
         JLabel label = new JLabel(info[0]);
+        label.setFont(new Font("80er Teenie Demo", Font.ITALIC, 25));
         label.setAlignmentX(Component.CENTER_ALIGNMENT);
+        label.setBorder(new EmptyBorder(5, 5, 5, 5));
+        label.setPreferredSize(new Dimension(CONTAINER_WIDTH, 100));
+        label.setMinimumSize(new Dimension(CONTAINER_WIDTH, 100));
         descriptionContainer.add(label);
+
         if (!(avg.equals(""))) {
             label = new JLabel("Average Rating: " + avg);
             label.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -242,6 +275,7 @@ public class DisplayRecipe extends JFrame {
 
     private void labelMaker (String text) {
         JLabel label = new JLabel(text);
+        label.setFont(new Font("80er Teenie Demo", Font.PLAIN, 13));
         label.setPreferredSize(new Dimension(TEXT_BOX_WIDTH, TEXT_BOX_HEIGHT));
         label.setAlignmentX(Component.CENTER_ALIGNMENT);
         descriptionContainer.add(label);
@@ -250,9 +284,11 @@ public class DisplayRecipe extends JFrame {
 
     private void textArea (String text) {
         JTextArea textArea = new JTextArea(text);
-        //textArea.setColumns(300);
+        textArea.setPreferredSize(new Dimension(550, 100));
+        textArea.setMaximumSize(new Dimension(550, 300));
         textArea.setLineWrap(true);
         textArea.setWrapStyleWord(true);
+        textArea.setBorder(new EmptyBorder(5, 5, 5, 5));
 
         textArea.setEditable(false);  
         textArea.setCursor(null);  
