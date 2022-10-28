@@ -192,6 +192,7 @@ public class NewRecipe extends JFrame{
                             System.out.println("ERROR: FAILED TO ADD NEW RECIPE TO DATABASE");
                         }
                         else{
+                            DataBase.recipeRequires(newId, ingredients);
                             NewRecipe.this.dispose();
                         }
                     }
