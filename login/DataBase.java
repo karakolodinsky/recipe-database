@@ -448,6 +448,25 @@ public class DataBase {
         return -1;                  // try failed
     }
 
+    /**
+     * 
+     * @param categoryString
+     * @param recipeId
+     */
+    public static void categorizeRecipe(String categoryString, Integer recipeId){
+
+        // make the categories a list of strings
+
+        // for each category, check if it alredy exists
+            // if the category exists, grab its id
+            // else make a new id
+
+        // add entry to the recipe category table (recipeId , categoryId)
+
+
+
+    }
+
 
     /**
      * Gets the current maximum recipeid value from the recipe table

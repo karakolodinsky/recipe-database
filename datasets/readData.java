@@ -171,7 +171,7 @@ public class readData {
 
                 String currIngred = ingredients[i];
 
-                //check that element of categories is not "" or ", " or " "
+                //check that element of ingredients is not "" or ", " or " "
                 if(!(currIngred.equals("") || currIngred.equals(", ") || currIngred.equals(" "))){
 
                     try {
@@ -303,11 +303,20 @@ public class readData {
         System.out.println("Password: ");
         String password = reader.readLine().trim();
         
+        // Uncomment the below to read in recipe data
+        // readData rd = new readData();
+        // Connection con = rd.dbLogin(username, password);
+        // //rd.readRecipes(con);
+        // rd.getDates(con);
+        // System.exit(1);
+
+
+        // Uncomment the below to read in the recipe review data
         readData rd = new readData();
         Connection con = rd.dbLogin(username, password);
-        //rd.readRecipes(con);
-        rd.getDates(con);
-        System.exit(1);
+        // rd.readRecipes(con);
+        // rd.getDates(con);
+        // System.exit(1);
     }
     
 }
