@@ -36,6 +36,7 @@ public class addIngredientPopup extends JFrame{
         setResizable(false);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setVisible(true);
+        setBounds(80, 80, 300, 300);
 
         init();
     }
@@ -56,6 +57,7 @@ public class addIngredientPopup extends JFrame{
                 addIngredientPopup.this.dispose();
                 
             }});
+        panel.add(btn);
 
         this.getContentPane().add(scrollPane);
         setContentPane(scrollPane);
@@ -66,6 +68,7 @@ public class addIngredientPopup extends JFrame{
             PreparedStatement ps = DataBase.getCon().prepareStatement("SELECT name FROM ingredient WHERE ingredientid=?;");
             ps.setInt(1, ingredientId);
             ResultSet rs = ps.executeQuery();
+            rs.next();
             String name = rs.getString("name");
             JLabel label = new JLabel(name);
             panel.add(label);

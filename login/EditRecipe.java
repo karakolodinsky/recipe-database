@@ -33,6 +33,7 @@ public class EditRecipe extends JFrame {
     private JPanel panel;
     private ResultSet rs;
     private int newDiff;
+    private JTextField add;
 
 
     public EditRecipe (String user, int recipeId, String btnText) throws Exception {
@@ -112,6 +113,25 @@ public class EditRecipe extends JFrame {
         labelLabel = new JLabel("Ingredients [ Name | Quantity | Units ]");
         panel.add(labelLabel);
         displayIngred();
+        JButton addIng = new JButton("Add Ingredient:");
+        addIng.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    int ingredientId = addIngredient(add.getText().strip());
+                    new addIngredientPopup(ingredientId, recipeId);
+                } catch (IOException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+                
+            }
+
+        });
+        panel.add(addIng);
+        add = textField();
+
         displayCategories();
 
 
@@ -126,7 +146,7 @@ public class EditRecipe extends JFrame {
         panel.add(label);
     }
 
-    private void textArea (String text) {
+    private JTextArea textArea (String text) {
         JTextArea textArea = new JTextArea(text);
         textArea.setEditable(true);   
         textArea.setOpaque(true);  
@@ -134,6 +154,16 @@ public class EditRecipe extends JFrame {
         textArea.setWrapStyleWord(true);
         textArea.setAlignmentX(LEFT_ALIGNMENT);
         panel.add(textArea);
+        return textArea;
+    }
+
+    private JTextField textField () {
+        JTextField textArea = new JTextField();
+        textArea.setEditable(true);   
+        textArea.setOpaque(true);  
+        textArea.setAlignmentX(LEFT_ALIGNMENT);
+        panel.add(textArea);
+        return textArea;
     }
 
     private JButton returnHome () {
@@ -276,7 +306,7 @@ public class EditRecipe extends JFrame {
     }
     
 
-    public static void addIngredient(String ingredient) throws IOException {
+    public static int addIngredient(String ingredient) throws IOException {
         Connection conn = DataBase.getConnect();
 
         try {
@@ -288,9 +318,9 @@ public class EditRecipe extends JFrame {
             ResultSet rs = st.getResultSet();
             int ingredientid = 0;
             if (rs.isBeforeFirst()) {
-                while(rs.next()){
+                if (rs.next()){
                     ingredientid = rs.getInt("ingredientid");
-                    
+                    return ingredientid;
                 }
             }
 
@@ -303,12 +333,14 @@ public class EditRecipe extends JFrame {
                 st.setInt(1, ingredientid);
                 st.setString(2, ingredient);
                 st.executeUpdate();
+                return ingredientid;
                 
             }
             
             
         } catch (SQLException e) {
             }
+        return 0;
 
     }
 
