@@ -1,38 +1,56 @@
 package login;
 
+import net.proteanit.sql.DbUtils;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.*;
 import java.awt.*;
+import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import javax.swing.*;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.NumberFormatter;
 
+/**
+ * UI-Interface for the New-Recipe functionality
+ *
+ * @author Serene Wood
+ */
+
 public class NewRecipe extends JFrame{
 
+    /** Java Swing vars */
     private static final long serialVersionUID = 1;
     private JPanel contentPane;
 
-    // standardized variables for buttons:
+    /** standardized variables for buttons: */
     private int strdButtonWidth = 150;
     private int strdButtonHeight = 40;
     private int strdFontSize = 10;
     private int borderSize = 20;
 
-    // standardized variables for text-boxes:
+    /** standardized variables for text-boxes: */
     private int TEXT_BOX_WIDTH = 100;
     private int COMBO_BOX_WIDTH = 100;
     private int COMBO_BOX_HEIGHT = 50;
 
-    // Current user
+    private int SMALL_TEXT_BOX_WIDTH = 30;
+    //private int SMALL_BOX_HEIGHT =20;
+
+    /** Current user: */
     static private String currUser;
 
-    // SQL variables:
+    /** SQL Recipe-Table Variables: */
     String name;            // <= 500 chars
     String author;
     String description;     // <= 200 chars
@@ -40,6 +58,13 @@ public class NewRecipe extends JFrame{
     Integer cooktime;
     Integer servings;
     Integer difficulty;
+
+    /** Ingredient  */
+    ArrayList<Ingredient> ingredients = new ArrayList<>();
+    ArrayList<String> ingredientsStrings = new ArrayList<>();
+    static String currIngredientStr;
+    //private JScrollPane IngredientScroll;
+
 
 
     /**
@@ -58,17 +83,22 @@ public class NewRecipe extends JFrame{
         });
     }
 
+    /**
+     * Unused constructor
+     */
     public NewRecipe() {
 
     }
 
+    /**
+     * Main NewRecipe Constructor
+     * @param user  Current user's username'
+     */
     public NewRecipe(String user) {
-        //solve s = new solve();
-        currUser = user;
-
+        currUser = user;                        // unnecessary
         author = UserLogin.getUsername();
 
-        // yoinked code:
+        /** yoinked code: **/
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(450, 190, 1014, 597);
         setResizable(false);
@@ -77,28 +107,25 @@ public class NewRecipe extends JFrame{
         setContentPane(contentPane);
         contentPane.setLayout(new FlowLayout());
 
-        //JTextField create = new JTextField("Create a new Recipe:", 20);
-        JLabel create = new JLabel("Create a new recipe");
-        contentPane.add(create);
-
+        /** Enter Recipe Name Label & Text-box **/
         JLabel rNameLabel = new JLabel("Enter Recipe Name:");
         JTextField rNameTxt = new JTextField(TEXT_BOX_WIDTH);
         contentPane.add(rNameLabel);
         contentPane.add(rNameTxt);
 
-        /**
-         * ADD RECIPE DESCRIPTION INPUT: VARCHAR(200)
-         */
+        /** Enter Recipe Description Label & Text-box **/
         JLabel rDescLabel = new JLabel("Enter Recipe Description:");
         JTextField rDescTxt = new JTextField(TEXT_BOX_WIDTH);
         contentPane.add(rDescLabel);
         contentPane.add(rDescTxt);
 
+        /** Enter Recipe Steps Label & Textbox **/
         JLabel rStepsLabel = new JLabel("Enter Recipe Steps:");
         JTextField rStepsTxt = new JTextField(TEXT_BOX_WIDTH);
         contentPane.add(rStepsLabel);
         contentPane.add(rStepsTxt);
 
+        /** Cooktime Formatter (Integers must be >= 0) **/
         NumberFormat format = NumberFormat.getInstance();
         NumberFormatter formatter = new NumberFormatter(format);
         formatter.setValueClass(Integer.class);
@@ -106,13 +133,14 @@ public class NewRecipe extends JFrame{
         formatter.setMaximum(Integer.MAX_VALUE);
         formatter.setAllowsInvalid(false);
 
+        /** Enter Recipe Cooktime Label & Text-box **/
         JLabel rCookTimeLabel = new JLabel("Enter Recipe Cooktime(in minutes):");
         JFormattedTextField rCookTimeInt = new JFormattedTextField(formatter);
         rCookTimeInt.setColumns(TEXT_BOX_WIDTH);
-
         contentPane.add(rCookTimeLabel);
         contentPane.add(rCookTimeInt);
 
+        /** Enter Recipe Difficulty Label & Drop-down **/
         JLabel rDifficultyLabel = new JLabel("Select Recipe Difficulty:");
         Integer[] diffChoices = {1, 2, 3, 4, 5};
         JComboBox rDiffTime = new JComboBox(diffChoices);
@@ -120,6 +148,7 @@ public class NewRecipe extends JFrame{
         contentPane.add(rDifficultyLabel);
         contentPane.add(rDiffTime);
 
+        /** Enter Recipe Servings Label & Drop-down **/
         JLabel rServingsLable = new JLabel("Select Recipe Servings:");
         Integer[] ServingsChoices = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
         JComboBox rServings = new JComboBox(ServingsChoices);
@@ -127,26 +156,21 @@ public class NewRecipe extends JFrame{
         contentPane.add(rServingsLable);
         contentPane.add(rServings);
 
+        /** Enter-Button calls DataBase.createRecipe() **/
         JButton enter = new JButton("Enter");
-        contentPane.add(enter);
-
         enter.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // String name;            // <= 500 chars
-                //    String author;
-                //    String steps;           // <= 5000 chars
-                //    int cooktime;
-                //    int servings;
-                //    int difficulty;
-
                 // don't judge my shitty != null checks
+                /** Check for all fields filled */
                 if (rNameTxt.getText() != null && rStepsTxt.getText()!= null && rCookTimeInt.getValue()!= null &&
                         rServings.getItemAt(rServings.getSelectedIndex())!= null &&
                         rDiffTime.getItemAt(rDiffTime.getSelectedIndex())!= null && rDescTxt.getText() != null){
-                    // Check for acceptable str length
+
+                    /** Check for acceptable str length */
                     if (rNameTxt.getText().length() < 500 && rStepsTxt.getText().length() < 5000 &&
                             rDescTxt.getText().length() <= 200){
+                        /* Pull & save entered values: */
                         name = rNameTxt.getText();
                         System.out.println("set var name as: " + name);
                         description = rDescTxt.getText();
@@ -163,12 +187,18 @@ public class NewRecipe extends JFrame{
                         System.out.println("The author of "+name+" is "+author);
 
                         /** Create recipe in SQL database; do not run until RecipeId is auto-generated **/
-                        DataBase.createRecipe(steps, description, cooktime, servings, difficulty, name);
-
-
-                        NewRecipe.this.dispose();
+                        int newId = DataBase.createRecipe(steps, description, cooktime, servings, difficulty, name);
+                        if (newId == -1){
+                            System.out.println("ERROR: FAILED TO ADD NEW RECIPE TO DATABASE");
+                        }
+                        else{
+                            DataBase.recipeRequires(newId, ingredients);
+                            NewRecipe.this.dispose();
+                        }
                     }
-                    else{                                                       // strings too long
+
+                    /** Error message pop-up for when string input exceed limits */
+                    else{       // strings too long
                         JFrame errorPopup = new JFrame("Error");
                         errorPopup.setSize(350,175);
                         PopupFactory pop = new PopupFactory();
@@ -180,7 +210,9 @@ public class NewRecipe extends JFrame{
                         p.show();
                     }
                 }
-                else{                                                           // Empty fields
+
+                /** Error message pop-up for field values are unfilled */
+                else{       // Empty fields
                     JFrame errorPopup = new JFrame("Error");
                     errorPopup.setSize(325,100);
                     PopupFactory pop = new PopupFactory();
@@ -188,14 +220,125 @@ public class NewRecipe extends JFrame{
                     errorPopup.add(new JLabel("Fill out all fields"));
                     errorPopup.show();
                     p.show();
-
                 }
-
             }
         });
 
-        contentPane.setVisible(true);
+        JPanel ingredientContainer = new JPanel();
+        ingredientContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
+        ingredientContainer.setPreferredSize(new Dimension(1014, 100));
+        ingredientContainer.setMaximumSize(new Dimension(1014, 100));
 
+        /** Enter Recipe Steps Label & Textbox **/
+        JLabel ingSelectLabel = new JLabel("Search for Ingredient:");
+        JTextField ingNameTxt = new JTextField(20);
+        //contentPane.add(ingSelectLabel);
+        //contentPane.add(ingNameTxt);
+        ingredientContainer.add(ingSelectLabel);
+        ingredientContainer.add(ingNameTxt);
+
+        JTable IngredientButtons = new JTable();
+        IngredientButtons.addMouseListener(new java.awt.event.MouseAdapter(){
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt){
+                int row = IngredientButtons.rowAtPoint(evt.getPoint());
+                String ing = (String) IngredientButtons.getValueAt(row, 0);
+                currIngredientStr = ing;
+            }
+        });
+        //IngredientButtons.setVisible(false);
+        JScrollPane IngredientScroll = new JScrollPane(IngredientButtons);
+        JButton ingSearch = new JButton("Search");
+        //contentPane.add(ingSearch);
+        ingredientContainer.add(ingSearch);
+        ingSearch.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try{
+                    if (ingNameTxt.getText() != null) {
+                        ResultSet ingredientsList = DataBase.GetIngredients(ingNameTxt.getText());
+                        while (ingredientsList.next()){
+                            IngredientButtons.setModel(DbUtils.resultSetToTableModel(ingredientsList));
+                        }
+                    }
+                    else{
+                        ResultSet ingredientsList =DataBase.GetIngredients("");
+                        while (ingredientsList.next()){
+                            IngredientButtons.setModel(DbUtils.resultSetToTableModel(ingredientsList));
+                        }
+                    }
+                } catch (IOException | SQLException ioException) { ioException.printStackTrace(); }
+            }
+        });
+
+        Dimension ingDim = new Dimension(400, 200 );
+        IngredientScroll.setPreferredSize( ingDim );
+        IngredientScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+
+        String[] ings;
+        JList<String> curIngredients = new JList<String>();
+        curIngredients.setListData(ingredientsStrings.toArray(new String[ingredientsStrings.size()]));
+        curIngredients.setPreferredSize( ingDim );
+
+        JLabel ingUnitLabel = new JLabel("Units (optional):");
+        JTextField ingUnitTxt = new JTextField(10);
+        //contentPane.add(ingUnitLabel);
+        //contentPane.add(ingUnitTxt);
+        ingredientContainer.add(ingUnitLabel);
+        ingredientContainer.add(ingUnitTxt);
+
+        JLabel ingQuantityLabel = new JLabel("Quantity:");
+        JFormattedTextField ingQuantityTxt = new JFormattedTextField(formatter);
+        ingQuantityTxt.setColumns(10);
+        //contentPane.add(ingQuantityLabel);
+        //contentPane.add(ingQuantityTxt);
+        ingredientContainer.add(ingQuantityLabel);
+        ingredientContainer.add(ingQuantityTxt);
+
+        JButton addIngredient = new JButton("Add Ingredient");
+        addIngredient.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (ingQuantityTxt.getValue() != null && currIngredientStr != null){
+                    Ingredient newIngredient;
+                    if (ingUnitTxt.getText() != null){
+                        newIngredient = new Ingredient (currIngredientStr,
+                                (Integer) ingQuantityTxt.getValue(), ingUnitTxt.getText());
+                    }
+                    else {
+                        newIngredient = new Ingredient(currIngredientStr,
+                                (Integer) ingQuantityTxt.getValue(), null);
+                    }
+                    ingredients.add(newIngredient);
+                    ingredientsStrings.add(currIngredientStr);
+                    curIngredients.setListData(ingredientsStrings.toArray(new String[ingredientsStrings.size()]));
+                    System.out.println("New Ingredient: " + newIngredient.toStr());
+                }
+            }});
+
+        contentPane.add(ingredientContainer);
+        contentPane.add(addIngredient);
+        contentPane.add(IngredientScroll);
+        contentPane.add(curIngredients);
+        contentPane.add(enter);
+        contentPane.setVisible(true);
+    }
+
+
+    /**
+     * Adds an ingredient button to save the current ingredient
+     * @param txt
+     * @return
+     */
+    private static JButton newIngredientButton (String txt){
+        JButton nb = new JButton(txt);
+        nb.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                currIngredientStr = txt;
+            }
+    });
+        return nb;
     }
 
 }

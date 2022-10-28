@@ -7,7 +7,13 @@ import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException; 
+import java.sql.SQLException;
+/**
+ * UI-Interface for the display recipe
+ *
+ * @author Teagan Nester
+ * @author ?
+ */
 
 public class DisplayRecipe extends JFrame {
 
