@@ -505,22 +505,59 @@ public class DataBase {
     }
 
     /**
-     * 
-     * @param categoryString
-     * @param recipeId
+     * Categorize a recipe with the given categories
+     * @param categoryString the string of categories
+     * @param recipeId the recipe to add these tags to
      */
     public static void categorizeRecipe(String categoryString, Integer recipeId){
 
         // make the categories a list of strings
+        String[] categories = categoryString.split(",");
 
-        // for each category, check if it alredy exists
-            // if the category exists, grab its id
-            // else make a new id
+        int size = categories.length;
+        for(int i = 0; i < size; i++){
 
-        // add entry to the recipe category table (recipeId , categoryId)
+            String currTag = categories[i];
 
+            //check that element of categories is not "" or ", " or " "
+            if(!(currTag.equals("") || currTag.equals(", ") || currTag.equals(" "))){
+            
+                try {
+                    ResultSet rs = null;
+                    PreparedStatement st = con.prepareStatement("SELECT categoryId FROM category WHERE categoryname=?;");
+                    st.setString(1, currTag.strip());
+                    boolean exists = st.execute();
+                    int categoryId = -1;
+                    if (exists) {
+                        // if category does not already exist, create it, else grab existing category's Id
+                        rs = st.getResultSet();
+                        if (!rs.isBeforeFirst()) {
+                            st = con.prepareStatement("Select max(categoryId) from category;");
+                            rs = st.executeQuery();
+                            rs.next();
+                            categoryId = rs.getInt(1) + 1;
+                            st = con.prepareStatement("Insert into category values(?, ?);");
+                            st.setInt(1, categoryId);
+                            st.setString(2, currTag);
+                            st.executeUpdate();
+                        }
+                        else{
+                            rs.next();
+                            categoryId = rs.getInt(1);
+                        }
+                    }
 
+                    // add category to recipeCategory
+                    st = con.prepareStatement("insert into recipe_category values(?, ?);");
+                    st.setInt(1, recipeId);
+                    st.setInt(2, categoryId);
+                    st.executeUpdate();
 
+                } catch (SQLException e) {
+                    System.exit(0);
+                } 
+            }       
+        }
     }
 
 
