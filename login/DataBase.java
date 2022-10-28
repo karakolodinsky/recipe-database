@@ -24,6 +24,7 @@ public class DataBase {
 
     private static String db_username;
     private static String db_password;
+    private static String user;
     protected static Connection con;
     public static final int ITERATIONS = 1000;
     // PBEWith<digest>And<encryption> Parameters for use with the PBEWith<digest>And<encryption> algorithm.
@@ -174,6 +175,7 @@ public class DataBase {
                     PreparedStatement st1 = (PreparedStatement) conn.prepareStatement("UPDATE netizen SET lastaccessdate = CURRENT_TIMESTAMP where username = ?");
                     st1.setString(1, username);
                     st1.executeUpdate();
+                    user = username;
                     return 1;
                     //update most recent access date
                 }
@@ -396,10 +398,11 @@ public class DataBase {
             for(int i = 0; i < ingredientCount; i++) {
                 if (rsFirstCheck.next()) {
                     PreparedStatement st2 = (PreparedStatement) conn
-                            .prepareStatement("SELECT username, purchasedate, ingredientid, quantitycurr, unit FROM in_pantry WHERE ingredientid=?" +
-                                            "group by username, purchasedate, ingredientid, quantitycurr, unit ORDER BY expirationdate DESC;", ResultSet.TYPE_SCROLL_SENSITIVE,
+                            .prepareStatement("SELECT purchasedate, ingredientid, quantitycurr, unit FROM in_pantry WHERE ingredientid=? AND username=? " +
+                                            "group by purchasedate, ingredientid, quantitycurr, unit, expirationdate ORDER BY expirationdate DESC;", ResultSet.TYPE_SCROLL_SENSITIVE,
                                     ResultSet.CONCUR_UPDATABLE);
                     st2.setInt(1, rsFirstCheck.getInt("ingredientid"));
+                    st2.setString(2, user);
                     boolean rscheck = st2.execute();
                     if (rscheck) {
                         ResultSet rs2 = st2.getResultSet();
@@ -462,10 +465,11 @@ public class DataBase {
 //                        quantityInPantry = rs1.getInt("quantity");
 //                    }
                     PreparedStatement st2 = (PreparedStatement)  conn
-                            .prepareStatement("SELECT username, purchasedate, ingredientid, quantitycurr, unit FROM in_pantry WHERE ingredientid=?" +
-                                    "group by username, purchasedate, ingredientid, quantitycurr, unit ORDER BY expirationdate DESC;", ResultSet.TYPE_SCROLL_SENSITIVE,
+                            .prepareStatement("SELECT purchasedate, ingredientid, quantitycurr, unit FROM in_pantry WHERE ingredientid=? AND username=? " +
+                                    "group by purchasedate, ingredientid, quantitycurr, unit, expirationdate ORDER BY expirationdate DESC;", ResultSet.TYPE_SCROLL_SENSITIVE,
                                     ResultSet.CONCUR_UPDATABLE);
                     st2.setInt(1, rs1.getInt("ingredientid"));
+                    st2.setString(2, user);
                     boolean rscheck = st2.execute();
                     if(rscheck){
                         ResultSet rs2 = st2.getResultSet();
@@ -475,7 +479,7 @@ public class DataBase {
                         else{
                             rs2.next();
                             int ingredientID = rs2.getInt("ingredientid");
-                            String username = rs2.getString("username");
+                            //String username = rs2.getString("username");
                             ArrayList<Date> toDelete = new ArrayList<Date>();
                             int quantityLeft = rs1.getInt("quantity");
                             rs2.previous();
@@ -509,7 +513,7 @@ public class DataBase {
                                                     "WHERE ingredientid=? AND username=? AND purchasedate=?;");
                                     stUpdQty.setInt(1, currentQuantity);
                                     stUpdQty.setInt(2, ingredientID);
-                                    stUpdQty.setString(3, username);
+                                    stUpdQty.setString(3, user);
                                     stUpdQty.setDate(4, purchaseDate);
                                     int rsUpdQty = stUpdQty.executeUpdate();
                                 }
@@ -524,7 +528,7 @@ public class DataBase {
                                             .prepareStatement("DELETE FROM in_pantry WHERE ingredientid=? AND" +
                                                     " username=? AND purchasedate=?;");
                                     stDelete.setInt(1, ingredientID);
-                                    stDelete.setString(2, username);
+                                    stDelete.setString(2, user);
                                     stDelete.setDate(3, thisPurchaseDate);
                                     int rsDelete = stDelete.executeUpdate();
                                 }
