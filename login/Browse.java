@@ -286,6 +286,47 @@ public class Browse extends JFrame {
                 
                     
 
+            } // searched for ingredien
+            else if (search.equals("Ingredient")) {
+                // sort by name
+                if (sort.equals("Name")) {
+                    if (asc) {
+                        ps = con.prepareStatement("SELECT r.name, r.recipeId, avg(n.rating) as avgrating " +
+                                                "FROM recipe r LEFT JOIN netizen_creates n on r.recipeId=n.recipeId " +
+                                                "WHERE name like ? GROUP BY r.recipeId, r.name ORDER BY r.name;");
+                    }
+                    else {
+                        ps = con.prepareStatement("SELECT r.name, r.recipeId, avg(n.rating) as avgrating " +
+                                                "FROM recipe r LEFT JOIN netizen_creates n on r.recipeId=n.recipeId " +
+                                                "WHERE name like ? GROUP BY r.recipeId, r.name ORDER BY r.name DESC;");
+                    }
+                }
+                //sort by date
+                else if (sort.equals("Date")) {
+                    if (asc) {
+                        ps = con.prepareStatement("SELECT r.name, r.recipeId, avg(n.rating) as avgrating " +
+                                                "FROM recipe r LEFT JOIN netizen_creates n on r.recipeId=n.recipeId " +
+                                                "WHERE name like ? GROUP BY r.recipeId, r.name ORDER BY r.date;");
+                    }
+                    else {
+                        ps = con.prepareStatement("SELECT r.name, r.recipeId, avg(n.rating) as avgrating " +
+                                                "FROM recipe r LEFT JOIN netizen_creates n on r.recipeId=n.recipeId " +
+                                                "WHERE name like ? GROUP BY r.recipeId, r.name ORDER BY r.date DESC;");
+                    }
+                }
+                else { //sort on rating
+                    if (asc) {
+                        ps = con.prepareStatement("SELECT r.name, r.recipeId, avg(n.rating) as avgrating " +
+                                                "FROM recipe r LEFT JOIN netizen_creates n on r.recipeId=n.recipeId " +
+                                                "WHERE name like ? GROUP BY r.recipeId, r.name ORDER BY avgrating;");
+                    }
+                    else {
+                        ps = con.prepareStatement("SELECT r.name, r.recipeId, avg(n.rating) as avgrating " +
+                                                "FROM recipe r LEFT JOIN netizen_creates n on r.recipeId=n.recipeId " +
+                                                "WHERE name like ? GROUP BY r.recipeId, r.name ORDER BY avgrating DESC;");
+                    }
+                }
+                ps.setString(1, "%" + searchVal + "%");
             }
             else { // change this it's stubbed out
                 ps = con.prepareStatement("SELECT recipeId, name FROM recipe WHERE name like %?% ORDER BY ?;");
