@@ -595,7 +595,9 @@ public class DataBase {
                             int ingredientID = rs2.getInt("ingredientid");
                             //String username = rs2.getString("username");
                             ArrayList<Date> toDelete = new ArrayList<Date>();
-                            int quantityLeft = rs1.getInt("quantity");
+                            // int quantityLeft = rs1.getInt("quantity");
+                            int recipeQuantity = rsFirstCheck.getInt("quantity");
+                            int quantityLeft = (int) (Math.ceil(scaleQuant * recipeQuantity));
                             rs2.previous();
                             boolean seen = false;
                             while(rs2.next() && quantityLeft > 0){
@@ -908,39 +910,6 @@ public static int deleteFromPantry(String username, String item) throws IOExcept
          }
          return 0;
     }
-//     public static int leaveReview(String user, int quant, int stars, String revtext, int recipeID){
-//         Connection conn = getCon();
-//         try{
-//                 ArrayList<Integer> list = new ArrayList<>();
-//                 ArrayList<Integer> list2 = new ArrayList<>();
-//                 ArrayList<String> list3 = new ArrayList<>();
-//                 PreparedStatement st0 = (PreparedStatement) conn
-//                 .prepareStatement("SELECT ingredientid, quantity, unit from recipe_req where recipeid = ? ");
-//         st0.setInt(1, recipeID);
-//         ResultSet rs0 = st0.executeQuery();
-//         while (rs0.next()) {
-//             list.add(rs0.getInt("ingredientID"));
-//             list2.add(rs0.getInt("quantity"));
-//             list3.add(rs0.getString("unit"));
-//         }
-//         for (int i =0 ; i< list.size() ;i++){
-//                 PreparedStatement st1 = (PreparedStatement) conn
-//                 .prepareStatement("SELECT ingredientid, quantitycurr, unit from in_pantry where user = ? ");
-//                 st1.setString(1, user);
-//                 ResultSet rs1 = st1.executeQuery();
-//                 while (rs1.next()) {
-//         } 
-        
-
-
-
-//         }
-//         catch (SQLException throwables) {
-//             throwables.printStackTrace();
-//             return -1;
-//         }
-//         return -1;
-//     }
 
 
 public static ResultSet getUserRecipes (String user){
