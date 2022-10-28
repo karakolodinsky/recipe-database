@@ -410,7 +410,7 @@ public class DataBase {
 
     // STUB
     // todo on make-bake-cook branch
-    public static int cookRecipe (int recipeID) {
+    public static int cookRecipe (int recipeID, int quant) {
         Connection conn = DataBase.getCon();
         try{
             PreparedStatement st = (PreparedStatement)  conn
@@ -700,6 +700,31 @@ public static int deleteFromPantry(String username, String item) throws IOExcept
         }
         return -1;
     }
+
+    public static int leaveReview(String user, int quant, int stars, String revtext, int recipeID){
+        Connection conn = getCon();
+        try{
+                if(DataBase.cookRecipe(recipeID, quant) != -1){
+                        PreparedStatement st = (PreparedStatement) conn
+                .prepareStatement("INSERT INTO netizen_creates values (?,?, now(), ?,?,? );");
+                st.setString(1, user);
+                st.setInt(2, recipeID);
+                st.setInt(3, stars);
+                st.setString(4, revtext);
+                st.setInt(5, quant);
+                }
+                else return -1;
+        } 
+        
+
+
+
+         catch (SQLException throwables) {
+             throwables.printStackTrace();
+             return -1;
+         }
+         return -1;
+    }
 //     public static int leaveReview(String user, int quant, int stars, String revtext, int recipeID){
 //         Connection conn = getCon();
 //         try{
@@ -733,6 +758,22 @@ public static int deleteFromPantry(String username, String item) throws IOExcept
 //         }
 //         return -1;
 //     }
+
+
+public static ResultSet getUserRecipes (String user){
+        Connection conn = DataBase.getConnect();
+        try{
+            PreparedStatement ps = (PreparedStatement) conn .prepareStatement("SELECT name, recipeid from recipe where author = ?");
+            ps.setString(1, user);
+            ResultSet rs = ps.executeQuery();
+            return rs;
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Select max failed");
+        return null;
+    }
 
 
 

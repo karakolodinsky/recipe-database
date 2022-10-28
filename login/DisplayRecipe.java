@@ -7,7 +7,7 @@ import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.SQLException; 
 /**
  * UI-Interface for the display recipe
  *
@@ -72,9 +72,19 @@ public class DisplayRecipe extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 //functionality for make-bake-cook
                 // will need to pass in recipeid to to Database.cookRecipe(int recipeid)
-                new Review();
-
-                // int x = DataBase.cookRecipe(recipeId);
+                int x = DataBase.cookRecipe(recipeId, 1);
+                if(x == -1){
+                    JOptionPane.showMessageDialog(new JFrame(), "out of ingredients!",
+                            "yo", JOptionPane.ERROR_MESSAGE);
+                }
+                else {
+                        EventQueue.invokeLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    new Review();
+                                }
+                            });
+                }
             }
         });
         JLabel label = new JLabel(info[0]);
