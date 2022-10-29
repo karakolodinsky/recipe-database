@@ -153,6 +153,12 @@ public class Pantry extends JFrame {
         try {
                 rs = DataBase.GetPantry(user);
                 PantTbl.setModel(DbUtils.resultSetToTableModel(rs));
+                for (int row = 0; row < PantTbl.getRowCount(); row++) {
+                        if (PantTbl.getModel().getValueAt(row, 5).equals("")){
+                                PantTbl.setValueAt(PantTbl.getModel().getValueAt(row, 0), row, 5);
+                                System.out.println("stuff is happening");
+                        }
+                    }
                 PantTbl.setFocusable(false);
                 PantTbl.setRowSelectionAllowed(true);
                 PantTbl.setDefaultEditor(Object.class, null);
