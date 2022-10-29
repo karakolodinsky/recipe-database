@@ -735,22 +735,22 @@ public class DataBase {
      * @param recipeId the recipe to be deleted
      * @return 1 if the recipe was deleted, 0 otherwise
      */
-    public static int DeleteRecipe(Integer recipeId){
+    public static int DeleteRecipe(int recipeId){
 
         try {
             ResultSet rs = null;
             PreparedStatement st = con.prepareStatement("SELECT recipeId FROM netizen_creates WHERE recipeId=?;");
-            st.setString(1, String.valueOf(recipeId));
+            st.setInt(1, recipeId);
             boolean exists = st.execute();
-            if (!exists) { 
-                st = con.prepareStatement("DELETE FROM recipe WHERE recipeid=?;");
-                st.setString(1, String.valueOf(recipeId));
-                st.executeUpdate();
+            if (exists) { 
                 st = con.prepareStatement("DELETE FROM recipe_category WHERE recipeid=?");
-                st.setString(1, String.valueOf(recipeId));
+                st.setInt(1, recipeId);
                 st.executeUpdate();
                 st = con.prepareStatement("DELETE FROM recipe_requires WHERE recipeid=?");
-                st.setString(1, String.valueOf(recipeId));
+                st.setInt(1, recipeId);
+                st.executeUpdate();
+                st = con.prepareStatement("DELETE FROM recipe WHERE recipeid=?;");
+                st.setInt(1, recipeId);
                 st.executeUpdate();
                 return 1;
             }

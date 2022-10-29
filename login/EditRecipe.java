@@ -71,8 +71,23 @@ public class EditRecipe extends JFrame {
         panel.add(Box.createVerticalGlue());
         formatRecipe();
         submit();
+        deleteRec();
         this.getContentPane().add(scrollPane);
         setContentPane(scrollPane);
+    }
+
+    private void deleteRec () {
+        JButton delete = new JButton("Delete Recipe");
+        panel.add(delete);
+        delete.addActionListener(new ActionListener () {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                DataBase.DeleteRecipe(recipeId);
+                EditRecipe.this.dispose();
+            }
+
+        });
     }
 
     private void submit() {
