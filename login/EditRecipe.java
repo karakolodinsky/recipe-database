@@ -37,7 +37,11 @@ public class EditRecipe extends JFrame {
     private JTextField delete;
     private JTextField deleteCat;
     private JTextField addCat;
-    private String recipeName;
+    private JTextField recipeName;
+    private JTextField cookTime;
+    private JTextField servings;
+    private JTextArea description;
+    private JTextArea step;
 
 
     public EditRecipe (String user, int recipeId, String btnText) throws Exception {
@@ -78,7 +82,34 @@ public class EditRecipe extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                // TODO Auto-generated method stub
+                String name = recipeName.getText().strip();
+                int time = Integer.parseInt(cookTime.getText().strip());
+                int serv = Integer.parseInt(servings.getText());
+                String steps = step.getText();
+                if (steps.length() > 5000) {
+                    steps.substring(0, 4999);
+                }
+                String desc = description.getText();
+                if (desc.length() > 500) {
+                    desc.substring(0, 499);
+                }
+
+                try {
+                    PreparedStatement ps = DataBase.getCon().prepareStatement("UPDATE recipe SET steps=?, description=?, cooktime=?, " +
+                                                                "servings=?, difficulty=?, name=? WHERE recipeid=?;");
+                    ps.setString(1, steps);
+                    ps.setString(2, desc);
+                    ps.setInt(3, time);
+                    ps.setInt(4, serv);
+                    ps.setString(6, name);
+                    ps.setInt(5, newDiff);
+                    ps.setInt(7, recipeId);
+                    ps.executeUpdate();
+                    EditRecipe.this.dispose();
+                } catch (SQLException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }          
                 
             }
             
@@ -96,6 +127,7 @@ public class EditRecipe extends JFrame {
         label.setEditable(true);
         label.setAlignmentX(Component.CENTER_ALIGNMENT);
         panel.add(label);
+        recipeName = label;
         if (!(avg.equals(""))) {
             JLabel labelLabel = new JLabel("Average Rating: " + avg);
             labelLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -110,23 +142,24 @@ public class EditRecipe extends JFrame {
         JLabel labelLabel = new JLabel("Uploaded On: " + date);
         panel.add(labelLabel);
         int diff = rs.getInt("difficulty");
+        newDiff = diff;
         diffMenu(diff);
         int time = rs.getInt("cooktime");
         labelLabel = new JLabel("Cook Time (Minutes):");
         panel.add(labelLabel);
-        labelMaker(String.valueOf(time));
+        cookTime = labelMaker(String.valueOf(time));
         int serv = rs.getInt("servings");
         labelLabel = new JLabel("Servings:");
         panel.add(labelLabel);
-        labelMaker(String.valueOf(serv));
+        servings = labelMaker(String.valueOf(serv));
         String desc = rs.getString("description");
         labelLabel = new JLabel("Description:");
         panel.add(labelLabel);
-        textArea(desc);
+        description = textArea(desc);
         String steps = rs.getString("steps");
         labelLabel = new JLabel("Steps:");
         panel.add(labelLabel);
-        textArea(steps);
+        step = textArea(steps);
         labelLabel = new JLabel("Ingredients [ Name | Quantity | Units ]");
         panel.add(labelLabel);
         displayIngred();
@@ -236,11 +269,12 @@ public class EditRecipe extends JFrame {
 
     
 
-    private void labelMaker (String text) {
+    private JTextField labelMaker (String text) {
         JTextField label = new JTextField(text);
         label.setAlignmentX(Component.LEFT_ALIGNMENT);
         label.setEditable(true);
         panel.add(label);
+        return label;
     }
 
     private JTextArea textArea (String text) {
@@ -279,6 +313,7 @@ public class EditRecipe extends JFrame {
         difficult.add(rbMenuItem);
         rbMenuItem = new JRadioButtonMenuItem("Easy-Medium");
         if (diff == 2) {
+            newDiff = 2;
             rbMenuItem.setSelected(true);
         }
         diffClick(rbMenuItem);

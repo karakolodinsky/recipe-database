@@ -57,6 +57,7 @@ public class myRecipes extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 try {
                     new EditRecipe(user, recipeId, btnText);
+                    myRecipes.this.dispose();
                 } catch (Exception e1) {
                     // TODO Auto-generated catch block
                     e1.printStackTrace();
