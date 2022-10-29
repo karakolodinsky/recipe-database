@@ -503,6 +503,7 @@ public class DataBase {
 
     public static int cookRecipe (int recipeID, double scaleQuant) {
         Connection conn = DataBase.getCon();
+
         try{
             PreparedStatement st = (PreparedStatement)  conn
                     .prepareStatement("SELECT COUNT(*) AS ingredientCount FROM recipe_requires WHERE recipeid=?");
@@ -606,6 +607,8 @@ public class DataBase {
                                 Date purchaseDate = rs2.getDate("purchasedate");
                                 int currentQuantity = rs2.getInt("quantitycurr");
 
+                                // make conversion maybe another table
+
                                 if(currentQuantity <= quantityLeft){
                                     // add purchase date to list
                                     //calculate qtyLeft
@@ -658,11 +661,24 @@ public class DataBase {
                         }
                     }
             }
-            return 0;
         } catch (SQLException e) {
 
             // print SQL exception information
             printSQLException(e);
+        }
+        try{
+            PreparedStatement stRevCheck = (PreparedStatement) conn
+                    .prepareStatement("SELECT recipeid FROM netizen_creates WHERE recipeid=?");
+            stRevCheck.setInt(1, recipeID);
+            boolean rsRevCheck = stRevCheck.execute();
+            ResultSet returnRS = stRevCheck.getResultSet();
+            if(returnRS.isBeforeFirst()){
+                return 2;
+            }
+        }
+            catch(SQLException throwables) {
+            throwables.printStackTrace();
+            return -1;
         }
         return 0;
     }
@@ -885,8 +901,8 @@ public static int deleteFromPantry(String username, String item) throws IOExcept
 
 
     public static int leaveReview(int stars, String revtext, int recipeID, double scaleQuant){
-
         Connection conn = getCon();
+
         try{
             PreparedStatement st = (PreparedStatement) conn
                 .prepareStatement("INSERT INTO netizen_creates values (?,?, now(), ?,?,? );");

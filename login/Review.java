@@ -81,7 +81,7 @@ public class Review extends JFrame {
         starss.setFont(new Font("Calibri", Font.BOLD, 26));
         contentPane.add(starss);
 
-        Integer[] stars = { 1, 2, 3, 4, 5};
+        Integer[] stars = { 0, 1, 2, 3, 4, 5};
         JComboBox<Integer> units = new JComboBox<Integer>(stars);
         units.setBounds(475, 325, 50, 30);
         contentPane.add(units);
