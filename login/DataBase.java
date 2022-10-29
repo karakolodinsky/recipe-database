@@ -842,7 +842,7 @@ public class DataBase {
     }
 
 
-public static int deleteFromPantry(String username, String item) throws IOException {
+public static int deleteFromPantry(String username, String item, Date purchasedate) throws IOException {
         Connection conn = DataBase.getCon();
 
         try {
@@ -855,9 +855,10 @@ public static int deleteFromPantry(String username, String item) throws IOExcept
                          ingID = rs0.getInt("ingredientID");
                         }
             PreparedStatement st = (PreparedStatement) conn
-                    .prepareStatement("DELETE FROM in_pantry WHERE username = ? and ingredientid = ?"); 
+                    .prepareStatement("DELETE FROM in_pantry WHERE username = ? and ingredientid = ? and purchasedate = ?"); 
             st.setString(1, username);
             st.setInt(2, ingID);
+            st.setDate(3, purchasedate);
             int rs = st.executeUpdate();
             if(rs == 1){
                 return 1;
@@ -1019,6 +1020,27 @@ public static ResultSet getUserRecipes (String user){
         }
         return null;
     }
+
+        /**
+     * Gets all ingredients belonging to a selected recipe
+     * @param recipeID      the recipes ID number / foreign key to recipe in recipe_requires
+     * @return              ResultSet of ingredients' recipe-specific name, quantity, unit
+     */
+    public static ResultSet getReview(int recipeid, String username){
+        Connection conn = getCon();
+        try{
+            PreparedStatement st = (PreparedStatement) conn
+                    .prepareStatement("SELECT  * from netizen_creates WHERE recipeid = ? and username = ? ");
+            st.setInt(1, recipeid);
+            st.setString(2, username);
+            ResultSet rs = st.executeQuery();
+            return rs;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return null;
+    }
+
 
 
     /**

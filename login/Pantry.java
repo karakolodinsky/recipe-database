@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.sql.Date;
 import java.sql.ResultSet;
 
 import javax.swing.*;
@@ -18,6 +19,7 @@ public class Pantry extends JFrame {
      * UserHome window width
      */
     public static int WIDTH_FRAME = 960;
+    Date date;
 
     /**
      * UserHome window height
@@ -150,6 +152,7 @@ public class Pantry extends JFrame {
         PantTbl.setBounds(100, 125, 775, 350);
         String user = UserLogin.getUsername();
         ResultSet rs;
+        
         try {
                 rs = DataBase.GetPantry(user);
                 PantTbl.setModel(DbUtils.resultSetToTableModel(rs));
@@ -173,6 +176,7 @@ public class Pantry extends JFrame {
                 public void mouseClicked(java.awt.event.MouseEvent evt) {
                     int row = PantTbl.rowAtPoint(evt.getPoint());
                     String ing = (String) PantTbl.getValueAt(row, 0);
+                    date = (Date) PantTbl.getValueAt(row, 1);
                     SelectedField.setText(ing);
                 }
             });
@@ -189,7 +193,7 @@ public class Pantry extends JFrame {
         delButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                        if (DataBase.deleteFromPantry(UserLogin.getUsername() , SelectedField.getText()) != -1){
+                        if (DataBase.deleteFromPantry(UserLogin.getUsername() , SelectedField.getText(), date) != -1){
                                 JOptionPane.showMessageDialog(contentPane, "Item deleted from your pantry.", "Deleted",
                                 JOptionPane.INFORMATION_MESSAGE);
                                         dispose();
