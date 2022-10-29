@@ -596,7 +596,9 @@ public class DataBase {
                             int ingredientID = rs2.getInt("ingredientid");
                             //String username = rs2.getString("username");
                             ArrayList<Date> toDelete = new ArrayList<Date>();
-                            int quantityLeft = rs1.getInt("quantity");
+                            // int quantityLeft = rs1.getInt("quantity");
+                            int recipeQuantity = rsFirstCheck.getInt("quantity");
+                            int quantityLeft = (int) (Math.ceil(scaleQuant * recipeQuantity));
                             rs2.previous();
                             boolean seen = false;
                             while(rs2.next() && quantityLeft > 0){
