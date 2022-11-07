@@ -135,6 +135,20 @@ public class UserHome extends JFrame {
         });
         contentPane.add(browseButton);
 
+        JButton recommendButton = new JButton("Recommendations");
+        recommendButton.setForeground(new Color(0, 0, 0));
+        recommendButton.setBackground(UIManager.getColor("Button.disabledForeground"));
+        recommendButton.setFont(new Font("Tahoma", Font.PLAIN, FONT_SIZE));
+        recommendButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                UserHome.this.dispose();
+                new Recommendation(user);
+                //browse.setTitle("Browse Recipes");
+                //browse.setVisible(true);
+            }
+        });
+        contentPane.add(recommendButton);
+
         JButton pantryButton = new JButton("My Pantry");
         pantryButton.setForeground(new Color(0, 0, 0));
         pantryButton.setBackground(UIManager.getColor("Button.disabledForeground"));
@@ -267,6 +281,7 @@ public class UserHome extends JFrame {
         newRecipeButton.setBounds((BORDER + (2 * (BUTTON_WIDTH + BORDER))), LOWER_BUTTON, BUTTON_WIDTH, BUTTON_HEIGHT);
         pantryButton.setBounds((BORDER + (3 * (BUTTON_WIDTH + BORDER))), LOWER_BUTTON, BUTTON_WIDTH, BUTTON_HEIGHT);
         newCategoryButton.setBounds((BORDER + (4 * (BUTTON_WIDTH + BORDER))), LOWER_BUTTON, BUTTON_WIDTH, BUTTON_HEIGHT);
+        recommendButton.setBounds((BORDER + (4 * (BUTTON_WIDTH + BORDER))), LOWER_BUTTON, BUTTON_WIDTH, BUTTON_HEIGHT);
 
 
 
