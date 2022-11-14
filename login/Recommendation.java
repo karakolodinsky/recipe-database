@@ -36,13 +36,44 @@ public class Recommendation extends JFrame{
 
     private void init (){
         JPanel contentPane = new JPanel();
+        Dimension space = new Dimension(960,20);
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
         contentPane.add(Box.createRigidArea(new Dimension(960,50)));
+        contentPane.add(topRate());
+        contentPane.add(Box.createRigidArea(space));
         contentPane.add(returnHome());
-        contentPane.add(Box.createRigidArea(new Dimension(960,20)));
+        contentPane.add(Box.createRigidArea(space));
         contentPane.add(logout());
         contentPane.add(Box.createRigidArea(new Dimension(960,50)));
         setContentPane(contentPane);
+    }
+
+    private JButton topRate () {
+        JButton btn = new JButton("Top Rated");
+        btn.addActionListener(new ActionListener(){
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Connection con = DataBase.getCon();
+                try {
+                    PreparedStatement ps = con.prepareStatement("SELECT * FROM recipepublic WHERE avgrating is not NULL "
+                                            + "ORDER BY avgrating DESC LIMIT 50;");
+                    boolean exec = ps.execute();
+
+                    if (exec) {
+                        ResultSet rs = ps.getResultSet();
+                        if ((rs.isBeforeFirst())) {
+                            new BrowseResult(user, rs);
+                        }
+        
+                    }
+                } catch (SQLException exception) {
+                    exception.printStackTrace();
+                }
+                
+            }});
+        btn.setAlignmentX(CENTER_ALIGNMENT);
+        return btn;
     }
 
     private JButton logout () {
