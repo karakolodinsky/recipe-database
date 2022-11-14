@@ -41,11 +41,40 @@ public class Recommendation extends JFrame{
         contentPane.add(Box.createRigidArea(new Dimension(960,50)));
         contentPane.add(topRate());
         contentPane.add(Box.createRigidArea(space));
+        contentPane.add(mostRecent());
+        contentPane.add(Box.createRigidArea(space));
         contentPane.add(returnHome());
         contentPane.add(Box.createRigidArea(space));
         contentPane.add(logout());
         contentPane.add(Box.createRigidArea(new Dimension(960,50)));
         setContentPane(contentPane);
+    }
+
+    private JButton mostRecent () {
+        JButton btn = new JButton("Most Recent");
+        btn.addActionListener(new ActionListener(){
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Connection con = DataBase.getCon();
+                try {
+                    PreparedStatement ps = con.prepareStatement("SELECT * FROM recipepublic ORDER BY date DESC LIMIT 50;");
+                    boolean exec = ps.execute();
+
+                    if (exec) {
+                        ResultSet rs = ps.getResultSet();
+                        if ((rs.isBeforeFirst())) {
+                            new BrowseResult(user, rs);
+                        }
+        
+                    }
+                } catch (SQLException exception) {
+                    exception.printStackTrace();
+                }
+                
+            }});
+        btn.setAlignmentX(CENTER_ALIGNMENT);
+        return btn;
     }
 
     private JButton topRate () {
