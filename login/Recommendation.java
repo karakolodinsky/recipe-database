@@ -38,15 +38,19 @@ public class Recommendation extends JFrame{
         JPanel contentPane = new JPanel();
         Dimension space = new Dimension(960,20);
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
-        contentPane.add(Box.createRigidArea(new Dimension(960,50)));
+        contentPane.add(Box.createRigidArea(new Dimension(960,60)));
         contentPane.add(topRate());
         contentPane.add(Box.createRigidArea(space));
         contentPane.add(mostRecent());
         contentPane.add(Box.createRigidArea(space));
+        contentPane.add(inPantry());
+        contentPane.add(Box.createRigidArea(space));
+        contentPane.add(recommend());
+        contentPane.add(Box.createRigidArea(space));
         contentPane.add(returnHome());
         contentPane.add(Box.createRigidArea(space));
         contentPane.add(logout());
-        contentPane.add(Box.createRigidArea(new Dimension(960,50)));
+        contentPane.add(Box.createRigidArea(new Dimension(960,60)));
         setContentPane(contentPane);
     }
 
@@ -76,6 +80,62 @@ public class Recommendation extends JFrame{
         btn.setAlignmentX(CENTER_ALIGNMENT);
         return btn;
     }
+
+    private JButton inPantry () {
+        JButton btn = new JButton("In the Pantry");
+        btn.addActionListener(new ActionListener(){
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Connection con = DataBase.getCon();
+                try {
+                    PreparedStatement ps = con.prepareStatement("");
+                    boolean exec = ps.execute();
+
+                    if (exec) {
+                        ResultSet rs = ps.getResultSet();
+                        if ((rs.isBeforeFirst())) {
+                            new BrowseResult(user, rs);
+                        }
+        
+                    }
+                } catch (SQLException exception) {
+                    exception.printStackTrace();
+                }
+                
+            }});
+        btn.setAlignmentX(CENTER_ALIGNMENT);
+        return btn;
+    }
+
+    private JButton recommend () {
+        JButton btn = new JButton("Recommended");
+        btn.addActionListener(new ActionListener(){
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Connection con = DataBase.getCon();
+                try {
+                    PreparedStatement ps = con.prepareStatement("");
+                    boolean exec = ps.execute();
+
+                    if (exec) {
+                        ResultSet rs = ps.getResultSet();
+                        if ((rs.isBeforeFirst())) {
+                            new BrowseResult(user, rs);
+                        }
+        
+                    }
+                } catch (SQLException exception) {
+                    exception.printStackTrace();
+                }
+                
+            }});
+        btn.setAlignmentX(CENTER_ALIGNMENT);
+        return btn;
+    }
+
+
 
     private JButton topRate () {
         JButton btn = new JButton("Top Rated");
