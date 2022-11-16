@@ -12,8 +12,6 @@ import java.security.spec.InvalidKeySpecException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Calendar;
-// import java.util.Date;
 import java.sql.Date;
 import java.lang.Math;
 
@@ -172,16 +170,15 @@ public class DataBase {
 
         try {
             PreparedStatement st = (PreparedStatement) conn
-                    .prepareStatement("Select username, passwordhash, salt from netizen where username=? and passwordhash=?;");
+                    .prepareStatement("Select username, passwordhash, salt from netizen where username=?;");
 
             st.setString(1, username);
-            st.setString(2, password);
             ResultSet rs = st.executeQuery();
             if (rs.next()) {
-                //String hashed = rs.getString("passwordhash");
-                //String salt = rs.getString("salt");
-                //String hashPass = hashPassword(password, salt);
-                //if (hashPass.equals(hashed)) {
+                String hashed = rs.getString("passwordhash");
+                String salt = rs.getString("salt");
+                String hashPass = hashPassword(password, salt);
+                if (hashPass.equals(hashed)) {
                     PreparedStatement st1 = (PreparedStatement) conn.prepareStatement("UPDATE netizen SET lastaccessdate = CURRENT_TIMESTAMP where username = ?");
                     st1.setString(1, username);
                     st1.executeUpdate();
@@ -190,7 +187,7 @@ public class DataBase {
                     //update most recent access date
                 }
                 
-            //}
+            }
         } catch (SQLException e) {
 
             JOptionPane.showMessageDialog(null, "Database statement error", "Database",
@@ -208,11 +205,11 @@ public class DataBase {
         try {
             PreparedStatement st = (PreparedStatement) conn
                     .prepareStatement("INSERT INTO netizen VALUES (?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, ?);");
-            //String salt = generateSalt(); 
-            //String hashPsswrd = hashPassword(password, salt);   
+            String salt = generateSalt(); 
+            String hashPsswrd = hashPassword(password, salt);   
             st.setString(1, username);
-            st.setString(2, password);
-            st.setString(3, "");
+            st.setString(2, hashPsswrd);
+            st.setString(3, salt);
             System.out.println(st);
             int rs = st.executeUpdate();
             if(rs == 1){
@@ -632,7 +629,7 @@ public class DataBase {
                                     stUpdQty.setInt(2, ingredientID);
                                     stUpdQty.setString(3, user);
                                     stUpdQty.setDate(4, purchaseDate);
-                                    int rsUpdQty = stUpdQty.executeUpdate();
+                                    stUpdQty.executeUpdate();
                                 }
                             }
                             if(quantityLeft <= 0){
@@ -647,7 +644,7 @@ public class DataBase {
                                     stDelete.setInt(1, ingredientID);
                                     stDelete.setString(2, user);
                                     stDelete.setDate(3, thisPurchaseDate);
-                                    int rsDelete = stDelete.executeUpdate();
+                                    stDelete.executeUpdate();
                                 }
                             }
                             else{
@@ -738,7 +735,7 @@ public class DataBase {
     public static int DeleteRecipe(int recipeId){
 
         try {
-            ResultSet rs = null;
+            //ResultSet rs = null;
             PreparedStatement st = con.prepareStatement("SELECT recipeId FROM netizen_creates WHERE recipeId=?;");
             st.setInt(1, recipeId);
             boolean exists = st.execute();
@@ -825,7 +822,7 @@ public class DataBase {
      */
     public static int getMaxRecipeId (){
         Connection conn = DataBase.getCon();
-        int newId;
+        //int newId;
         try{
             PreparedStatement id = (PreparedStatement) conn .prepareStatement("SELECT MAX(R.RECIPEID) " +
                                                                                 "FROM RECIPE AS R;");

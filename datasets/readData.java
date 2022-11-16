@@ -1,12 +1,9 @@
 package datasets;
-
+import login.DataBase;
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,16 +14,9 @@ import java.sql.DriverManager;
 import java.util.Random;
 //import java.util.random.*;
 
-import javax.annotation.processing.Filer;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
-import javax.swing.JOptionPane;
-
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
-
-import login.DataBase;
 
 public class readData {
 
@@ -316,13 +306,56 @@ public class readData {
                     st.executeUpdate();
                 }
             } catch (SQLException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
 
         br.close();
         fr.close();
+    }
+
+    /*
+     * from https://www.baeldung.com/java-random-string
+     */
+    private String generatePsswrd() {
+        int leftLimit = 48; // numeral '0'
+        int rightLimit = 122; // letter 'z'
+        int targetStringLength = 10;
+        Random random = new Random();
+    
+        String generatedString = random.ints(leftLimit, rightLimit + 1)
+          .filter(i -> (i <= 57 || i >= 65) && (i <= 90 || i >= 97))
+          .limit(targetStringLength)
+          .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+          .toString();
+    
+        return generatedString;
+    }
+
+    private void updatePsswrd (Connection con) throws IOException {
+        PreparedStatement st;
+        try {
+            st = con.prepareStatement("SELECT username, passwordhash FROM netizen WHERE salt=?;");
+            st.setString(1, "[B@145f66e3");
+            st.execute();
+            ResultSet rs = st.getResultSet();
+            if (rs.isBeforeFirst()) {
+                while (rs.next()) {
+                    String username = rs.getString("username");
+                    String password = generatePsswrd();
+                    st = con.prepareStatement("UPDATE netizen SET passwordhash = ?, salt = ? WHERE username = ?;");
+                    String salt = DataBase.generateSalt(); 
+                    String hashPsswrd = DataBase.hashPassword(password, salt);   
+                    st.setString(1, hashPsswrd);
+                    st.setString(2, salt);
+                    st.setString(3, username);
+                    st.executeUpdate();
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private Connection dbLogin (String username, String password) {
@@ -376,9 +409,10 @@ public class readData {
         // Uncomment the below to read in the recipe review data
         readData rd = new readData();
         Connection con = rd.dbLogin(username, password);
-        //rd.readRecipes(con);
-        //rd.getDates(con);
+        rd.readRecipes(con);
+        rd.getDates(con);
         rd.readReviews(con);
+        rd.updatePsswrd(con);
         System.exit(1);
     }
     
