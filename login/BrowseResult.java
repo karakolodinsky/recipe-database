@@ -2,11 +2,8 @@ package login;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,7 +12,7 @@ import java.sql.SQLException;
 
 public class BrowseResult extends JFrame {
 
-    private String user;
+    //private String user;
     private JScrollPane contentPane;
     public static final int WIDTH_FRAME = 1200;
     public static final int HEIGHT_FRAME = 600;
@@ -25,7 +22,7 @@ public class BrowseResult extends JFrame {
 
     public BrowseResult (String user, ResultSet rs) throws SQLException {
         super("Browse Results");
-        this.user = user;
+        //this.user = user;
         this.rs = rs;
         setResizable(false);
         setLayout(null);
@@ -58,7 +55,6 @@ public class BrowseResult extends JFrame {
                 try {
                     new DisplayRecipe(btnText, recipeId, btnText);
                 } catch (SQLException e1) {
-                    // TODO Auto-generated catch block
                     e1.printStackTrace();
                 }
                 
@@ -90,7 +86,6 @@ public class BrowseResult extends JFrame {
                 try {
                     new BrowseResult("test", null);
                 } catch (SQLException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
             }

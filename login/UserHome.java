@@ -67,7 +67,6 @@ public class UserHome extends JFrame {
 
     //user = userSes;
 
-    private JMenuBar menuBar_menubar;
     private JPanel contentPane;
 
     public UserHome(){
@@ -93,9 +92,10 @@ public class UserHome extends JFrame {
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         setContentPane(contentPane);
         contentPane.setLayout(null);
+        contentPane.setBackground(new Color(196,239,255,255));
         JButton btnNewButton = new JButton("Logout");
         btnNewButton.setForeground(new Color(0, 0, 0));
-        btnNewButton.setBackground(UIManager.getColor("Button.disabledForeground"));
+        btnNewButton.setBackground(new Color (255,213,237,255));
 
         btnNewButton.setFont(new Font("Tahoma", Font.PLAIN, FONT_SIZE));
 
@@ -123,7 +123,7 @@ public class UserHome extends JFrame {
         contentPane.add(btnNewButton);
         JButton browseButton = new JButton("Browse Recipes");
         browseButton.setForeground(new Color(0, 0, 0));
-        browseButton.setBackground(UIManager.getColor("Button.disabledForeground"));
+        browseButton.setBackground(new Color (255,213,237,255));
         browseButton.setFont(new Font("Tahoma", Font.PLAIN, FONT_SIZE));
         browseButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -137,7 +137,7 @@ public class UserHome extends JFrame {
 
         JButton recommendButton = new JButton("Recommendations");
         recommendButton.setForeground(new Color(0, 0, 0));
-        recommendButton.setBackground(UIManager.getColor("Button.disabledForeground"));
+        recommendButton.setBackground(new Color (255,213,237,255));
         recommendButton.setFont(new Font("Tahoma", Font.PLAIN, FONT_SIZE));
         recommendButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -151,7 +151,7 @@ public class UserHome extends JFrame {
 
         JButton pantryButton = new JButton("My Pantry");
         pantryButton.setForeground(new Color(0, 0, 0));
-        pantryButton.setBackground(UIManager.getColor("Button.disabledForeground"));
+        pantryButton.setBackground(new Color (255,213,237,255));
         pantryButton.setFont(new Font("Tahoma", Font.PLAIN, FONT_SIZE));
         pantryButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -179,7 +179,7 @@ public class UserHome extends JFrame {
         //contentPane.add(button);
 
         JButton newRecipeButton = new JButton("Create new Recipe");
-        newRecipeButton.setBackground(UIManager.getColor("Button.disabledForeground"));
+        newRecipeButton.setBackground(new Color (255,213,237,255));
         newRecipeButton.setFont(new Font("Tahoma", Font.PLAIN, FONT_SIZE));
         //newRecipeButton.setBounds(247, 320, 491, 114);
         newRecipeButton.addActionListener(new ActionListener() {
@@ -196,7 +196,7 @@ public class UserHome extends JFrame {
 
 
         JButton editRecipeButton = new JButton("View My Recipes");
-        editRecipeButton.setBackground(UIManager.getColor("Button.disabledForeground"));
+        editRecipeButton.setBackground(new Color (255,213,237,255));
         editRecipeButton.setFont(new Font("Tahoma", Font.PLAIN, FONT_SIZE));
         //editRecipeButton.setBounds(247, 320, 491, 114);
         editRecipeButton.addActionListener(new ActionListener() {
@@ -209,7 +209,6 @@ public class UserHome extends JFrame {
                         newR.setTitle("Create a recipe:");
                         newR.setVisible(true);
                 } catch (SQLException e1) {
-                        // TODO Auto-generated catch block
                         e1.printStackTrace();
                 }
             }
@@ -219,12 +218,12 @@ public class UserHome extends JFrame {
         /** Create a new category */
         JButton newCategoryButton = new JButton("Create a Category");
         newCategoryButton.setForeground(new Color(0, 0, 0));
-        newCategoryButton.setBackground(UIManager.getColor("Button.disabledForeground"));
+        newCategoryButton.setBackground(new Color (255,213,237,255));
         newCategoryButton.setFont(new Font("Tahoma", Font.PLAIN, FONT_SIZE));
         newCategoryButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 UserHome.this.dispose();
-                NewCategory newR = new NewCategory(user);
+                new NewCategory(user);
             }
         });
         contentPane.add(newCategoryButton);
@@ -268,9 +267,9 @@ public class UserHome extends JFrame {
 
         /** Cooking mama */
         try{
-            BufferedImage myPicture = ImageIO.read(new File("./login/mama.jpg"));
+            BufferedImage myPicture = ImageIO.read(new File("./login/mama2.0.png"));
             JLabel picLabel = new JLabel(new ImageIcon(myPicture));
-            picLabel.setBounds((int) Math.floor(WIDTH_FRAME/3), 200, 310, 359);
+            picLabel.setBounds((int) Math.floor(WIDTH_FRAME/3), 200, 300, 350);
             add(picLabel);
         } catch (IOException e) { e.printStackTrace(); }
 

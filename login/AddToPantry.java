@@ -9,16 +9,9 @@ import java.sql.*;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
-import java.util.Locale;
-import java.util.Properties;
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.text.DateFormatter;
-import javax.swing.text.AbstractDocument.Content;
 import java.util.Date;
 
 /**
@@ -42,13 +35,9 @@ public class AddToPantry extends JFrame {
      */
     public static final int HEIGHT_FRAME = 360;
 
-
-    private JTextField ingredientJLabel;
-    private JButton btnNewButton;
-    private JButton RegisterButton;
     private JLabel label_errorText;
     private JPanel contentPane;
-    private Insets insets;
+    //private Insets insets;
 
 
     public AddToPantry() {
@@ -61,7 +50,7 @@ public class AddToPantry extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setVisible(true);
 
-        insets = this.getInsets();
+        //insets = this.getInsets();
 
         init();
 

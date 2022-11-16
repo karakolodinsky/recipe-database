@@ -10,8 +10,6 @@ import java.sql.*;
 
 public class Browse extends JFrame {
 
-    static private String netizenUsername;
-
     static private String user;
 
     static private String search = "Name";
@@ -44,7 +42,7 @@ public class Browse extends JFrame {
     public Browse(String user) {  
         //Providing Title  
         super("Browse"); 
-        this.user = user; 
+        Browse.user = user; 
         setResizable(false);
         setSize(WIDTH_FRAME, HEIGHT_FRAME);
         setLocationRelativeTo(null);
