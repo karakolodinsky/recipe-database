@@ -6,7 +6,7 @@ import java.sql.*;
 
 public class Recommendation extends JFrame{
 
-    static private String user;
+    private String user;
 
     /**
      * login window width
@@ -22,7 +22,7 @@ public class Recommendation extends JFrame{
     
     public Recommendation (String user) {
         super("Recommendation"); 
-        Recommendation.user = user; 
+        this.user = user; 
         setResizable(false);
         setSize(WIDTH_FRAME, HEIGHT_FRAME);
         setLocationRelativeTo(null);
@@ -37,8 +37,9 @@ public class Recommendation extends JFrame{
     private void init (){
         JPanel contentPane = new JPanel();
         Dimension space = new Dimension(960,20);
+        contentPane.setBackground(new Color(196,239,255,255));
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
-        contentPane.add(Box.createRigidArea(new Dimension(960,60)));
+        contentPane.add(Box.createRigidArea(new Dimension(960,150)));
         contentPane.add(topRate());
         contentPane.add(Box.createRigidArea(space));
         contentPane.add(mostRecent());
@@ -50,7 +51,7 @@ public class Recommendation extends JFrame{
         contentPane.add(returnHome());
         contentPane.add(Box.createRigidArea(space));
         contentPane.add(logout());
-        contentPane.add(Box.createRigidArea(new Dimension(960,60)));
+        //contentPane.add(Box.createRigidArea(new Dimension(960,80)));
         setContentPane(contentPane);
     }
 
@@ -77,6 +78,7 @@ public class Recommendation extends JFrame{
                 }
                 
             }});
+        btn.setBackground(new Color (255,213,237,255));
         btn.setAlignmentX(CENTER_ALIGNMENT);
         return btn;
     }
@@ -105,6 +107,7 @@ public class Recommendation extends JFrame{
                 
             }});
         btn.setAlignmentX(CENTER_ALIGNMENT);
+        btn.setBackground(new Color (255,213,237,255));
         return btn;
     }
 
@@ -116,7 +119,12 @@ public class Recommendation extends JFrame{
             public void actionPerformed(ActionEvent e) {
                 Connection con = DataBase.getCon();
                 try {
-                    PreparedStatement ps = con.prepareStatement("");
+                    PreparedStatement ps = con.prepareStatement("SELECT * FROM recipepublic WHERE recipeid IN (SELECT DISTINCT nc2.recipeid FROM " +
+                                            "(SELECT * FROM netizen_creates WHERE username = ?) AS nc1 " +
+                                            "JOIN netizen_creates AS nc2 ON (nc1.recipeid = nc2.recipeid) WHERE nc2.username != ?) " +
+                                            "ORDER BY avgrating DESC;");
+                    ps.setString(1, user);
+                    ps.setString(2, user);
                     boolean exec = ps.execute();
 
                     if (exec) {
@@ -131,6 +139,7 @@ public class Recommendation extends JFrame{
                 }
                 
             }});
+        btn.setBackground(new Color (255,213,237,255));
         btn.setAlignmentX(CENTER_ALIGNMENT);
         return btn;
     }
@@ -162,6 +171,7 @@ public class Recommendation extends JFrame{
                 
             }});
         btn.setAlignmentX(CENTER_ALIGNMENT);
+        btn.setBackground(new Color (255,213,237,255));
         return btn;
     }
 
@@ -182,6 +192,7 @@ public class Recommendation extends JFrame{
             }
         });
         btnNewButton.setAlignmentX(CENTER_ALIGNMENT);
+        btnNewButton.setBackground(new Color (255,213,237,255));
         //btnNewButton.setAlignmentY(CENTER_ALIGNMENT);
         return btnNewButton;
     }
@@ -202,6 +213,7 @@ public class Recommendation extends JFrame{
             }
         });
         home.setAlignmentX(CENTER_ALIGNMENT);
+        home.setBackground(new Color (255,213,237,255));
         //home.setAlignmentY(CENTER_ALIGNMENT);
         return home;
     }

@@ -142,7 +142,7 @@ public class UserHome extends JFrame {
         recommendButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 UserHome.this.dispose();
-                new Recommendation(user);
+                new Recommendation(netizenUsername);
                 //browse.setTitle("Browse Recipes");
                 //browse.setVisible(true);
             }
