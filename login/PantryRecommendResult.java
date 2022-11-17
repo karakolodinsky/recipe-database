@@ -71,7 +71,7 @@ public class PantryRecommendResult extends JFrame {
         Connection con = DataBase.getCon();
         int size = recipeids.size();
         for (int i = 0; i < size; i++) {
-            PreparedStatement ps = con.prepareStatement("SELECT * FROM recipepublic WHERE recipeid = ?");
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM recipepublic WHERE recipeid = ?;");
             ps.setInt(1, recipeids.get(i));
             ResultSet rs = ps.executeQuery();
             rs.next();

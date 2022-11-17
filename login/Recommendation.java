@@ -10,6 +10,11 @@ public class Recommendation extends JFrame{
     private static String user;
     private ArrayList<Integer> pantryRecipes;
 
+    // unit conversions
+    // 1 fl oz is about the same as an oz
+    // 1 oz = 28.3 grams
+    private static final double GRAMS = 28.3;
+
     /**
      * login window width
      */
@@ -58,6 +63,41 @@ public class Recommendation extends JFrame{
         setContentPane(contentPane);
     }
 
+    private int unitConv (String recUnit, String panUnit, int qtyHave) {
+        // no conversion needed
+        if (recUnit.equals(panUnit)) {
+            return qtyHave;
+        }
+        // if no unit is specified, assume no conversion is needed
+        if (recUnit.equals("") || panUnit.equals("")) {
+            return qtyHave;
+        }
+        if (recUnit.equals("fl oz")) {
+            if (panUnit.equals("oz")) {
+                return qtyHave;
+            }
+            // qtyHave must be grams -> convert to oz
+            else {
+                qtyHave = (int)(qtyHave / GRAMS);
+                return qtyHave;
+            }
+        }
+        if (recUnit.equals("oz")) {
+            if (panUnit.equals("fl oz")) {
+                return qtyHave;
+            }
+            else {
+                qtyHave = (int)(qtyHave / GRAMS);
+                return qtyHave;
+            }
+        }
+        // recUnit is grams and panUnit is oz/fl oz
+        else {
+            qtyHave = (int)(qtyHave * GRAMS);
+            return qtyHave;
+        } 
+    }
+
     private void checkIngrCount (ResultSet rs) {
         Connection con = DataBase.getCon();
         try {
@@ -73,13 +113,16 @@ public class Recommendation extends JFrame{
                 while (result.next()) {
                     int ingredientid = result.getInt("ingredientid");
                     int qtyRequired = result.getInt("quantity");
+                    String unit = result.getString("unit");
                     ps = con.prepareStatement("SELECT quantitycurr, unit FROM in_pantry WHERE username = ? AND ingredientid = ? ORDER BY expirationdate ASC;");
                     ps.setString(1, user);
                     ps.setInt(2, ingredientid);
                     ResultSet result2 = ps.executeQuery();
                     // for each instance of ingredient in user's pantry
                     while (result2.next()) {
+                        String unit2 = result2.getString("unit");
                         int qtyHave = result2.getInt("quantitycurr");
+                        qtyHave = unitConv(unit, unit2, qtyHave);
                         qtyRequired -= qtyHave;
                     }
                     if (qtyRequired > 0) {
