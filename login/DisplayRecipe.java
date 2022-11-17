@@ -153,13 +153,33 @@ public class DisplayRecipe extends JFrame {
                             "yo", JOptionPane.ERROR_MESSAGE);
                 }
                 else {
-                        EventQueue.invokeLater(new Runnable() {
-                                @Override
-                                public void run() {
-                                    new Review(recipeId, scaleQuant);
-                                    int y = DataBase.cookRecipe(recipeId, scaleQuant);
-                                }
-                            });
+                        Connection con = DataBase.getCon();
+                        try {
+                            PreparedStatement ps = con.prepareStatement("Select username FROM netizen_creates WHERE username=? AND recipeid=?;");
+                            ps.setString(1, user);
+                            ps.setInt(2, recipeId);
+                            ps.execute();
+                            ResultSet rs = ps.getResultSet();
+                            if (!rs.isBeforeFirst()) {
+                                EventQueue.invokeLater(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        new Review(recipeId, scaleQuant);
+                                        DataBase.cookRecipe(recipeId, scaleQuant);
+                                    }
+                                });
+                            }
+                            else {
+                                EventQueue.invokeLater(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        DataBase.cookRecipe(recipeId, scaleQuant);
+                                    }
+                                });
+                            }
+                        } catch (SQLException e1) {
+                            e1.printStackTrace();
+                        }
                 }
             }
         });

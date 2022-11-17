@@ -16,13 +16,14 @@ public class BrowseResult extends JFrame {
     private JScrollPane contentPane;
     public static final int WIDTH_FRAME = 1200;
     public static final int HEIGHT_FRAME = 600;
+    private String user;
     private JPanel panel;
     private ResultSet rs;
 
 
     public BrowseResult (String user, ResultSet rs) throws SQLException {
         super("Browse Results");
-        //this.user = user;
+        this.user = user;
         this.rs = rs;
         setResizable(false);
         setLayout(null);
@@ -53,7 +54,7 @@ public class BrowseResult extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    new DisplayRecipe(btnText, recipeId, btnText);
+                    new DisplayRecipe(user, recipeId, btnText);
                 } catch (SQLException e1) {
                     e1.printStackTrace();
                 }
