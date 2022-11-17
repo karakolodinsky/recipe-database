@@ -2,11 +2,13 @@ package login;
 import javax.swing.*;
 import java.awt.*;  
 import java.awt.event.*;
-import java.sql.*;  
+import java.sql.*;
+import java.util.ArrayList;  
 
 public class Recommendation extends JFrame{
 
-    private String user;
+    private static String user;
+    private ArrayList<Integer> pantryRecipes;
 
     /**
      * login window width
@@ -20,9 +22,10 @@ public class Recommendation extends JFrame{
 
     //Creating Constructor for initializing JFrame components 
     
-    public Recommendation (String user) {
+    public Recommendation (String userStr) {
         super("Recommendation"); 
-        this.user = user; 
+        user = userStr; 
+        pantryRecipes = new ArrayList<>();
         setResizable(false);
         setSize(WIDTH_FRAME, HEIGHT_FRAME);
         setLocationRelativeTo(null);
@@ -53,6 +56,41 @@ public class Recommendation extends JFrame{
         contentPane.add(logout());
         //contentPane.add(Box.createRigidArea(new Dimension(960,80)));
         setContentPane(contentPane);
+    }
+
+    private void checkIngrCount (ResultSet rs) {
+        Connection con = DataBase.getCon();
+        try {
+            // for each recipe
+            while (rs.next()) {
+                int size = pantryRecipes.size();
+                int recipeid = rs.getInt("recipeid");
+                pantryRecipes.add(recipeid);
+                PreparedStatement ps = con.prepareStatement("SELECT ingredientid, quantity, unit FROM recipe_requires WHERE recipeid = ?;");
+                ps.setInt(1, recipeid);
+                ResultSet result = ps.executeQuery();
+                //for each ingredient in recipe
+                while (result.next()) {
+                    int ingredientid = result.getInt("ingredientid");
+                    int qtyRequired = result.getInt("quantity");
+                    ps = con.prepareStatement("SELECT quantitycurr, unit FROM in_pantry WHERE username = ? AND ingredientid = ? ORDER BY expirationdate ASC;");
+                    ps.setString(1, user);
+                    ps.setInt(2, ingredientid);
+                    ResultSet result2 = ps.executeQuery();
+                    // for each instance of ingredient in user's pantry
+                    while (result2.next()) {
+                        int qtyHave = result2.getInt("quantitycurr");
+                        qtyRequired -= qtyHave;
+                    }
+                    if (qtyRequired > 0) {
+                        pantryRecipes.remove(size);
+                    }
+                }
+                
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private JButton mostRecent () {
@@ -91,13 +129,32 @@ public class Recommendation extends JFrame{
             public void actionPerformed(ActionEvent e) {
                 Connection con = DataBase.getCon();
                 try {
-                    PreparedStatement ps = con.prepareStatement("");
+                    PreparedStatement ps = con.prepareStatement("WITH tableone as (" +
+                        "SELECT rr.recipeid, COUNT(DISTINCT rr.ingredientid) as ingr_in_pant " +
+                        "FROM recipe_requires as rr " +
+                        "JOIN in_pantry as ip on rr.ingredientid = ip.ingredientid " +
+                        "JOIN recipe as r on r.recipeid = rr.recipeid " +
+                        "WHERE ip.username = ? " +
+                        "GROUP BY rr.recipeid ), " +
+                        "tabletwo as (" +
+                            "SELECT rr.recipeid, COUNT(DISTINCT rr.ingredientid) as ingr_needed " +
+                            "FROM recipe_requires as rr " +
+                            "GROUP BY rr.recipeid) " +
+                        "SELECT DISTINCT tableone.recipeid, rp.avgrating from tableone " +
+                        "JOIN tabletwo on ingr_in_pant = ingr_needed " +
+                        "AND tableone.recipeid = tabletwo.recipeid " +
+                        "JOIN recipepublic as rp on rp.recipeid = tableone.recipeid " +
+                        "ORDER BY rp.avgrating DESC;"); 
+                    ps.setString(1, user);
                     boolean exec = ps.execute();
 
                     if (exec) {
                         ResultSet rs = ps.getResultSet();
-                        if ((rs.isBeforeFirst())) {
-                            new BrowseResult(user, rs);
+                        if (rs.isBeforeFirst()) {
+                            checkIngrCount(rs);
+                            if (pantryRecipes.size() > 0) {
+                                new PantryRecommendResult(user, pantryRecipes);
+                            }
                         }
         
                     }
@@ -217,6 +274,7 @@ public class Recommendation extends JFrame{
         //home.setAlignmentY(CENTER_ALIGNMENT);
         return home;
     }
+
 
     //Running Constructor  
     public static void main(String args[]) {  
